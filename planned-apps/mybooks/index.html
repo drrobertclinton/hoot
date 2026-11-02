@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>My Books</title>
+<meta name="description" content="A reading buddy for kids 8 to 12: read any book, time your reading, snap a page to learn tricky words, practice reading aloud and earn badges.">
+<meta name="theme-color" content="#6a3fc8">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="core.css">
+<style>
+:root{--bg:#f6f3ff;--card:#fff;--soft:#efe8ff;--ink:#2a1f4a;--muted:#6a6385;--line:#e2daf6;--accent:#6a3fc8;--accent2:#5a2fb6;--blue:#ff8a00;--sun:#ff9f1c;--radius:20px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17122a;--card:#211a3a;--soft:#2c2350;--ink:#f1edff;--muted:#b5acd6;--line:#352b5e;--accent:#a17cff;--accent2:#bba0ff}}
+body{font-family:'Nunito',system-ui,sans-serif;font-size:17px}
+.btn{border-radius:16px;font-weight:900}
+.btn.sun{background:var(--sun);border-color:var(--sun)}
+.timer{font-size:4rem;font-weight:900;letter-spacing:-.02em;text-align:center;font-variant-numeric:tabular-nums}
+.book{display:flex;gap:14px;align-items:center}
+.cover{width:64px;height:92px;border-radius:8px;background:var(--soft) center/cover;flex:none;display:grid;place-items:center;font-size:1.8rem;box-shadow:0 2px 8px rgba(40,20,90,.15)}
+.pagetext{font-size:1.25rem;line-height:2.1;word-spacing:.08em}
+.pagetext .w{cursor:pointer;border-radius:6px;padding:2px 1px}
+.pagetext .w:hover,.pagetext .w.sel{background:var(--soft);outline:2px solid var(--accent)}
+.pagetext .w.now{background:#ffe08a;color:#2a1f4a}
+.pagetext .w.miss{text-decoration:underline wavy var(--sun) 2px;text-underline-offset:5px}
+.pagetext .w.ok{color:var(--accent2)}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.badge{text-align:center;padding:14px 6px;border-radius:18px;background:var(--card);border:1px solid var(--line)}
+.badge .e{font-size:2.2rem;line-height:1.1;filter:grayscale(1);opacity:.35}
+.badge.on .e{filter:none;opacity:1}
+.badge b{display:block;font-size:.82rem;margin-top:4px}
+.badge span{font-size:.7rem;color:var(--muted)}
+.wordbig{font-size:2.4rem;font-weight:900;letter-spacing:-.01em}
+.rec{width:14px;height:14px;border-radius:50%;background:#e33;display:inline-block;animation:p 1s infinite}
+@keyframes p{50%{opacity:.3}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top"><img class="logo" src="icon.svg" alt=""><h1><small>Reading buddy</small>My Books</h1><span class="sp"></span></header>
+  <main id="main"></main>
+</div>
+<script src="core.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

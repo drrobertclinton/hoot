@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Who Is in Charge? Daily</title>
+<meta name="description" content="A 30-day devotional for men and fathers: one thought, one Scripture and one thing to do today. From the book Who Is in Charge? by Robert Clinton, MD.">
+<meta name="theme-color" content="#1d2b3a">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="core.css">
+<style>
+:root{--bg:#f7f4ee;--card:#fffdf9;--soft:#f0e9dc;--ink:#1d2b3a;--muted:#5d6672;--line:#e3dccd;--accent:#a8741f;--accent2:#8a5d14;--blue:#2f5876}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1822;--card:#16222f;--soft:#1e2d3c;--ink:#efe9de;--muted:#a9b2bc;--line:#26384a;--accent:#d4a24c;--accent2:#e6bb6c;--blue:#7fa8c8}}
+.serif{font-family:'Source Serif 4',Georgia,serif}
+.top{background:color-mix(in srgb,var(--bg) 92%,transparent)}
+.scripture{font-family:'Source Serif 4',Georgia,serif;font-size:1.22rem;line-height:1.55;border-left:3px solid var(--accent);padding:4px 0 4px 16px;margin:8px 0 6px}
+.ref{font-weight:800;font-size:.85rem;color:var(--accent2)}
+.thought p{font-family:'Source Serif 4',Georgia,serif;font-size:1.1rem;line-height:1.7;margin-bottom:14px}
+.dtitle{font-family:'Source Serif 4',Georgia,serif;font-weight:600;font-size:2rem;line-height:1.15;margin:4px 0 10px;letter-spacing:-.01em}
+.daygrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.daygrid button{aspect-ratio:1;border-radius:12px;border:1px solid var(--line);background:var(--card);font-weight:800;cursor:pointer;position:relative}
+.daygrid button.read{background:var(--soft)}
+.daygrid button.did::after{content:'';position:absolute;right:5px;top:5px;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.daygrid button.cur{outline:2px solid var(--accent);outline-offset:1px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top"><img class="logo" src="icon.svg" alt=""><h1><small>Who Is in Charge?</small>Daily</h1><span class="sp"></span><button class="iconbtn" id="share" aria-label="Share today's verse"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M7 8l5-5 5 5"/></svg></button></header>
+  <main id="main"></main>
+</div>
+<script src="core.js"></script>
+<script src="days.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
