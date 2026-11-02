@@ -14,7 +14,7 @@ The browser can only ask for fixed jobs (named course, unit and mode) and never 
 - `public/index.html` – the kids' app (sets and scores stay in the browser), with the grown-up agreement screen.
 - `public/tutor.html` – the course tutor: pick a course and unit, Learn / Practice / Homework / Mastery check. Grown-up PIN sets the answer setting and state.
 - `public/curriculum.mjs` – every course and unit, shared by the page and the server.
-- `lib/tutor.mjs` – the tutor's teaching rules, answer settings, safety rules and the mastery check.
+- `lib/tutor.mjs` – the tutor's teaching rules, answer settings, safety rules, the mastery check, the course-wide quick check, and reading a teacher's report to find weak units. State tests are named for all 50 states and DC.
 - `public/teacher.html` – teachers make a class and share study guides.
 - `public/privacy.html` – privacy notice.
 - `public/maker.js`, `public/style.css` – shared by the pages.

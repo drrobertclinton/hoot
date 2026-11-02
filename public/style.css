@@ -157,3 +157,5 @@ select, input[type=password] { font: 17px var(--body); padding: 12px 14px; borde
 textarea:focus-visible, select:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px }
 .feature { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); text-decoration: none }
 .feature .muted { color: inherit; opacity: .85 }
+h3 { font-size: 18px; font-weight: 800 }
+.note { text-align: center }

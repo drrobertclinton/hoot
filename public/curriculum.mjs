@@ -81,16 +81,32 @@ export const COURSES = [
   c("act-sci", "prep", "Test prep", "ACT Science", "ACT", ["Pacing and strategy", "Reading tables and graphs", "Research summaries and experiments", "Conflicting viewpoints", "Outside science knowledge you need", "Timed practice"]),
   c("psat", "prep", "Test prep", "PSAT/NMSQT", "PSAT", ["How the PSAT and National Merit work", "Reading and writing skills", "Algebra", "Advanced math", "Problem solving and data", "Geometry and trigonometry", "Timed practice"]),
 
-  // ---------- State tests (North Carolina first) ----------
-  c("nc-eog-read", "state", "State tests", "NC EOG Reading (grades 3–8)", "3–8", ["How the EOG works", "Literary text: key ideas", "Literary text: craft and structure", "Informational text: key ideas", "Informational text: craft and structure", "Comparing texts", "Vocabulary and word meaning", "Timed practice by grade"]),
-  c("nc-eog-math", "state", "State tests", "NC EOG Math (grades 3–8)", "3–8", ["How the EOG works and calculator rules", "Numbers and operations", "Fractions and decimals", "Ratios and proportions", "Expressions and equations", "Functions", "Geometry and measurement", "Statistics and probability", "Timed practice by grade"]),
-  c("nc-eog-sci", "state", "State tests", "NC EOG Science (grades 5 and 8)", "5, 8", ["How the EOG works", "Forces, motion and energy", "Matter and its properties", "Earth systems and weather", "Ecosystems", "Body systems and cells", "Evolution and genetics (grade 8)", "Timed practice"]),
-  c("nc-eoc-math1", "state", "State tests", "NC EOC Math 1", "HS", ["How the EOC works", "Linear functions", "Systems", "Exponential functions", "Quadratic functions", "Statistics", "Timed practice"]),
-  c("nc-eoc-math3", "state", "State tests", "NC EOC Math 3", "HS", ["How the EOC works", "Polynomial and rational functions", "Exponential and logarithmic functions", "Trigonometric functions", "Geometry and circles", "Statistics and modeling", "Timed practice"]),
-  c("nc-eoc-bio", "state", "State tests", "NC EOC Biology", "HS", ["How the EOC works", "Cells and transport", "Energy in living things", "Genetics and DNA", "Evolution", "Ecology", "Timed practice"]),
-  c("nc-eoc-eng2", "state", "State tests", "NC EOC English II", "HS", ["How the EOC works", "Literary analysis", "Informational and argument texts", "Vocabulary and figurative language", "Editing and revising", "Timed practice"]),
+  // ---------- State tests (named for the student's state; see STATE_TESTS) ----------
+  c("st-read", "state", "State tests", "Reading and English (grades 3–8)", "3–8", ["How your state test works", "Literary text: key ideas and details", "Literary text: craft and structure", "Informational text: key ideas", "Informational text: craft and structure", "Comparing texts", "Vocabulary and word meaning", "Writing and editing questions", "Timed practice by grade"]),
+  c("st-math", "state", "State tests", "Math (grades 3–8)", "3–8", ["How your state test works and calculator rules", "Numbers and operations", "Fractions and decimals", "Ratios and proportions", "Expressions and equations", "Functions", "Geometry and measurement", "Statistics and probability", "Timed practice by grade"]),
+  c("st-sci", "state", "State tests", "Science (grades 5 and 8)", "5, 8", ["How your state test works", "Forces, motion and energy", "Matter and its properties", "Earth systems and weather", "Space science", "Ecosystems", "Body systems and cells", "Heredity and evolution", "Timed practice"]),
+  c("st-eoc-math", "state", "State tests", "High school math end-of-course test", "HS", ["How your state's end-of-course test works", "Linear equations and functions", "Systems", "Exponential functions", "Quadratic functions", "Geometry topics on the test", "Statistics", "Timed practice"]),
+  c("st-eoc-bio", "state", "State tests", "High school biology end-of-course test", "HS", ["How the test works", "Cells and transport", "Energy in living things", "Genetics and DNA", "Evolution", "Ecology", "Timed practice"]),
+  c("st-eoc-eng", "state", "State tests", "High school English end-of-course test", "HS", ["How the test works", "Literary analysis", "Informational and argument texts", "Vocabulary and figurative language", "Editing and revising", "Writing the essay", "Timed practice"]),
+  c("st-eoc-hist", "state", "State tests", "High school US history or civics test", "HS", ["How the test works", "Founding documents and the Constitution", "How government works", "Major eras of US history", "Reading primary sources, maps and charts", "Timed practice"]),
 ];
 
 export const STATES = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
+
+// The name of each state's yearly tests (as of 2025-26), so the tutor can match
+// their format. The tutor reminds families to check the current test with the school.
+export const STATE_TESTS = {
+  "Alabama": "ACAP", "Alaska": "AK STAR", "Arizona": "AASA", "Arkansas": "ATLAS", "California": "CAASPP (Smarter Balanced)",
+  "Colorado": "CMAS", "Connecticut": "Smarter Balanced", "Delaware": "DeSSA", "District of Columbia": "DC CAPE", "Florida": "FAST and B.E.S.T. end-of-course",
+  "Georgia": "Georgia Milestones", "Hawaii": "Smarter Balanced", "Idaho": "ISAT", "Illinois": "Illinois Assessment of Readiness", "Indiana": "ILEARN",
+  "Iowa": "ISASP", "Kansas": "KAP", "Kentucky": "KSA", "Louisiana": "LEAP 2025", "Maine": "Maine Through Year Assessment",
+  "Maryland": "MCAP", "Massachusetts": "MCAS", "Michigan": "M-STEP", "Minnesota": "MCA", "Mississippi": "MAAP",
+  "Missouri": "Missouri Assessment Program", "Montana": "MAST", "Nebraska": "NSCAS", "Nevada": "Smarter Balanced", "New Hampshire": "NH SAS",
+  "New Jersey": "NJSLA", "New Mexico": "NM-MSSA", "New York": "NYS tests and Regents exams", "North Carolina": "EOG and EOC", "North Dakota": "NDSA",
+  "Ohio": "Ohio State Tests", "Oklahoma": "OSTP", "Oregon": "OSAS", "Pennsylvania": "PSSA and Keystone exams", "Rhode Island": "RICAS",
+  "South Carolina": "SC READY and EOCEP", "South Dakota": "SD-SA (Smarter Balanced)", "Tennessee": "TCAP", "Texas": "STAAR", "Utah": "RISE and Utah Aspire Plus",
+  "Vermont": "VTCAP", "Virginia": "SOL tests", "Washington": "Smarter Balanced", "West Virginia": "WVGSA", "Wisconsin": "Forward Exam", "Wyoming": "WY-TOPP",
+};
+export const testName = state => STATE_TESTS[state] || "state test";
 
 export const course = id => COURSES.find(x => x.id === id);

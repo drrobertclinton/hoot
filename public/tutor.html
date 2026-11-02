@@ -20,8 +20,10 @@
   <!-- PICK A COURSE -->
   <section id="pick" class="wrap" style="padding:0;gap:16px">
     <p class="muted">Pick a course. Hoot teaches it one step at a time, from kindergarten through calculus.</p>
+    <p class="small muted" id="stateLine"></p>
     <div class="chips" id="bands" role="tablist"></div>
     <div class="sets" id="courses"></div>
+    <p class="small muted note">Hoot is extra help for learning and practice. It can't promise a passing grade or test score.</p>
     <nav class="foot"><a href="/">Flashcards from my pages</a><button class="ghost small" id="grownBtn">Grown-up settings</button><a href="/privacy.html">Privacy</a></nav>
   </section>
 
@@ -33,7 +35,40 @@
       <p class="muted small" id="courseProgress"></p>
     </div>
     <div class="progress"><i id="courseBar"></i></div>
+    <div class="panel" id="weakPanel">
+      <div>
+        <h3>Find my weak spots</h3>
+        <p class="muted small">Take a quick check across the whole course, or add a report or graded test from your teacher. Hoot shows which units need work and takes you straight to them.</p>
+      </div>
+      <div class="row">
+        <button class="primary" id="diagBtn">Take a quick check</button>
+        <label class="btn picker">
+          <input type="file" id="repFiles" accept="image/*,.pdf,application/pdf,.docx,.txt" multiple>
+          <span>Use my teacher's report</span>
+        </label>
+      </div>
+      <div class="thumbs" id="repThumbs" hidden></div>
+      <p class="small" id="repTally" hidden></p>
+      <button class="go" id="repGo" hidden>Find my weak spots in this report</button>
+      <div class="status" id="weakStatus" hidden></div>
+      <div class="why ok" id="weakResult" hidden></div>
+      <p class="small muted">Hoot is extra help. It can't promise a passing grade or test score.</p>
+    </div>
     <div class="sets" id="units"></div>
+  </section>
+
+  <!-- QUICK CHECK -->
+  <section id="diagView" class="wrap" style="padding:0;gap:14px" hidden>
+    <div class="topbar"><button class="ghost" id="diagBack">‹ Units</button><span class="label">Quick check</span></div>
+    <h2 id="diagTitle"></h2>
+    <div class="count"><span id="dCount"></span><span id="dRight"></span></div>
+    <div class="progress"><i id="dBar"></i></div>
+    <div class="panel">
+      <div class="q" id="dQ"></div>
+      <div class="choices" id="dChoices"></div>
+      <div class="why" id="dWhy" hidden></div>
+      <button class="primary" id="dNext" hidden>Next question</button>
+    </div>
   </section>
 
   <!-- ONE UNIT -->
@@ -124,7 +159,7 @@
 
 <script src="/maker.js"></script>
 <script type="module">
-import { BANDS, COURSES, STATES, course as findCourse } from "/curriculum.mjs";
+import { BANDS, COURSES, STATES, testName, course as findCourse } from "/curriculum.mjs";
 
 const $ = id => document.getElementById(id);
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
@@ -148,6 +183,7 @@ const HELP_OPTS = [
 ];
 
 // ---------- picking ----------
+const title = c => c.band === "state" ? `${settings.state} ${testName(settings.state)}: ${c.name}` : c.name;
 const unitsDone = c => Object.values(progress[c.id] || {}).filter(u => u.mastered).length;
 function showPick() {
   show("pick");
@@ -158,11 +194,12 @@ function showPick() {
     btn.onclick = () => { settings.band = b.id; save(SETTINGS, settings); showPick(); };
     bands.append(btn);
   }
+  $("stateLine").textContent = `Lessons match ${settings.state}'s standards. A grown-up can change the state in Grown-up settings.`;
   const list = $("courses"); list.replaceChildren();
   for (const c of COURSES.filter(c => c.band === settings.band)) {
     const row = el("button", "set");
     const info = el("div", "info");
-    info.append(el("div", "name", c.name), el("div", "muted small", `${c.subject} · ${c.units.length} units`));
+    info.append(el("div", "name", title(c)), el("div", "muted small", `${c.subject} · ${c.units.length} units`));
     row.append(info);
     const done = unitsDone(c);
     if (done) row.append(el("span", "score", `${done}/${c.units.length}`));
@@ -175,7 +212,8 @@ function openCourse(id) {
   const c = findCourse(id); if (!c) return showPick();
   cur.c = c; show("courseView");
   $("courseSubject").textContent = c.subject;
-  $("courseName").textContent = c.name;
+  $("courseName").textContent = title(c);
+  for (const id of ["weakStatus", "weakResult"]) $(id).hidden = true;
   const done = unitsDone(c);
   $("courseProgress").textContent = `${done} of ${c.units.length} units mastered`;
   $("courseBar").style.width = (100 * done / c.units.length) + "%";
@@ -185,6 +223,7 @@ function openCourse(id) {
     const row = el("button", "set");
     const num = el("span", "unit-num" + (p && p.mastered ? " done" : ""), p && p.mastered ? "✓" : String(i + 1));
     const info = el("div", "info"); info.append(el("div", "name", u));
+    if (p && p.weak && !p.mastered) { const t = el("span", "tag", "Needs work"); info.firstChild.append(t); }
     if (p && p.best != null) info.append(el("div", "muted small", p.mastered ? "Mastered" : `Best mastery check: ${p.best} of 8`));
     row.append(num, info);
     row.onclick = () => openUnit(i, "learn");
@@ -193,13 +232,14 @@ function openCourse(id) {
   history.replaceState(null, "", `/tutor.html#${c.id}`);
 }
 
-function show(id) { for (const s of ["pick", "courseView", "unitView"]) $(s).hidden = s !== id; window.scrollTo(0, 0); }
+function show(id) { for (const s of ["pick", "courseView", "unitView", "diagView"]) $(s).hidden = s !== id; window.scrollTo(0, 0); }
 
 // ---------- a unit ----------
 function openUnit(i, mode) {
   cur.unit = i; show("unitView");
   $("unitCourse").textContent = cur.c.name;
   $("unitName").textContent = cur.c.units[i];
+  $("unitCourse").textContent = title(cur.c);
   history.replaceState(null, "", `/tutor.html#${cur.c.id}/${i}`);
   setMode(mode);
 }
@@ -298,7 +338,7 @@ document.querySelectorAll("#quick button").forEach(b => b.onclick = () => send(b
 $("clearChat").onclick = () => { delete chats[key()]; save(CHATS, chats); setMode(cur.mode); };
 
 // ---------- mastery check ----------
-let quiz = [], qi = 0, right = 0, missed = [];
+let quiz = [], right = 0, missed = [];
 function masteryHome() {
   $("mStart").hidden = false; $("mPlay").hidden = true; $("mDone").hidden = true;
   const p = (progress[cur.c.id] || {})[cur.unit];
@@ -311,40 +351,46 @@ async function startMastery() {
   try {
     const qs = Maker.cleanQuiz(await Maker.post("/api/study", { kind: "mastery", course: cur.c.id, unit: cur.unit, state: settings.state, missed }));
     if (!qs.length) throw { code: "invalid_json" };
-    quiz = qs.slice(0, 8).map(q => { // shuffle choices; the server puts the right one first
-      const order = q.choices.map((_, i) => i).sort(() => Math.random() - 0.5);
-      return { ...q, choices: order.map(i => q.choices[i]), answer: order.indexOf(q.answer) };
-    });
-    qi = 0; right = 0; missed = [];
-    Maker.status($("mStatus"), ""); $("mStart").hidden = true; $("mPlay").hidden = false; askQ();
+    quiz = shuffle(qs.slice(0, 8));
+    Maker.status($("mStatus"), ""); $("mStart").hidden = true; $("mPlay").hidden = false;
+    runQuiz("m", quiz, (ok, wrong) => { right = ok; missed = wrong.map(q => q.q); finishMastery(); });
   } catch (e) { Maker.status($("mStatus"), Maker.errText(e), "err"); }
   finally { $("mGo").disabled = false; $("mAgain").disabled = false; }
 }
-function askQ() {
-  const q = quiz[qi];
-  $("mCount").textContent = `Question ${qi + 1} of ${quiz.length}`;
-  $("mRight").textContent = `${right} right`;
-  $("mBar").style.width = (100 * qi / quiz.length) + "%";
-  $("mQ").textContent = q.q; $("mWhy").hidden = true; $("mNext").hidden = true;
-  const box = $("mChoices"); box.replaceChildren();
-  q.choices.forEach((ch, i) => {
-    const b = el("button", "choice"); b.append(el("b", null, "ABCD"[i] || i + 1), el("span", null, ch));
-    b.onclick = () => {
-      if (!$("mNext").hidden) return;
-      const ok = i === q.answer; if (ok) right++; else missed.push(q.q);
-      [...box.children].forEach((c, j) => { c.disabled = true; if (j === q.answer) c.classList.add("right"); else if (j === i) c.classList.add("wrong"); });
-      $("mWhy").className = "why " + (ok ? "ok" : "no"); $("mWhy").textContent = (ok ? "Right! " : "Not quite. ") + q.why; $("mWhy").hidden = false;
-      $("mRight").textContent = `${right} right`;
-      $("mNext").textContent = qi + 1 < quiz.length ? "Next question" : "See my score"; $("mNext").hidden = false;
-    };
-    box.append(b);
-  });
+// Runs a multiple-choice quiz in the elements named p+"Count", p+"Q", etc.
+function runQuiz(p, qs, onDone) {
+  let i = 0, ok = 0; const wrong = [];
+  const ask = () => {
+    const q = qs[i];
+    $(p + "Count").textContent = `Question ${i + 1} of ${qs.length}`;
+    $(p + "Right").textContent = `${ok} right`;
+    $(p + "Bar").style.width = (100 * i / qs.length) + "%";
+    $(p + "Q").textContent = q.q; $(p + "Why").hidden = true; $(p + "Next").hidden = true;
+    const box = $(p + "Choices"); box.replaceChildren();
+    q.choices.forEach((ch, j) => {
+      const b = el("button", "choice"); b.append(el("b", null, "ABCD"[j] || j + 1), el("span", null, ch));
+      b.onclick = () => {
+        if (!$(p + "Next").hidden) return;
+        const good = j === q.answer; if (good) ok++; else wrong.push(q);
+        [...box.children].forEach((c, k) => { c.disabled = true; if (k === q.answer) c.classList.add("right"); else if (k === j) c.classList.add("wrong"); });
+        $(p + "Why").className = "why " + (good ? "ok" : "no"); $(p + "Why").textContent = (good ? "Right! " : "Not quite. ") + q.why; $(p + "Why").hidden = false;
+        $(p + "Right").textContent = `${ok} right`;
+        $(p + "Next").textContent = i + 1 < qs.length ? "Next question" : "See how I did"; $(p + "Next").hidden = false;
+      };
+      box.append(b);
+    });
+  };
+  $(p + "Next").onclick = () => { i++; if (i < qs.length) ask(); else onDone(ok, wrong); };
+  ask();
 }
-$("mNext").onclick = () => { qi++; if (qi < quiz.length) return askQ(); finishMastery(); };
+const shuffle = qs => qs.map(q => { // the server puts the right answer first
+  const order = q.choices.map((_, i) => i).sort(() => Math.random() - 0.5);
+  return { ...q, choices: order.map(i => q.choices[i]), answer: order.indexOf(q.answer) };
+});
 function finishMastery() {
   const need = Math.ceil(quiz.length * 7 / 8), ok = right >= need;
   const p = (progress[cur.c.id] ||= {}), u = p[cur.unit] || { best: 0, mastered: false };
-  u.best = Math.max(u.best || 0, right); u.mastered = u.mastered || ok; p[cur.unit] = u; save(PROGRESS, progress);
+  u.best = Math.max(u.best || 0, right); u.mastered = u.mastered || ok; if (ok) u.weak = false; p[cur.unit] = u; save(PROGRESS, progress);
   $("mPlay").hidden = true; $("mDone").hidden = false;
   $("mScore").textContent = `${right} / ${quiz.length}`;
   $("mText").textContent = ok ? "Unit mastered! On to the next one." : `You need ${need} to master it. Go over the ones you missed with the tutor, then try a new check.`;
@@ -356,6 +402,59 @@ $("mLearn").onclick = () => {
 };
 $("toPick").onclick = showPick;
 $("toCourse").onclick = () => openCourse(cur.c.id);
+
+// ---------- weak spots: quick check and teacher's report ----------
+function markWeak(weak, strong) {
+  const p = (progress[cur.c.id] ||= {});
+  for (const i of strong || []) if (p[i]) p[i].weak = false;
+  for (const i of weak) { p[i] = p[i] || { best: null, mastered: false }; p[i].weak = true; p[i].mastered = false; }
+  save(PROGRESS, progress);
+}
+function showWeak(weak, summary) {
+  openCourse(cur.c.id);
+  const box = $("weakResult"); box.replaceChildren(); box.hidden = false;
+  if (summary) box.append(el("p", null, summary));
+  if (!weak.length) { box.append(el("p", null, "No weak spots found. Keep it up, and take each unit's mastery check to lock it in.")); return; }
+  box.append(el("p", null, `Units to work on (${weak.length}):`));
+  const list = el("div", "row");
+  for (const i of weak) { const b = el("button", null, cur.c.units[i]); b.onclick = () => openUnit(i, "learn"); list.append(b); }
+  box.append(list);
+  box.scrollIntoView({ block: "nearest" });
+}
+$("diagBtn").onclick = async () => {
+  $("diagBtn").disabled = true; $("weakResult").hidden = true;
+  Maker.status($("weakStatus"), "Writing your quick check…", "busy");
+  try {
+    const qs = (await Maker.post("/api/study", { kind: "diagnose", course: cur.c.id, state: settings.state }))
+      .map(q => ({ ...Maker.cleanQuiz([q])[0], unit: q.unit })).filter(q => q.q);
+    if (!qs.length) throw { code: "invalid_json" };
+    Maker.status($("weakStatus"), "");
+    show("diagView"); $("diagTitle").textContent = title(cur.c);
+    runQuiz("d", shuffle(qs), (ok, wrong) => {
+      const weak = [...new Set(wrong.map(q => q.unit).filter(u => u != null))].sort((a, b) => a - b);
+      const tested = new Set(qs.map(q => q.unit).filter(u => u != null));
+      markWeak(weak, [...tested].filter(u => !weak.includes(u)));
+      showWeak(weak, `You got ${ok} of ${qs.length} right.`);
+    });
+  } catch (e) { Maker.status($("weakStatus"), Maker.errText(e), "err"); }
+  finally { $("diagBtn").disabled = false; }
+};
+$("diagBack").onclick = () => openCourse(cur.c.id);
+let rep = null;
+rep = Maker.picker({ files: $("repFiles"), thumbs: $("repThumbs"), tally: $("repTally"), status: $("weakStatus") }, () => { $("repGo").hidden = !rep || !rep.count; });
+$("repGo").onclick = async () => {
+  const src = rep.sources, imgs = src.filter(s => s.kind === "img"), text = src.filter(s => s.kind === "text").map(s => s.text).join("\n\n");
+  $("repGo").disabled = true; $("weakResult").hidden = true;
+  Maker.status($("weakStatus"), "Reading the report…", "busy");
+  try {
+    const images = await Promise.all(imgs.slice(0, 3).map(async s => ({ type: "image/jpeg", data: await b64(s.blob) })));
+    const d = await Maker.post("/api/study", { kind: "weakspots", course: cur.c.id, state: settings.state, images, text });
+    markWeak(d.weak, d.strong); rep.clear();
+    showWeak(d.weak, d.summary + (imgs.length > 3 ? " (Hoot read the first 3 pages.)" : ""));
+    Maker.status($("weakStatus"), "");
+  } catch (e) { Maker.status($("weakStatus"), Maker.errText(e), "err"); }
+  finally { $("repGo").disabled = false; }
+};
 
 // ---------- grown-up settings ----------
 const hash = async s => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("hoot-pin:" + s)))].map(b => b.toString(16).padStart(2, "0")).join("");
