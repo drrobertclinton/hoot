@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hoot Coding</title>
+<meta name="description" content="Learn to code with Hoot: guide the owl with command blocks and loops, then write real JavaScript that draws.">
+<meta name="theme-color" content="#2459d6">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="core.css">
+<style>
+:root{--bg:#eef2f8;--card:#fff;--soft:#e4ebf8;--ink:#16213a;--muted:#5a6680;--line:#d3dcec;--accent:#2459d6;--accent2:#1c47ad;--bolt:#ffd23f;--code:#0f1730;--codeink:#e6edff;--radius:16px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1526;--card:#18203a;--soft:#202b4b;--ink:#e8edf8;--muted:#9aa6c2;--line:#2b3656;--accent:#7aa2ff;--accent2:#a5c0ff}}
+body{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;font-size:17px}
+h1,h2,h3{font-family:'Bricolage Grotesque','Segoe UI',sans-serif}
+.btn.bolt{background:var(--bolt);border-color:var(--bolt);color:#16213a}
+.grid-board{display:grid;gap:2px;background:var(--line);padding:2px;border-radius:12px;margin:10px auto;max-width:420px}
+.grid-board div{aspect-ratio:1;display:grid;place-items:center;font-size:1.5rem;background:#cfe8c4;border-radius:4px;position:relative}
+.grid-board .w{background:#5b7a52}
+.grid-board .n::after{content:'🪺'}
+.grid-board .a::after{content:'🌰'}
+.owl{position:absolute;inset:0;display:grid;place-items:center;font-size:1.7rem;transition:transform .25s;z-index:2}
+.cmds{display:flex;gap:8px;flex-wrap:wrap}
+.cmds button{font-weight:700;border-radius:12px;border:2px solid var(--line);background:var(--card);padding:10px 12px;cursor:pointer;min-height:46px}
+.prog{min-height:64px;background:var(--soft);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px}
+.blk{display:flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border-radius:10px;padding:6px 10px;font-weight:700;cursor:pointer;width:max-content;max-width:100%}
+.blk.rep{background:#7a4fd6;flex-direction:column;align-items:stretch;width:auto}
+.blk.rep.target{outline:3px solid var(--bolt)}
+.blk.rep .in{background:rgba(255,255,255,.15);border-radius:8px;padding:6px;display:flex;flex-direction:column;gap:6px;min-height:34px}
+.blk .x{background:rgba(255,255,255,.25);border:0;color:#fff;border-radius:6px;width:24px;height:24px;cursor:pointer;margin-left:auto}
+.blk.run{outline:3px solid var(--bolt)}
+.cnt{display:inline-flex;align-items:center;gap:4px}
+.cnt button{width:26px;height:26px;border-radius:6px;border:0;background:rgba(255,255,255,.25);color:#fff;font-weight:800;cursor:pointer}
+textarea.code{width:100%;min-height:200px;background:var(--code);color:var(--codeink);font:15px/1.5 'JetBrains Mono',ui-monospace,monospace;border:0;border-radius:12px;padding:12px;tab-size:2;resize:vertical}
+.out{background:var(--code);color:#9fe8b0;font:14px/1.5 'JetBrains Mono',monospace;border-radius:12px;padding:10px;min-height:44px;white-space:pre-wrap;max-height:180px;overflow:auto}
+.out .err{color:#ff9aa2}
+canvas.turtle{width:100%;max-width:420px;aspect-ratio:1;background:#fffef7;border-radius:12px;border:1px solid var(--line);display:block;margin:10px auto}
+.lv{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.lv button{aspect-ratio:1;border-radius:12px;border:2px solid var(--line);background:var(--card);font-weight:800;cursor:pointer;font-size:1.05rem}
+.lv button.done{background:var(--soft);border-color:var(--accent)}
+.lv button:disabled{opacity:.4}
+code{font-family:'JetBrains Mono',monospace;background:var(--soft);padding:1px 5px;border-radius:5px;font-size:.92em}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top"><img class="logo" src="icon.svg" alt=""><h1><small>Hoot</small>Coding</h1><span class="sp"></span></header>
+  <main id="main"></main>
+</div>
+<script src="core.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
