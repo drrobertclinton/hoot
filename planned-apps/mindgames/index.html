@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Low Tide Mind Games</title>
+<meta name="description" content="Puzzle games with Jonah Pruitt and the Low Tide Club: fix the pipes, crack the tide code, spot the pattern and match the beach finds.">
+<meta name="theme-color" content="#1b5e8c">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="core.css">
+<style>
+:root{--bg:#eef6fb;--card:#fff;--soft:#e1eff8;--ink:#13324a;--muted:#5a7487;--line:#cfe2ee;--accent:#1b6fa6;--accent2:#155a88;--sun:#ffc21a;--mud:#8a6a4a;--blue:#2a86b8;--radius:20px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1f2e;--card:#11293b;--soft:#173449;--ink:#e8f3fa;--muted:#9bb6c8;--line:#1f4058;--accent:#4fb0e6;--accent2:#7cc6ef}}
+body{font-family:'Nunito',system-ui,sans-serif;font-size:17px}
+h1,h2,h3,.disp{font-family:'Baloo 2','Nunito',sans-serif}
+.btn{border-radius:16px;font-weight:800}
+.gamecard{display:flex;gap:14px;align-items:center;cursor:pointer;text-align:left;width:100%}
+.gamecard .gi{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;font-size:2rem;flex:none}
+.stars{color:var(--sun);letter-spacing:2px;font-size:.95rem}
+.board{display:grid;gap:3px;background:var(--line);border-radius:14px;padding:3px;margin:12px auto;max-width:440px;touch-action:manipulation}
+.cell{aspect-ratio:1;background:var(--card);border-radius:8px;cursor:pointer;display:grid;place-items:center;padding:0;border:0}
+.cell svg{width:100%;height:100%;transition:transform .15s}
+.pipe{stroke:#b9c9d4;stroke-width:16;stroke-linecap:round;fill:none}
+.on .pipe{stroke:var(--accent)}
+.src{fill:var(--sun)}.lamp{fill:#c8d5de}.on .lamp{fill:var(--sun)}
+.say{display:flex;gap:10px;align-items:flex-start;background:var(--soft);border-radius:16px;padding:12px;margin:10px 0}
+.say .who{font-size:1.8rem;line-height:1}
+.say p{margin:0}
+.sym{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:1.6rem;background:var(--card);border:2px solid var(--line)}
+.guessrow{display:flex;gap:8px;align-items:center;padding:6px 0}
+.peg{display:grid;grid-template-columns:repeat(2,12px);gap:3px}
+.peg i{width:12px;height:12px;border-radius:50%;border:2px solid var(--line)}
+.peg i.b{background:var(--accent);border-color:var(--accent)}
+.peg i.w{background:transparent;border-color:var(--accent)}
+.pick{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.pick button{font-size:1.7rem;width:54px;height:54px;border-radius:14px;border:2px solid var(--line);background:var(--card);cursor:pointer}
+.seq{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;font-size:1.9rem;font-weight:800;font-family:'Baloo 2',sans-serif}
+.seq span{min-width:52px;height:56px;border-radius:14px;background:var(--card);border:2px solid var(--line);display:grid;place-items:center;padding:0 8px}
+.seq .q{border-style:dashed;border-color:var(--accent);color:var(--accent)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.opts button{font-size:1.6rem;font-weight:800;min-height:62px;border-radius:16px;border:2px solid var(--line);background:var(--card);cursor:pointer;font-family:'Baloo 2',sans-serif;color:var(--ink)}
+.mem{display:grid;gap:8px;margin:12px auto;max-width:440px}
+.mem button{aspect-ratio:3/4;border-radius:14px;border:0;font-size:2rem;cursor:pointer;background:linear-gradient(150deg,var(--accent),var(--accent2));color:transparent;transition:transform .2s}
+.mem button.up,.mem button.got{background:var(--card);color:inherit;border:2px solid var(--line)}
+.mem button.got{opacity:.55}
+@media (prefers-reduced-motion:reduce){.cell svg,.mem button{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top"><img class="logo" src="icon.svg" alt=""><h1><small>Jonah Pruitt</small>Low Tide Mind Games</h1><span class="sp"></span></header>
+  <main id="main"></main>
+</div>
+<script src="core.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

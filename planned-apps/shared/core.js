@@ -47,6 +47,7 @@
     bar.innerHTML = '<div class="in">' + list.map(t => `<button data-tab="${t.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${t.icon}</svg>${esc(t.label)}</button>`).join('') + '</div>';
     document.body.appendChild(bar);
     function go(){
+      closeSheet();
       const id = (location.hash.slice(1).split('/')[0]) || list[0].id;
       const t = list.find(x => x.id === id) || list[0];
       $$('button', bar).forEach(b => b.setAttribute('aria-current', b.dataset.tab === t.id ? 'page' : 'false'));
