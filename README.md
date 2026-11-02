@@ -1,15 +1,20 @@
 # Hoot
 
-Kids photograph their review pages (or add PDFs / Word docs) and Hoot makes
-flashcards and a practice test. Teachers can make a class, upload study guides,
+Hoot Tutor teaches every course from kindergarten through calculus, plus AP,
+ACT, SAT, PSAT and state end-of-year tests, one step at a time, and helps with
+homework from a photo. Kids can also photograph their review pages (or add
+PDFs / Word docs) and Hoot makes flashcards and a practice test. Teachers can make a class, upload study guides,
 and give students a class code.
 
 Claude is called only from the server, with the key in an environment variable.
-The browser can ask for two fixed jobs and never sends its own prompt.
+The browser can only ask for fixed jobs (named course, unit and mode) and never sends its own prompt.
 
 ## What's where
 
 - `public/index.html` – the kids' app (sets and scores stay in the browser), with the grown-up agreement screen.
+- `public/tutor.html` – the course tutor: pick a course and unit, Learn / Practice / Homework / Mastery check. Grown-up PIN sets the answer setting and state.
+- `public/curriculum.mjs` – every course and unit, shared by the page and the server.
+- `lib/tutor.mjs` – the tutor's teaching rules, answer settings, safety rules and the mastery check.
 - `public/teacher.html` – teachers make a class and share study guides.
 - `public/privacy.html` – privacy notice.
 - `public/maker.js`, `public/style.css` – shared by the pages.
@@ -25,6 +30,7 @@ The browser can ask for two fixed jobs and never sends its own prompt.
 | `KV_REST_API_URL`, `KV_REST_API_TOKEN` | yes, for classes | Set automatically when you connect an Upstash Redis database in Vercel's Storage tab. |
 | `STUDY_MODEL` | no | Defaults to `claude-opus-5-5`. |
 | `STUDY_REQUESTS_PER_HOUR` | no | Per-visitor limit on page reads, default 120. |
+| `TUTOR_REQUESTS_PER_HOUR` | no | Per-visitor limit on tutor messages, default 300. |
 
 ## Deploy on Vercel
 

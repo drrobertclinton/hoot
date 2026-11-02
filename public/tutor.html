@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hoot Tutor</title>
+<meta name="description" content="A tutor for every course from kindergarten through calculus, AP, ACT, SAT and state tests.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="brand">
+    <svg class="logo" viewBox="0 0 38 38" aria-hidden="true"><rect width="38" height="38" rx="11" fill="var(--accent)"/><path d="M9 9l5 4M29 9l-5 4" stroke="var(--bolt)" stroke-width="3" stroke-linecap="round"/><circle cx="13.5" cy="19" r="6" fill="var(--bolt)"/><circle cx="24.5" cy="19" r="6" fill="var(--bolt)"/><circle cx="13.5" cy="19" r="2.6" fill="#16213a"/><circle cx="24.5" cy="19" r="2.6" fill="#16213a"/><path d="M19 23l-2.6 3.2h5.2z" fill="var(--bolt)"/></svg>
+    <h1>Hoot Tutor</h1>
+  </header>
+
+  <!-- PICK A COURSE -->
+  <section id="pick" class="wrap" style="padding:0;gap:16px">
+    <p class="muted">Pick a course. Hoot teaches it one step at a time, from kindergarten through calculus.</p>
+    <div class="chips" id="bands" role="tablist"></div>
+    <div class="sets" id="courses"></div>
+    <nav class="foot"><a href="/">Flashcards from my pages</a><button class="ghost small" id="grownBtn">Grown-up settings</button><a href="/privacy.html">Privacy</a></nav>
+  </section>
+
+  <!-- ONE COURSE -->
+  <section id="courseView" class="wrap" style="padding:0;gap:16px" hidden>
+    <div class="topbar"><button class="ghost" id="toPick">‹ All courses</button><span class="label" id="courseSubject"></span></div>
+    <div>
+      <h2 id="courseName"></h2>
+      <p class="muted small" id="courseProgress"></p>
+    </div>
+    <div class="progress"><i id="courseBar"></i></div>
+    <div class="sets" id="units"></div>
+  </section>
+
+  <!-- ONE UNIT -->
+  <section id="unitView" class="wrap" style="padding:0;gap:14px" hidden>
+    <div class="topbar"><button class="ghost" id="toCourse">‹ Units</button><span class="label" id="unitCourse"></span></div>
+    <h2 id="unitName"></h2>
+    <div class="tabs four" role="tablist">
+      <button role="tab" data-mode="learn">Learn</button>
+      <button role="tab" data-mode="practice">Practice</button>
+      <button role="tab" data-mode="homework">Homework</button>
+      <button role="tab" data-mode="mastery">Mastery</button>
+    </div>
+
+    <div id="chatView" class="wrap" style="padding:0;gap:12px">
+      <div class="chat" id="chat" aria-live="polite"></div>
+      <div class="row quick" id="quick">
+        <button data-say="Can I have a hint?">Hint</button>
+        <button data-say="I don't get it. Can you explain it a different way?">I don't get it</button>
+        <button data-say="Can you show me an example?">Example</button>
+      </div>
+      <div class="thumbs" id="shots" hidden></div>
+      <div class="composer">
+        <label class="btn picker" id="photoBtn" title="Add a photo of your work" aria-label="Add a photo of your work">
+          <input type="file" id="photo" accept="image/*" capture="environment">
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        </label>
+        <textarea id="say" rows="1" placeholder="Type your answer or question"></textarea>
+        <button class="primary" id="sendBtn">Send</button>
+      </div>
+      <div class="status" id="chatStatus" hidden></div>
+      <button class="ghost small" id="clearChat">Start this over</button>
+    </div>
+
+    <div id="masteryView" class="wrap" style="padding:0;gap:14px" hidden>
+      <div class="panel" id="mStart">
+        <p>Answer 8 questions. Get 7 right and this unit is mastered.</p>
+        <p class="muted small" id="mBest"></p>
+        <button class="go" id="mGo">Start the mastery check</button>
+        <div class="status" id="mStatus" hidden></div>
+      </div>
+      <div id="mPlay" class="wrap" style="padding:0;gap:14px" hidden>
+        <div class="count"><span id="mCount"></span><span id="mRight"></span></div>
+        <div class="progress"><i id="mBar"></i></div>
+        <div class="panel">
+          <div class="q" id="mQ"></div>
+          <div class="choices" id="mChoices"></div>
+          <div class="why" id="mWhy" hidden></div>
+          <button class="primary" id="mNext" hidden>Next question</button>
+        </div>
+      </div>
+      <div class="panel" id="mDone" hidden>
+        <p class="label">Mastery check</p>
+        <div class="big-score" id="mScore"></div>
+        <p id="mText"></p>
+        <div class="row">
+          <button class="go" id="mAgain">Try a new mastery check</button>
+          <button id="mLearn">Go over it with the tutor</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- grown-up settings -->
+<div class="gate" id="grown" hidden>
+  <div class="panel">
+    <h2>Grown-up settings</h2>
+    <div id="pinAsk" class="wrap" style="padding:0;gap:10px">
+      <p id="pinMsg">Enter your 4-digit grown-up PIN.</p>
+      <input type="password" id="pin" inputmode="numeric" maxlength="4" autocomplete="off" class="code-input" placeholder="PIN">
+      <div class="row"><button class="primary" id="pinOk">Continue</button><button id="pinCancel">Cancel</button></div>
+      <div class="status err" id="pinErr" hidden></div>
+    </div>
+    <div id="settings" class="wrap" style="padding:0;gap:14px" hidden>
+      <div>
+        <p class="label">How much help on homework</p>
+        <div class="choices" id="helpOpts"></div>
+      </div>
+      <div>
+        <p class="label">State (so lessons match your state's standards and tests)</p>
+        <select id="state"></select>
+      </div>
+      <p class="muted small">Only someone with the PIN can change these. They are saved on this device.</p>
+      <button class="primary" id="setDone">Done</button>
+    </div>
+  </div>
+</div>
+
+<script src="/maker.js"></script>
+<script type="module">
+import { BANDS, COURSES, STATES, course as findCourse } from "/curriculum.mjs";
+
+const $ = id => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
+const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+
+// The grown-up agreement lives on the main page.
+try { if (localStorage.getItem("hoot-consent-v1") !== "yes") location.replace("/?next=tutor"); } catch {}
+
+const SETTINGS = "hoot-tutor-settings-v1", PROGRESS = "hoot-tutor-progress-v1", CHATS = "hoot-tutor-chats-v1";
+let settings = load(SETTINGS, { help: "teach", state: "North Carolina", pin: null, band: "elem" });
+let progress = load(PROGRESS, {});      // {courseId: {unitIndex: {best, mastered}}}
+let chats = load(CHATS, {});            // {"course|unit|mode": [{role, text}]}
+let cur = { c: null, unit: 0, mode: "learn" };
+
+const HELP_OPTS = [
+  ["teach", "Teach only", "Hoot never gives the answer to an assigned problem. It works a similar one, then says \"now do yours\". Recommended."],
+  ["check", "Check my work", "Hoot says if an answer is right and points to the first wrong step, but doesn't solve it."],
+  ["after", "Answers after trying", "After two real tries, Hoot may show the full solution."],
+  ["full", "Full help", "Hoot may show full worked solutions, always explained step by step."],
+];
+
+// ---------- picking ----------
+const unitsDone = c => Object.values(progress[c.id] || {}).filter(u => u.mastered).length;
+function showPick() {
+  show("pick");
+  const bands = $("bands"); bands.replaceChildren();
+  for (const b of BANDS) {
+    const btn = el("button", "chip", b.name); btn.setAttribute("role", "tab");
+    btn.setAttribute("aria-selected", String(settings.band === b.id));
+    btn.onclick = () => { settings.band = b.id; save(SETTINGS, settings); showPick(); };
+    bands.append(btn);
+  }
+  const list = $("courses"); list.replaceChildren();
+  for (const c of COURSES.filter(c => c.band === settings.band)) {
+    const row = el("button", "set");
+    const info = el("div", "info");
+    info.append(el("div", "name", c.name), el("div", "muted small", `${c.subject} · ${c.units.length} units`));
+    row.append(info);
+    const done = unitsDone(c);
+    if (done) row.append(el("span", "score", `${done}/${c.units.length}`));
+    row.onclick = () => openCourse(c.id);
+    list.append(row);
+  }
+}
+
+function openCourse(id) {
+  const c = findCourse(id); if (!c) return showPick();
+  cur.c = c; show("courseView");
+  $("courseSubject").textContent = c.subject;
+  $("courseName").textContent = c.name;
+  const done = unitsDone(c);
+  $("courseProgress").textContent = `${done} of ${c.units.length} units mastered`;
+  $("courseBar").style.width = (100 * done / c.units.length) + "%";
+  const list = $("units"); list.replaceChildren();
+  c.units.forEach((u, i) => {
+    const p = (progress[c.id] || {})[i];
+    const row = el("button", "set");
+    const num = el("span", "unit-num" + (p && p.mastered ? " done" : ""), p && p.mastered ? "✓" : String(i + 1));
+    const info = el("div", "info"); info.append(el("div", "name", u));
+    if (p && p.best != null) info.append(el("div", "muted small", p.mastered ? "Mastered" : `Best mastery check: ${p.best} of 8`));
+    row.append(num, info);
+    row.onclick = () => openUnit(i, "learn");
+    list.append(row);
+  });
+  history.replaceState(null, "", `/tutor.html#${c.id}`);
+}
+
+function show(id) { for (const s of ["pick", "courseView", "unitView"]) $(s).hidden = s !== id; window.scrollTo(0, 0); }
+
+// ---------- a unit ----------
+function openUnit(i, mode) {
+  cur.unit = i; show("unitView");
+  $("unitCourse").textContent = cur.c.name;
+  $("unitName").textContent = cur.c.units[i];
+  history.replaceState(null, "", `/tutor.html#${cur.c.id}/${i}`);
+  setMode(mode);
+}
+const key = () => `${cur.c.id}|${cur.unit}|${cur.mode}`;
+const STARTERS = {
+  learn: "Teach me this unit, please.",
+  practice: "Give me a practice problem, please.",
+};
+function setMode(mode) {
+  cur.mode = mode;
+  for (const b of document.querySelectorAll(".tabs.four button")) b.setAttribute("aria-selected", String(b.dataset.mode === mode));
+  $("chatView").hidden = mode === "mastery"; $("masteryView").hidden = mode !== "mastery";
+  if (mode === "mastery") return masteryHome();
+  $("photoBtn").hidden = false;
+  $("say").placeholder = mode === "homework" ? "Type the problem or add a photo of it" : "Type your answer or question";
+  $("quick").hidden = mode === "homework" && !(chats[key()] || []).length;
+  renderChat();
+  if (!(chats[key()] || []).length && STARTERS[mode]) send(STARTERS[mode], true);
+  else if (mode === "homework" && !(chats[key()] || []).length) bubble("tutor", "Show me the problem you're working on. You can take a photo of it or type it in. Then tell me what you've tried so far.");
+}
+document.querySelectorAll(".tabs.four button").forEach(b => b.onclick = () => setMode(b.dataset.mode));
+
+function bubble(role, text) {
+  const b = el("div", "bubble " + role, text);
+  $("chat").append(b);
+  return b;
+}
+function renderChat() {
+  $("chat").replaceChildren();
+  for (const m of chats[key()] || []) if (!m.hidden) bubble(m.role, m.text + (m.photos ? `\n📷 ${m.photos} photo${m.photos > 1 ? "s" : ""}` : ""));
+}
+
+let shots = [], busy = false;
+function renderShots() {
+  const t = $("shots"); t.replaceChildren(); t.hidden = !shots.length;
+  shots.forEach((s, i) => {
+    const d = el("div", "thumb"); const img = el("img"); img.src = s.url; img.alt = "Photo " + (i + 1);
+    const x = el("button", null, "×"); x.setAttribute("aria-label", "Remove photo " + (i + 1));
+    x.onclick = () => { URL.revokeObjectURL(s.url); shots.splice(i, 1); renderShots(); };
+    d.append(img, x); t.append(d);
+  });
+}
+async function shrink(file) {
+  const bmp = await createImageBitmap(file, { imageOrientation: "from-image" });
+  const k = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+  const cv = document.createElement("canvas"); cv.width = Math.round(bmp.width * k); cv.height = Math.round(bmp.height * k);
+  cv.getContext("2d").drawImage(bmp, 0, 0, cv.width, cv.height);
+  return new Promise(r => cv.toBlob(r, "image/jpeg", 0.82));
+}
+const b64 = blob => new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(",")[1]); fr.onerror = rej; fr.readAsDataURL(blob); });
+$("photo").addEventListener("change", async ev => {
+  const f = ev.target.files[0]; ev.target.value = "";
+  if (!f) return;
+  if (shots.length >= 3) return Maker.status($("chatStatus"), "You can send up to 3 photos at a time.", "err");
+  try { const blob = await shrink(f); shots.push({ blob, url: URL.createObjectURL(blob) }); renderShots(); Maker.status($("chatStatus"), ""); }
+  catch { Maker.status($("chatStatus"), "That photo couldn't be opened. Try taking it again.", "err"); }
+});
+
+async function send(text, hidden) {
+  text = (text || "").trim();
+  if (busy || (!text && !shots.length)) return;
+  busy = true; $("sendBtn").disabled = true;
+  const k = key(), list = chats[k] || (chats[k] = []);
+  const photos = shots.splice(0);
+  list.push({ role: "kid", text: text || "Here's my work.", hidden: !!hidden, photos: photos.length || undefined });
+  if (!hidden) bubble("kid", (text || "Here's my work.") + (photos.length ? `\n📷 ${photos.length} photo${photos.length > 1 ? "s" : ""}` : ""));
+  renderShots(); $("say").value = ""; fit();
+  const wait = bubble("tutor thinking", "Hoot is thinking…");
+  try {
+    const images = await Promise.all(photos.map(async p => ({ type: "image/jpeg", data: await b64(p.blob) })));
+    const d = await Maker.post("/api/study", {
+      kind: "tutor", course: cur.c.id, unit: cur.unit, mode: cur.mode, help: settings.help, state: settings.state,
+      messages: list.map(m => ({ role: m.role, text: m.text })), images,
+    });
+    list.push({ role: "tutor", text: d.say });
+    chats[k] = list.slice(-40); save(CHATS, chats);
+    wait.remove(); if (key() === k) bubble("tutor", d.say);
+    $("quick").hidden = false;
+    Maker.status($("chatStatus"), "");
+  } catch (e) {
+    wait.remove(); list.pop();
+    if (!hidden) $("say").value = text;
+    photos.forEach(p => shots.push(p)); renderShots();
+    Maker.status($("chatStatus"), Maker.errText(e), "err");
+  } finally {
+    photos.forEach(p => { if (!shots.includes(p)) URL.revokeObjectURL(p.url); });
+    busy = false; $("sendBtn").disabled = false;
+    if (key() === k) $("chat").lastElementChild?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+}
+$("sendBtn").onclick = () => send($("say").value);
+$("say").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send($("say").value); } });
+const fit = () => { const t = $("say"); t.style.height = "auto"; t.style.height = Math.min(160, t.scrollHeight) + "px"; };
+$("say").addEventListener("input", fit);
+document.querySelectorAll("#quick button").forEach(b => b.onclick = () => send(b.dataset.say));
+$("clearChat").onclick = () => { delete chats[key()]; save(CHATS, chats); setMode(cur.mode); };
+
+// ---------- mastery check ----------
+let quiz = [], qi = 0, right = 0, missed = [];
+function masteryHome() {
+  $("mStart").hidden = false; $("mPlay").hidden = true; $("mDone").hidden = true;
+  const p = (progress[cur.c.id] || {})[cur.unit];
+  $("mBest").textContent = p ? (p.mastered ? "You've mastered this unit. Take it again any time to stay sharp." : `Your best so far: ${p.best} of 8.`) : "";
+}
+async function startMastery() {
+  $("mGo").disabled = true; $("mAgain").disabled = true;
+  $("mStart").hidden = false; $("mDone").hidden = true;
+  Maker.status($("mStatus"), "Writing your questions…", "busy");
+  try {
+    const qs = Maker.cleanQuiz(await Maker.post("/api/study", { kind: "mastery", course: cur.c.id, unit: cur.unit, state: settings.state, missed }));
+    if (!qs.length) throw { code: "invalid_json" };
+    quiz = qs.slice(0, 8).map(q => { // shuffle choices; the server puts the right one first
+      const order = q.choices.map((_, i) => i).sort(() => Math.random() - 0.5);
+      return { ...q, choices: order.map(i => q.choices[i]), answer: order.indexOf(q.answer) };
+    });
+    qi = 0; right = 0; missed = [];
+    Maker.status($("mStatus"), ""); $("mStart").hidden = true; $("mPlay").hidden = false; askQ();
+  } catch (e) { Maker.status($("mStatus"), Maker.errText(e), "err"); }
+  finally { $("mGo").disabled = false; $("mAgain").disabled = false; }
+}
+function askQ() {
+  const q = quiz[qi];
+  $("mCount").textContent = `Question ${qi + 1} of ${quiz.length}`;
+  $("mRight").textContent = `${right} right`;
+  $("mBar").style.width = (100 * qi / quiz.length) + "%";
+  $("mQ").textContent = q.q; $("mWhy").hidden = true; $("mNext").hidden = true;
+  const box = $("mChoices"); box.replaceChildren();
+  q.choices.forEach((ch, i) => {
+    const b = el("button", "choice"); b.append(el("b", null, "ABCD"[i] || i + 1), el("span", null, ch));
+    b.onclick = () => {
+      if (!$("mNext").hidden) return;
+      const ok = i === q.answer; if (ok) right++; else missed.push(q.q);
+      [...box.children].forEach((c, j) => { c.disabled = true; if (j === q.answer) c.classList.add("right"); else if (j === i) c.classList.add("wrong"); });
+      $("mWhy").className = "why " + (ok ? "ok" : "no"); $("mWhy").textContent = (ok ? "Right! " : "Not quite. ") + q.why; $("mWhy").hidden = false;
+      $("mRight").textContent = `${right} right`;
+      $("mNext").textContent = qi + 1 < quiz.length ? "Next question" : "See my score"; $("mNext").hidden = false;
+    };
+    box.append(b);
+  });
+}
+$("mNext").onclick = () => { qi++; if (qi < quiz.length) return askQ(); finishMastery(); };
+function finishMastery() {
+  const need = Math.ceil(quiz.length * 7 / 8), ok = right >= need;
+  const p = (progress[cur.c.id] ||= {}), u = p[cur.unit] || { best: 0, mastered: false };
+  u.best = Math.max(u.best || 0, right); u.mastered = u.mastered || ok; p[cur.unit] = u; save(PROGRESS, progress);
+  $("mPlay").hidden = true; $("mDone").hidden = false;
+  $("mScore").textContent = `${right} / ${quiz.length}`;
+  $("mText").textContent = ok ? "Unit mastered! On to the next one." : `You need ${need} to master it. Go over the ones you missed with the tutor, then try a new check.`;
+}
+$("mGo").onclick = startMastery; $("mAgain").onclick = startMastery;
+$("mLearn").onclick = () => {
+  setMode("learn");
+  if (missed.length) send("I missed these on my mastery check. Can you help me understand them?\n" + missed.map(q => "- " + q).join("\n"));
+};
+$("toPick").onclick = showPick;
+$("toCourse").onclick = () => openCourse(cur.c.id);
+
+// ---------- grown-up settings ----------
+const hash = async s => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("hoot-pin:" + s)))].map(b => b.toString(16).padStart(2, "0")).join("");
+$("grownBtn").onclick = () => {
+  $("grown").hidden = false; $("settings").hidden = true; $("pinAsk").hidden = false; $("pin").value = ""; $("pinErr").hidden = true;
+  $("pinMsg").textContent = settings.pin ? "Enter your 4-digit grown-up PIN." : "Make a 4-digit grown-up PIN. You'll need it to change these settings.";
+  $("pin").focus();
+};
+$("pinCancel").onclick = () => { $("grown").hidden = true; };
+$("pinOk").onclick = async () => {
+  const v = $("pin").value.trim();
+  if (!/^\d{4}$/.test(v)) { $("pinErr").textContent = "The PIN is 4 numbers."; $("pinErr").hidden = false; return; }
+  const h = await hash(v);
+  if (settings.pin && settings.pin !== h) { $("pinErr").textContent = "That PIN doesn't match."; $("pinErr").hidden = false; return; }
+  if (!settings.pin) { settings.pin = h; save(SETTINGS, settings); }
+  $("pinAsk").hidden = true; $("settings").hidden = false; renderSettings();
+};
+function renderSettings() {
+  const box = $("helpOpts"); box.replaceChildren();
+  for (const [id, name, desc] of HELP_OPTS) {
+    const b = el("button", "choice" + (settings.help === id ? " right" : ""));
+    const t = el("span"); t.append(el("strong", null, name), el("br"), el("span", "small muted", desc));
+    b.append(el("b", null, settings.help === id ? "✓" : ""), t);
+    b.onclick = () => { settings.help = id; save(SETTINGS, settings); renderSettings(); };
+    box.append(b);
+  }
+  const sel = $("state");
+  if (!sel.options.length) for (const s of STATES) sel.append(new Option(s, s));
+  sel.value = settings.state;
+}
+$("state").onchange = e => { settings.state = e.target.value; save(SETTINGS, settings); };
+$("setDone").onclick = () => { $("grown").hidden = true; };
+
+// ---------- start ----------
+const [cid, uidx] = location.hash.slice(1).split("/");
+if (findCourse(cid)) { openCourse(cid); if (uidx !== undefined && findCourse(cid).units[+uidx] !== undefined) openUnit(+uidx, "learn"); }
+else showPick();
+</script>
+</body>
+</html>

@@ -20,6 +20,10 @@
 
   <!-- HOME -->
   <section id="home" class="wrap" style="padding:0;gap:18px">
+    <a class="panel feature" href="/tutor.html">
+      <h2>Learn with the tutor</h2>
+      <p class="small muted">Every course from kindergarten through calculus, plus AP, ACT, SAT and state tests. Hoot teaches step by step and helps with homework.</p>
+    </a>
     <div class="panel">
       <div>
         <h2>Make a new study set</h2>
@@ -136,11 +140,11 @@
 <div class="gate" id="gate" hidden>
   <div class="panel">
     <h2>Hi, grown-up!</h2>
-    <p>Hoot turns a student's review pages into flashcards and practice tests. Before a child uses it, please read this and agree.</p>
+    <p>Hoot is a tutor and study helper. It teaches school courses step by step and turns review pages into flashcards and practice tests. Before a child uses it, please read this and agree.</p>
     <ul>
-      <li>Photos and files are sent to our AI helper (Claude, made by Anthropic) to be read. We don't keep the photos.</li>
+      <li>Photos, files and messages to the tutor are sent to our AI helper (Claude, made by Anthropic) to be answered. We don't keep them on our server.</li>
       <li>We don't ask for a child's name, email or any account.</li>
-      <li>Study sets and scores stay on this device.</li>
+      <li>Study sets, tutor chats and scores stay on this device.</li>
       <li>Please help kids take pictures of school pages only, not faces or personal papers.</li>
     </ul>
     <p class="small"><a href="/privacy.html">Read the full privacy notice</a></p>
@@ -188,7 +192,11 @@
   let agreed = false;
   try { agreed = localStorage.getItem(CONSENT) === "yes"; } catch {}
   $("gate").hidden = agreed;
-  $("agreeBtn").onclick = () => { try { localStorage.setItem(CONSENT, "yes"); } catch {} $("gate").hidden = true; };
+  $("agreeBtn").onclick = () => {
+    try { localStorage.setItem(CONSENT, "yes"); } catch {}
+    if (new URLSearchParams(location.search).get("next") === "tutor") return location.replace("/tutor.html");
+    $("gate").hidden = true;
+  };
 
   // ---------- making a set ----------
   let busy = false, pick = null;
