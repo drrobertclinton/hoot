@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#2c7a57"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon.svg">
+<title>Coressence Kitchen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a kitchen notebook. Herb-green accent, saffron + plum for macros, one column on phones, bottom tab bar. */
+:root{
+ --bg:#f6f7f2;--surface:#ffffff;--sunk:#eef1ea;--ink:#1c2621;--muted:#58675f;--line:#dbe2d8;
+ --herb:#2c7a57;--herb-soft:#e2efe7;--on-herb:#ffffff;--saffron:#c27a12;--plum:#85507f;--warn:#a5402b;--warn-soft:#fbeae5;
+ --display:"Young Serif",Georgia,"Times New Roman",serif;--body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+ --r:12px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --bg:#111714;--surface:#19211d;--sunk:#141b17;--ink:#e5ece7;--muted:#9fb0a6;--line:#2b3630;
+ --herb:#5cbf8e;--herb-soft:#1f3328;--on-herb:#0d1a13;--saffron:#e7a646;--plum:#c693c0;--warn:#ec8a74;--warn-soft:#3a201a;color-scheme:dark}}
+:root[data-theme="dark"]{
+ --bg:#111714;--surface:#19211d;--sunk:#141b17;--ink:#e5ece7;--muted:#9fb0a6;--line:#2b3630;
+ --herb:#5cbf8e;--herb-soft:#1f3328;--on-herb:#0d1a13;--saffron:#e7a646;--plum:#c693c0;--warn:#ec8a74;--warn-soft:#3a201a;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.2;text-wrap:balance;margin:0}
+h2{font-size:1.45rem}h3{font-size:1.12rem}
+p{margin:0}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{border-bottom:1px solid var(--line);background:var(--surface)}
+header.top .wrap{padding-block:14px 12px;display:flex;flex-direction:column;gap:10px}
+.brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.brand small{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--herb);font-weight:700}
+.brand h1{font-size:1.6rem}
+main.wrap{padding-block:18px;display:flex;flex-direction:column;gap:16px}
+section.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.muted{color:var(--muted)}.small{font-size:.88rem}
+.eyebrow{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+button,.btn{font:inherit;font-weight:600;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:9px 14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+button:hover{border-color:var(--herb)}
+button.pri{background:var(--herb);color:var(--on-herb);border-color:var(--herb)}
+button:disabled{opacity:.55;cursor:wait}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,.chip:focus-visible{outline:2px solid var(--herb);outline-offset:2px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spread{justify-content:space-between}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:.86rem;font-weight:500;padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--herb-soft);border-color:var(--herb);color:var(--ink);font-weight:700}
+.person{font-weight:600}
+label{font-weight:600;font-size:.9rem;display:flex;flex-direction:column;gap:4px;min-width:0}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:9px 10px;width:100%;min-width:0}
+textarea{min-height:110px;resize:vertical}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat{background:var(--sunk);border-radius:10px;padding:10px;min-width:0}
+.stat b{display:block;font-size:1.35rem;font-variant-numeric:tabular-nums;font-family:var(--display);font-weight:400}
+.stat span{font-size:.78rem;color:var(--muted)}
+.stat.p b{color:var(--herb)}.stat.c b{color:var(--saffron)}.stat.f b{color:var(--plum)}
+@media (max-width:440px){.stats{grid-template-columns:repeat(2,1fr)}}
+.macro-bar{display:flex;height:10px;border-radius:6px;overflow:hidden;background:var(--sunk)}
+.macro-bar i{display:block}.mp{background:var(--herb)}.mc{background:var(--saffron)}.mf{background:var(--plum)}
+.hands{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.hand{border:1px dashed var(--line);border-radius:10px;padding:10px;font-size:.9rem}
+.hand b{font-size:1.1rem;font-variant-numeric:tabular-nums}
+.note{background:var(--herb-soft);border-radius:10px;padding:12px;font-size:.9rem}
+.disclaimer{background:var(--warn-soft);color:var(--ink);border-radius:10px;padding:12px;font-size:.84rem}
+.example{border:1px dashed var(--saffron);border-radius:10px;padding:10px 12px;font-size:.9rem}
+details{border-top:1px solid var(--line);padding-top:10px}
+details>summary{cursor:pointer;font-weight:700;list-style:none;display:flex;justify-content:space-between;gap:8px}
+details>summary::after{content:"+";color:var(--herb);font-weight:700}
+details[open]>summary::after{content:"–"}
+details>div{padding-top:10px;display:flex;flex-direction:column;gap:10px}
+ul.tips{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:4px}
+.list{display:flex;flex-direction:column;gap:8px}
+.rcard{display:grid;grid-template-columns:1fr auto;gap:4px 10px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;width:100%;font-weight:400}
+.rcard .nm{font-weight:700;min-width:0}
+.rcard .kc{font-family:var(--display);font-variant-numeric:tabular-nums;white-space:nowrap}
+.rcard .meta{grid-column:1/-1;font-size:.82rem;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.tag{font-size:.74rem;padding:2px 7px;border-radius:999px;background:var(--sunk);color:var(--muted);font-weight:600}
+.tag.good{background:var(--herb-soft);color:var(--herb)}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+.tbl{overflow-x:auto}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+ol.steps{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:6px}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:18px;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}
+.drop img{max-height:220px;border-radius:8px}
+.pick{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.pick .rank{font-family:var(--display);font-size:1.6rem;color:var(--herb);line-height:1}
+.status{font-size:.92rem;color:var(--muted)}
+.err{color:var(--warn);font-weight:600}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);z-index:5}
+nav.tabs .in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav.tabs button{border:0;border-radius:0;background:none;flex-direction:column;gap:2px;font-size:.72rem;font-weight:600;color:var(--muted);padding:9px 2px}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button[aria-current="page"]{color:var(--herb)}
+.sheet{position:fixed;inset:0;background:rgba(10,20,15,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sheet[hidden]{display:none!important}
+.panel{background:var(--bg);width:100%;max-width:720px;max-height:92vh;overflow-y:auto;border-radius:16px 16px 0 0;padding:18px max(16px,env(safe-area-inset-left,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:.9rem;z-index:30}
+@media (prefers-reduced-motion:no-preference){section.card{animation:rise .25s ease-out both}@keyframes rise{from{transform:translateY(4px)}to{transform:none}}}
+</style>
+</head><body>
+<header class="top"><div class="wrap"><div class="brand"><small>Coressence</small><h1>Kitchen</h1><span class="muted small">Healthy cooking, built around you</span></div><div class="chips" id="people" aria-label="Who are we cooking for"></div></div></header>
+<main class="wrap" id="main"></main>
+<script>window.KITCHEN_AI_ENDPOINT="";</script>
+<script>
+/* Coressence Kitchen content. Macros are per serving, estimates for typical brands.
+   x = contains: G gluten, D dairy, N tree nuts/peanuts, S shellfish, F fish, E egg, Y soy, M beef/lamb, P poultry, K pork, Z sesame */
+const RECIPES = [
+ {id:'yogurt-bowl',n:'Greek yogurt power bowl',cat:'Breakfast',t:5,s:1,k:330,p:26,c:30,f:12,fi:7,na:90,x:'DN',
+  ing:['1 cup plain 2% Greek yogurt','3/4 cup mixed berries','1 tbsp chia seeds','1 tbsp chopped walnuts','Cinnamon, a drizzle of honey if wanted'],
+  st:['Spoon yogurt into a bowl.','Top with berries, chia and walnuts.','Finish with cinnamon. Skip the honey to cut about 60 calories.']},
+ {id:'veg-scramble',n:'Veggie egg scramble with toast',cat:'Breakfast',t:12,s:1,k:330,p:29,c:18,f:15,fi:4,na:520,x:'EDG',
+  ing:['2 eggs + 1/2 cup liquid egg whites','1 cup spinach','1/2 bell pepper, diced','2 tbsp feta','1 slice whole-grain toast','1 tsp olive oil'],
+  st:['Warm oil in a nonstick pan over medium. Soften pepper 3 minutes.','Add spinach until wilted.','Pour in eggs and whites; stir gently until set (no runny egg).','Top with feta. Serve with toast.']},
+ {id:'overnight-oats',n:'Protein overnight oats',cat:'Breakfast',t:5,s:1,k:340,p:22,c:48,f:6,fi:7,na:100,x:'D',
+  ing:['1/2 cup rolled oats (certified gluten-free if needed)','1/2 cup low-fat milk','1/2 cup plain Greek yogurt','1/2 cup berries','1 tsp chia, cinnamon, vanilla'],
+  st:['Stir everything but the berries in a jar.','Refrigerate overnight (or at least 4 hours).','Top with berries in the morning. Eat cold or warmed.']},
+ {id:'egg-muffins',n:'Sheet-pan egg muffins',cat:'Breakfast',t:30,s:6,k:210,p:18,c:4,f:13,fi:1,na:420,x:'EP',
+  ing:['10 eggs','6 oz cooked turkey sausage, crumbled','2 cups chopped vegetables (peppers, onion, spinach)','Salt-free seasoning, black pepper','Cooking spray'],
+  st:['Heat oven to 350°F and spray a 12-cup muffin tin.','Divide sausage and vegetables among cups.','Whisk eggs with seasoning; pour over.','Bake 20–22 minutes until set. A serving is 2 muffins. Keeps 4 days in the fridge.']},
+ {id:'tofu-scramble',n:'Turmeric tofu scramble',cat:'Breakfast',t:15,s:2,k:280,p:22,c:14,f:15,fi:4,na:380,x:'Y',
+  ing:['14 oz extra-firm tofu, drained','1/2 tsp turmeric, 1/2 tsp garlic powder','1 cup chopped kale or spinach','1/2 cup cherry tomatoes','1 tsp olive oil','2 tbsp nutritional yeast'],
+  st:['Crumble tofu into a hot oiled pan.','Add spices and cook 5 minutes, stirring.','Add greens and tomatoes until wilted.','Stir in nutritional yeast and serve.']},
+ {id:'smoothie',n:'Protein smoothie (GLP-1 friendly)',cat:'Snack',t:5,s:1,k:250,p:28,c:24,f:5,fi:5,na:180,x:'D',
+  ing:['1 scoop whey or plant protein','1 cup unsweetened milk of choice','1/2 frozen banana','1/2 cup frozen berries','1 tbsp ground flax','Ice'],
+  st:['Blend until smooth.','Sip slowly over 15–20 minutes. Small sips sit easier on a GLP-1 stomach.']},
+ {id:'burrito-bowl',n:'Grilled chicken burrito bowl',cat:'Lunch',t:30,s:4,k:480,p:40,c:48,f:13,fi:11,na:560,x:'P',
+  ing:['1 1/4 lb chicken breast','1 tbsp chili-lime seasoning (salt-free)','2 cups cooked brown rice','1 can black beans, rinsed','2 cups shredded romaine','1 cup pico de gallo','1 avocado, sliced','Lime wedges'],
+  st:['Season chicken; grill over medium-high 6–8 minutes per side to 165°F. Rest 5 minutes and slice.','Warm the beans.','Build bowls: lettuce, 1/2 cup rice, beans, chicken, pico, a few avocado slices.','Squeeze lime over the top.']},
+ {id:'lettuce-wraps',n:'Turkey lettuce wraps',cat:'Lunch',t:20,s:4,k:300,p:28,c:12,f:15,fi:3,na:590,x:'PY',
+  ing:['1 lb 93% lean ground turkey','1 tbsp sesame or avocado oil','2 cloves garlic, 1 tbsp ginger','1 can water chestnuts, chopped','3 tbsp low-sodium soy sauce or coconut aminos','1 tbsp rice vinegar','Butter lettuce leaves, shredded carrot, green onion'],
+  st:['Brown turkey in oil, breaking it up, until no pink remains (165°F).','Add garlic, ginger, water chestnuts; cook 2 minutes.','Stir in soy sauce and vinegar.','Spoon into lettuce cups and top with carrot and onion.']},
+ {id:'tuna-bean',n:'Tuna and white bean salad',cat:'Lunch',t:10,s:2,k:360,p:34,c:28,f:12,fi:9,na:480,x:'F',
+  ing:['2 cans (5 oz) tuna in water, drained','1 can cannellini beans, rinsed','1/4 red onion, minced','1 cup cherry tomatoes, halved','1 tbsp olive oil + juice of 1 lemon','Parsley, black pepper'],
+  st:['Toss everything in a bowl.','Rest 10 minutes so the onion mellows.','Serve over greens or with whole-grain crackers.']},
+ {id:'lentil-soup',n:'Lentil vegetable soup',cat:'Lunch',t:45,s:6,k:260,p:15,c:42,f:4,fi:15,na:420,x:'',
+  ing:['1 1/2 cups dry green or brown lentils, rinsed','1 onion, 2 carrots, 2 celery stalks, diced','3 cloves garlic','1 can no-salt-added diced tomatoes','8 cups low-sodium vegetable broth','2 tsp cumin, 1 tsp smoked paprika','2 cups spinach, lemon juice'],
+  st:['Sweat onion, carrot and celery in a splash of broth 6 minutes.','Add garlic, spices, tomatoes, lentils and broth.','Simmer 25–30 minutes until lentils are tender.','Stir in spinach and lemon. Freezes well.']},
+ {id:'greek-chicken-salad',n:'Greek chicken salad with tzatziki',cat:'Lunch',t:25,s:4,k:410,p:40,c:14,f:21,fi:4,na:620,x:'PD',
+  ing:['1 1/4 lb chicken breast','Lemon, oregano, garlic','6 cups chopped romaine','1 cucumber, 1 cup cherry tomatoes, 1/4 red onion','1/4 cup kalamata olives','1/4 cup feta','3/4 cup tzatziki (Greek yogurt based)'],
+  st:['Marinate chicken in lemon, oregano and garlic 15+ minutes.','Bake at 425°F 18–22 minutes to 165°F, or grill.','Slice over the salad.','Use tzatziki as the dressing.']},
+ {id:'shrimp-stirfry',n:'Shrimp and vegetable stir-fry',cat:'Dinner',t:20,s:4,k:400,p:30,c:45,f:10,fi:5,na:610,x:'SY',
+  ing:['1 lb peeled shrimp','4 cups mixed vegetables (broccoli, snap peas, peppers)','1 tbsp avocado oil','2 cloves garlic, 1 tbsp ginger','3 tbsp low-sodium soy sauce + 1 tsp cornstarch + 1/4 cup water','2 cups cooked brown rice'],
+  st:['Stir-fry vegetables in hot oil 4 minutes; set aside.','Cook shrimp 2–3 minutes per side until pink and opaque.','Return vegetables, add garlic, ginger and sauce; toss until glossy.','Serve over 1/2 cup rice per person.']},
+ {id:'chickpea-bowl',n:'Chickpea quinoa bowl, lemon tahini',cat:'Lunch',t:25,s:4,k:450,p:17,c:58,f:17,fi:12,na:380,x:'Z',
+  ing:['1 cup dry quinoa, rinsed','2 cans chickpeas, rinsed','2 cups roasted vegetables','2 cups greens','3 tbsp tahini + lemon + water to thin','Paprika, cumin'],
+  st:['Cook quinoa in 2 cups water 15 minutes.','Roast chickpeas with spices at 425°F 20 minutes.','Whisk tahini, lemon and water into a drizzle.','Build bowls and drizzle.']},
+ {id:'sheet-salmon',n:'Sheet-pan lemon herb salmon',cat:'Dinner',t:25,s:4,k:420,p:36,c:10,f:26,fi:3,na:330,x:'F',
+  ing:['4 salmon fillets (5 oz each)','1 bunch asparagus','1 pint cherry tomatoes','1 tbsp olive oil','Lemon, dill, garlic, black pepper'],
+  st:['Heat oven to 400°F.','Toss vegetables with oil on a sheet pan; roast 5 minutes.','Add salmon, top with lemon, dill and garlic.','Roast 12–15 minutes until fish flakes and reads 145°F.']},
+ {id:'chicken-roast-veg',n:'Herb chicken, roasted veg and sweet potato',cat:'Dinner',t:40,s:4,k:450,p:42,c:38,f:13,fi:6,na:400,x:'P',
+  ing:['1 1/2 lb chicken breast','2 medium sweet potatoes, cubed','4 cups broccoli and carrots','1 1/2 tbsp olive oil','Italian herbs, garlic powder, pepper'],
+  st:['Heat oven to 425°F. Roast sweet potato 10 minutes.','Add vegetables and seasoned chicken to the pan.','Roast 18–22 minutes until chicken reads 165°F.','Rest chicken 5 minutes before slicing.']},
+ {id:'turkey-meatballs',n:'Turkey meatballs marinara',cat:'Dinner',t:35,s:4,k:430,p:36,c:34,f:16,fi:7,na:640,x:'PEGD',
+  ing:['1 lb 93% lean ground turkey','1 egg, 1/3 cup whole-wheat breadcrumbs','2 tbsp parmesan, garlic, Italian herbs','2 cups low-sodium marinara','4 cups zucchini noodles or 6 oz whole-wheat pasta'],
+  st:['Mix turkey, egg, crumbs, parmesan and herbs; roll 16 meatballs.','Bake at 400°F 18–20 minutes to 165°F.','Simmer in marinara 5 minutes.','Serve over zucchini noodles or a half-and-half mix with pasta.']},
+ {id:'beef-broccoli',n:'Lean beef and broccoli',cat:'Dinner',t:25,s:4,k:410,p:35,c:30,f:16,fi:4,na:620,x:'MY',
+  ing:['1 lb flank or sirloin steak, thinly sliced','5 cups broccoli florets','1 tbsp avocado oil','3 tbsp low-sodium soy sauce, 1 tbsp honey, 1 tsp cornstarch','Garlic, ginger','1 1/3 cups cooked brown rice'],
+  st:['Sear beef in hot oil in batches, 1–2 minutes a side; remove.','Steam-fry broccoli with 2 tbsp water 3 minutes.','Add garlic, ginger, sauce and beef; toss until thick.','Serve with 1/3 cup rice each.']},
+ {id:'pork-apples',n:'Pork tenderloin with apples',cat:'Dinner',t:35,s:4,k:340,p:33,c:22,f:12,fi:5,na:300,x:'K',
+  ing:['1 1/4 lb pork tenderloin','2 apples, sliced','1 onion, sliced','12 oz green beans','1 tbsp olive oil, Dijon, thyme'],
+  st:['Rub pork with Dijon and thyme; sear on all sides.','Add apples and onion around it in an oven-safe pan.','Roast at 425°F 18–22 minutes to 145°F; rest 3 minutes.','Steam green beans and serve alongside.']},
+ {id:'cod-papillote',n:'Cod in parchment with tomatoes',cat:'Dinner',t:25,s:4,k:260,p:32,c:10,f:10,fi:3,na:480,x:'F',
+  ing:['4 cod fillets (6 oz)','2 cups cherry tomatoes','1/4 cup olives, sliced','2 zucchini, thinly sliced','1 tbsp olive oil, lemon, garlic, basil'],
+  st:['Heat oven to 400°F. Lay zucchini on 4 parchment sheets.','Top with cod, tomatoes, olives, garlic, a little oil and lemon.','Fold into sealed packets.','Bake 12–15 minutes to 145°F. Open carefully, steam is hot.']},
+ {id:'chicken-chili',n:'Slow cooker chicken chili',cat:'Dinner',t:15,s:6,k:360,p:34,c:34,f:8,fi:11,na:540,x:'P',
+  ing:['2 lb chicken breast','2 cans beans (white or pinto), rinsed','1 can corn, drained','1 can diced green chiles','1 onion, diced','3 cups low-sodium chicken broth','Cumin, chili powder, oregano'],
+  st:['Put everything in the slow cooker.','Cook on low 6 hours or high 3 hours.','Shred chicken with two forks; stir back in.','Top with Greek yogurt, cilantro and lime.']},
+ {id:'bean-enchiladas',n:'Black bean and sweet potato enchiladas',cat:'Dinner',t:45,s:4,k:430,p:16,c:66,f:12,fi:15,na:560,x:'D',
+  ing:['2 sweet potatoes, cubed and roasted','1 can black beans, rinsed','8 corn tortillas','1 1/2 cups red enchilada sauce','1/2 cup shredded cheese (or skip for dairy-free)','Cumin, cilantro'],
+  st:['Mash half the sweet potato with beans and cumin.','Fill tortillas, roll and place seam-down in a dish.','Cover with sauce and cheese.','Bake at 375°F 20 minutes.']},
+ {id:'air-tenders',n:'Air fryer crispy chicken tenders',cat:'Dinner',t:25,s:4,k:300,p:36,c:10,f:13,fi:1,na:420,x:'PEN',
+  ing:['1 1/4 lb chicken tenderloins','1 egg, beaten','3/4 cup almond flour (or whole-wheat panko)','Smoked paprika, garlic powder','Cooking spray'],
+  st:['Dip tenders in egg, then seasoned almond flour.','Spray lightly and place in a single layer.','Air fry at 380°F 10–12 minutes, flipping halfway, to 165°F.','Serve with Greek yogurt ranch and raw vegetables.']},
+ {id:'flank-chimichurri',n:'Grilled flank steak, chimichurri',cat:'Dinner',t:25,s:4,k:360,p:36,c:6,f:21,fi:2,na:360,x:'M',
+  ing:['1 1/4 lb flank steak','1 cup parsley, 2 garlic cloves, 2 tbsp olive oil, 2 tbsp red wine vinegar, chili flakes','Large mixed salad'],
+  st:['Blend or chop the chimichurri ingredients.','Grill steak over high heat 4–6 minutes a side to 145°F.','Rest 5 minutes; slice thinly against the grain.','Spoon chimichurri over steak and salad.']},
+ {id:'shrimp-tacos',n:'Shrimp tacos with crunchy slaw',cat:'Dinner',t:20,s:4,k:380,p:28,c:36,f:13,fi:6,na:590,x:'SD',
+  ing:['1 lb shrimp','1 tbsp taco seasoning (low-sodium)','8 small corn tortillas','3 cups shredded cabbage','1/2 cup Greek yogurt + lime + chipotle','Avocado, cilantro'],
+  st:['Season shrimp and sear 2 minutes a side.','Toss cabbage with half the yogurt sauce.','Warm tortillas.','Fill with slaw and shrimp; drizzle remaining sauce.']},
+ {id:'turkey-burger',n:'Turkey burgers with oven fries',cat:'Dinner',t:35,s:4,k:450,p:34,c:36,f:18,fi:6,na:600,x:'PG',
+  ing:['1 lb 93% lean ground turkey','Worcestershire, garlic, onion powder','4 whole-wheat buns (or lettuce wraps)','2 medium potatoes cut into wedges, 1 tbsp olive oil','Lettuce, tomato, mustard'],
+  st:['Toss wedges with oil; bake at 425°F 30 minutes, flipping once.','Form 4 patties; grill or pan-cook 5–6 minutes a side to 165°F.','Build burgers with lettuce, tomato and mustard.','Use a lettuce wrap to drop 20+ g carbs.']},
+ {id:'coconut-curry',n:'Tofu vegetable coconut curry',cat:'Dinner',t:30,s:4,k:470,p:20,c:50,f:21,fi:8,na:480,x:'Y',
+  ing:['14 oz extra-firm tofu, cubed','1 can light coconut milk','2 tbsp red curry paste','4 cups vegetables (peppers, spinach, cauliflower)','1 1/3 cups cooked brown rice','Lime, basil'],
+  st:['Bake or air fry tofu at 400°F until golden.','Simmer curry paste and coconut milk 3 minutes.','Add vegetables until tender, then tofu.','Serve over 1/3 cup rice with lime.']},
+ {id:'chicken-veg-soup',n:'Pressure cooker chicken vegetable soup',cat:'Lunch',t:35,s:6,k:250,p:28,c:18,f:6,fi:4,na:520,x:'P',
+  ing:['1 1/2 lb chicken breast','3 carrots, 3 celery stalks, 1 onion','2 cups green beans or zucchini','1 can no-salt-added diced tomatoes','8 cups low-sodium chicken broth','Thyme, bay leaf, black pepper'],
+  st:['Add everything to the pressure cooker.','Cook on high 10 minutes; natural release 10 minutes.','Shred chicken and stir back in.','Gentle on the stomach when recovering from illness.']},
+ {id:'egg-roll-bowl',n:'Egg roll in a bowl',cat:'Dinner',t:20,s:4,k:290,p:27,c:12,f:15,fi:4,na:560,x:'PY',
+  ing:['1 lb lean ground turkey or chicken','1 bag (14 oz) coleslaw mix','1 tbsp sesame or avocado oil','3 tbsp low-sodium soy sauce','Garlic, ginger, green onion, sriracha'],
+  st:['Brown the meat in oil to 165°F.','Add garlic and ginger 1 minute.','Add slaw mix and soy sauce; cook 4–5 minutes until just tender.','Top with green onion and sriracha.']},
+ {id:'stuffed-peppers',n:'Stuffed bell peppers',cat:'Dinner',t:50,s:4,k:400,p:30,c:34,f:15,fi:6,na:520,x:'MD',
+  ing:['4 bell peppers, tops cut off','1 lb 93% lean ground beef','1 cup cooked brown rice','1 can no-salt-added diced tomatoes','1/2 cup shredded mozzarella','Italian seasoning, garlic'],
+  st:['Brown beef to 160°F; drain.','Stir in rice, tomatoes and seasoning.','Fill peppers, cover with foil, bake at 375°F 30 minutes.','Top with cheese; bake 5 more minutes.']},
+ {id:'roasted-chickpeas',n:'Crispy roasted chickpeas',cat:'Snack',t:35,s:4,k:150,p:7,c:20,f:5,fi:6,na:200,x:'',
+  ing:['2 cans chickpeas, rinsed and patted very dry','1 tbsp olive oil','Smoked paprika, garlic powder, pinch of salt'],
+  st:['Heat oven to 425°F.','Toss chickpeas with oil and spices.','Roast 25–30 minutes, shaking twice, until crunchy.']},
+ {id:'hummus-plate',n:'Hummus and veggie plate',cat:'Snack',t:5,s:1,k:180,p:6,c:18,f:10,fi:6,na:280,x:'Z',
+  ing:['1/4 cup hummus','1 cup carrots, cucumber, peppers, snap peas'],
+  st:['Slice the vegetables.','Dip and enjoy.']},
+ {id:'cottage-berries',n:'Cottage cheese and berries',cat:'Snack',t:2,s:1,k:180,p:20,c:16,f:3,fi:2,na:450,x:'D',
+  ing:['3/4 cup low-fat cottage cheese','1/2 cup berries','Cinnamon'],st:['Top cottage cheese with berries and cinnamon.']},
+ {id:'edamame',n:'Steamed edamame',cat:'Snack',t:5,s:1,k:190,p:17,c:14,f:8,fi:8,na:10,x:'Y',
+  ing:['1 cup shelled edamame (frozen)','Lemon, chili flakes, pinch of flaky salt'],st:['Steam or microwave 3–4 minutes.','Season and serve warm or cold.']},
+ {id:'eggs-fruit',n:'Hard-boiled eggs and fruit',cat:'Snack',t:15,s:1,k:200,p:13,c:15,f:10,fi:3,na:140,x:'E',
+  ing:['2 eggs','1 small apple or orange'],st:['Cover eggs with water, bring to a boil, cover and rest 10–12 minutes off heat.','Cool in ice water and peel.','Eat with the fruit.']}
+];
+
+const PROTEINS = [
+ {n:'Chicken breast',safe:'165°F',m:[['Bake / roast','425°F, 18–22 min'],['Grill','Medium-high, 6–8 min per side'],['Air fry','380°F, 16–20 min, flip halfway'],['Poach','Gentle simmer in broth, 12–15 min'],['Sear then oven','3 min per side, finish at 400°F for 8–10 min'],['Slow cook','Low 4–6 h']],tip:'Pound to an even 3/4 inch so it cooks evenly and stays juicy. A 30-minute brine (1 tbsp salt per 4 cups water) helps if you are not watching sodium.'},
+ {n:'Chicken thighs (boneless, skinless)',safe:'165°F (most tender at 175°F)',m:[['Roast','425°F, 20–25 min'],['Grill','5–7 min per side'],['Air fry','380°F, 18–22 min'],['Pressure cook','High 8–10 min, natural release 5 min']],tip:'Trim visible fat. Thighs forgive overcooking and have more iron than breast.'},
+ {n:'Ground turkey or chicken',safe:'165°F',m:[['Pan crumble','Medium-high, 8–10 min'],['Meatballs','Bake at 400°F, 18–20 min'],['Burgers','Grill or pan, 5–6 min per side']],tip:'Pick 93% lean or higher. Add grated zucchini or mushrooms for moisture and volume.'},
+ {n:'Beef steak (sirloin, flank, tenderloin)',safe:'145°F + 3 min rest',m:[['Grill','High heat, 4–6 min per side'],['Broil','5–7 min per side, 4 in from heat'],['Pan sear','Cast iron, 3–4 min per side'],['Sous-vide style','Oven at 250°F to 135°F, then sear']],tip:'Choose "loin" or "round" cuts. Slice against the grain. Marinate and flip often to cut charring.'},
+ {n:'Ground beef',safe:'160°F',m:[['Pan brown','8–10 min, drain the fat'],['Meatloaf','Bake at 350°F, 55–65 min'],['Burgers','4–5 min per side']],tip:'90–95% lean. Half beef, half lentils or mushrooms cuts fat and adds fiber.'},
+ {n:'Pork tenderloin and chops',safe:'145°F + 3 min rest',m:[['Roast tenderloin','425°F, 20–25 min'],['Grill','Turn every 5 min, 15–20 min total'],['Air fry','400°F, 18–20 min'],['Chops: sear + bake','4 min per side, then 400°F 8–10 min']],tip:'Tenderloin is about as lean as chicken breast. Skip breaded or sugary glazes.'},
+ {n:'Salmon and trout',safe:'145°F or flakes easily',m:[['Bake','400°F, 12–15 min'],['Air fry','390°F, 8–10 min'],['Grill','Skin side down on foil, 6–8 min'],['Poach','Simmering water or broth, 8–10 min'],['In parchment','400°F, 12–15 min']],tip:'Aim for fish twice a week. Salmon gives omega-3s; leave the skin on while cooking to protect it.'},
+ {n:'White fish (cod, tilapia, halibut)',safe:'145°F',m:[['Bake','400°F, 10–12 min'],['In parchment','400°F, 12–15 min'],['Pan sear','3–4 min per side'],['Steam','8–10 min']],tip:'Very lean and mild. Lemon, herbs and tomatoes do the flavor work without much fat.'},
+ {n:'Shrimp and scallops',safe:'Pink and opaque',m:[['Sauté','2–3 min per side'],['Grill skewers','2–3 min per side'],['Roast','400°F, 8–10 min'],['Air fry','400°F, 6–8 min']],tip:'Shrimp is high protein, very low fat. Watch sodium in pre-seasoned frozen bags.'},
+ {n:'Tofu and tempeh',safe:'Heat through',m:[['Bake','400°F, 25–30 min, flip once'],['Air fry','400°F, 12–15 min'],['Stir-fry','8–10 min'],['Crumble scramble','5–7 min']],tip:'Press extra-firm tofu 15 minutes for a crisp outside. Tempeh has more protein and fiber.'},
+ {n:'Eggs',safe:'Yolk and white firm; egg dishes 160°F',m:[['Hard boil','Cover, boil, rest 10–12 min'],['Poach','Simmer 3–4 min'],['Bake (muffin cups)','350°F, 20–22 min'],['Scramble','Low heat, 1 tsp oil']],tip:'Mixing whole eggs and whites keeps protein high and lowers fat.'},
+ {n:'Beans and lentils',safe:'Fully soft',m:[['Lentils (dry)','Simmer 20–25 min, no soaking'],['Dry beans','Soak overnight, simmer 60–90 min'],['Pressure cook beans','High 25–40 min'],['Canned','Rinse well to cut sodium by about 40%']],tip:'The cheapest protein plus fiber. Kidney beans must be boiled hard, never slow-cooked from raw.'},
+ {n:'Vegetables',safe:'Tender-crisp',m:[['Roast','425°F, 20–30 min'],['Steam','4–8 min'],['Air fry','380°F, 10–15 min'],['Grill','Medium-high, 5–10 min'],['Sauté','1 tsp oil, 5–8 min']],tip:'Fill half the plate. Roasting brings out sweetness without sugar.'},
+ {n:'Whole grains',safe:'Tender',m:[['Brown rice','1 : 2 water, 40–45 min'],['Quinoa','Rinse, 1 : 2 water, 15 min'],['Farro','Simmer 25–30 min'],['Oats','Rolled 5 min, steel-cut 25 min']],tip:'A serving is about 1/2 cup cooked, one cupped hand.'}
+];
+
+const PRINCIPLES = [
+ ['Build the plate first','Half vegetables, a quarter lean protein, a quarter whole-grain or starchy carb, plus a thumb of healthy fat.'],
+ ['Pick gentle cooking methods','Steam, poach, bake, roast, grill, air fry and pressure cook. Save deep-frying for rare treats.'],
+ ['Measure the oil','Every tablespoon of oil is about 120 calories. Use a spray or a teaspoon and a nonstick pan.'],
+ ['Flavor without salt','Lemon, lime, vinegar, garlic, herbs, smoked paprika, cumin and chili do more than salt. Taste before you add salt.'],
+ ['Protein at every meal','About 25–35 g a meal keeps you full and protects muscle, more so when losing weight or on a GLP-1.'],
+ ['Fiber is the quiet hero','Aim for 25–38 g a day from beans, vegetables, berries, oats and whole grains. Add it gradually.'],
+ ['Fish twice a week','Salmon, trout and sardines for omega-3s. Keep high-mercury fish (swordfish, king mackerel) rare.'],
+ ['Cut ultra-processed foods','Cook from whole ingredients most of the time. Read labels for sodium, added sugar and serving size.'],
+ ['Drink water, not calories','Sugary drinks are the easiest calories to cut. Sparkling water with citrus works.'],
+ ['Keep it safe','Use a thermometer. Separate boards for raw meat. Refrigerate leftovers within 2 hours and eat within 3–4 days.']
+];
+
+const SWAPS = [
+ ['Sour cream','Plain Greek yogurt','Twice the protein, a third of the fat'],
+ ['Mayonnaise','Mashed avocado or yogurt + mustard','Better fats, fewer calories'],
+ ['Frying','Air frying or oven "frying"','Same crunch, about 70–80% less oil'],
+ ['80% ground beef','93% turkey or 90–95% beef','Much less saturated fat'],
+ ['White rice','Brown rice, cauliflower rice or half and half','More fiber, fewer carbs'],
+ ['Regular pasta','Whole-wheat, lentil pasta or zucchini noodles','More fiber and protein'],
+ ['Heavy cream','Evaporated skim milk or blended cauliflower','Creamy without the fat'],
+ ['Butter in baking','Half unsweetened applesauce','Cuts fat by half'],
+ ['Sugar in recipes','Cut by a third; add cinnamon or vanilla','Most recipes still taste sweet'],
+ ['Breadcrumbs','Whole-wheat panko, oats or almond flour','More fiber; almond is gluten-free'],
+ ['Salt','Lemon, herbs, garlic, salt-free blends','Lower blood pressure load'],
+ ['Flour tortillas','Corn or whole-wheat tortillas','Fewer calories, more fiber'],
+ ['Lots of mild cheese','Half as much sharp cheese','Same flavor, less fat'],
+ ['Bacon','Turkey bacon or smoked paprika','Smoky flavor with less fat and sodium'],
+ ['Canned cream soups','Milk thickened with flour, or blended white beans','Far less sodium'],
+ ['Soda or juice','Sparkling water with fruit','Removes empty sugar']
+];
+
+/* Eating out: general patterns by restaurant type (no brand-specific claims) */
+const EATOUT = [
+ {n:'Burger places',best:['Grilled chicken sandwich, no mayo','Single patty burger in a lettuce wrap or a plain bun','Side salad or fruit cup instead of fries'],tweak:['Ask for mustard, ketchup or pico instead of mayo-based sauces','Skip the cheese and bacon to save 150–250 calories'],avoid:['Double and triple patties','Large fries and shakes']},
+ {n:'Chicken spots',best:['Grilled nuggets or grilled filets','Grilled chicken salad with dressing on the side','Grilled chicken wrap'],tweak:['Choose a light vinaigrette and use half','Swap fries for a side salad or fruit'],avoid:['Fried and breaded chicken','Creamy dipping sauces (often 100–200 cal each)']},
+ {n:'Mexican and bowl places',best:['Burrito bowl: chicken or steak, beans, fajita veg, salsa, lettuce','Soft tacos with grilled meat on corn tortillas','Fajitas with corn tortillas'],tweak:['Half rice or no rice, extra beans and vegetables','Choose salsa and a little guacamole over cheese and sour cream'],avoid:['Big flour tortillas (300+ cal by themselves)','Queso, chips and chimichangas']},
+ {n:'Sandwich and sub shops',best:['6-inch turkey, chicken or roast beef on whole wheat','Any protein as a salad or bowl','Lots of vegetables'],tweak:['Mustard or vinegar instead of mayo','Light or no cheese'],avoid:['Footlongs and meatball subs','Salami, pepperoni and other cured meats (high sodium)']},
+ {n:'Pizza',best:['Thin crust with vegetables and chicken','Two slices plus a side salad'],tweak:['Ask for light cheese','Blot the oil off the top'],avoid:['Stuffed or deep-dish crust','Pepperoni, sausage and extra cheese']},
+ {n:'Asian and stir-fry',best:['Steamed or grilled chicken, shrimp or tofu with vegetables','Sashimi, poke or simple rolls','Broth-based soups'],tweak:['Sauce on the side; ask for less oil','Brown rice or half rice'],avoid:['Fried rice, lo mein, tempura','Sweet glazes like orange or General Tso’s']},
+ {n:'Breakfast and coffee',best:['Egg white or egg-and-veg wrap','Plain oatmeal with fruit or nuts','Greek yogurt parfait'],tweak:['Unsweetened latte or coffee with milk','Skip syrups and whipped cream'],avoid:['Pastries, muffins and scones','Large sweetened coffee drinks (often 400+ cal)']},
+ {n:'Steakhouse and grill',best:['Sirloin, filet or grilled fish','Grilled chicken with two vegetable sides','Shrimp cocktail starter'],tweak:['Plain baked potato or sweet potato, toppings on the side','Box half of the steak before you start'],avoid:['Ribeye and prime rib (much fattier)','Loaded potatoes and fried onion starters']},
+ {n:'Italian',best:['Grilled chicken or fish with vegetables','Minestrone and a salad','Pasta with marinara and vegetables, lunch-size portion'],tweak:['Ask for half pasta, extra vegetables','Skip the bread basket refill'],avoid:['Alfredo, carbonara and other cream sauces','Fried calamari and parmigiana dishes']},
+ {n:'Gas station and on the run',best:['Hard-boiled eggs, cheese sticks, jerky (watch sodium)','Greek yogurt, fruit, nuts','Protein shake with under 10 g sugar'],tweak:['Read the label for serving size','Water or unsweetened tea'],avoid:['Hot case fried food','Candy, pastries and energy drinks']}
+];
+
+const CONDITIONS = {
+ glp1:{n:'On a GLP-1 (semaglutide, tirzepatide, etc.)',tips:['Eat protein first at each meal, about 25–35 g, to protect muscle while you lose weight.','Use small plates and stop at the first sign of fullness. Eat slowly, over 20+ minutes.','Four or five small meals often sit better than three big ones.','Greasy, fried and very sweet foods tend to make nausea worse.','Drink at least 8 cups of fluid a day; sip between meals rather than with them.','Add fiber slowly (vegetables, berries, oats, beans) to help with constipation.','Strength training plus protein helps keep muscle. Ask your care team about a multivitamin.']},
+ diabetes:{n:'Diabetes or prediabetes',tips:['Use the plate method: half non-starchy vegetables, a quarter protein, a quarter carbs.','Pair carbs with protein or fat; eat vegetables and protein first.','Choose high-fiber carbs: beans, lentils, whole grains, berries.','Keep carb amounts steady from day to day, especially if you take insulin.','Drink water and unsweetened drinks.']},
+ heart:{n:'Heart health or high blood pressure',tips:['Keep sodium under 2,300 mg a day; many people aim for 1,500 mg.','Rinse canned beans and vegetables, and cook with herbs and acid instead of salt.','Fish twice a week, olive oil in place of butter, more potassium foods (unless your kidney doctor limits them).','Choose lean cuts and limit processed meats.']},
+ kidney:{n:'Kidney disease',tips:['Protein, potassium, phosphorus and sodium limits depend on your stage and labs. A renal dietitian should set them.','This app lowers protein targets for you, but follow your care team’s numbers first.','Avoid salt substitutes that use potassium unless your doctor approves.']},
+ muscle:{n:'Muscle disease, muscle loss or age 65+',tips:['Spread protein evenly: about 25–40 g at each meal.','Leucine-rich foods help muscle: dairy, eggs, meat, fish, soy.','Do strength or resistance work as your care team allows.','Ask your doctor about vitamin D and whether you need more calories.','If chewing or swallowing is hard, try soups, smoothies, eggs, fish and ground meats.']},
+ illness:{n:'Recovering from illness or surgery',tips:['Healing needs enough calories and extra protein. This is not the time for strict dieting.','Small, frequent meals and snacks are easier to finish.','Soups, smoothies, eggs, yogurt and soft cooked foods go down easily.','Keep fluids up, especially with fever, vomiting or diarrhea.']},
+ nausea:{n:'Upset stomach or nausea',tips:['Bland, low-fat foods: toast, rice, bananas, applesauce, broth, plain chicken.','Cold or room-temperature foods smell less and are often easier.','Eat small amounts every 2–3 hours and sip fluids slowly.']},
+ cancer:{n:'Cancer treatment',tips:['Needs vary a lot by treatment. An oncology dietitian is the best guide.','Food safety matters more with a weak immune system: no raw sprouts, runny eggs, undercooked meat or unpasteurized foods.','Prioritize protein and calories if weight is dropping.']},
+ pregnancy:{n:'Pregnancy or breastfeeding',tips:['No raw or undercooked meat, fish or eggs. Heat deli meats until steaming.','Eat low-mercury fish (salmon, sardines, shrimp) 2–3 times a week; avoid shark, swordfish, king mackerel, tilefish.','Calorie needs rise by roughly 340 a day in the second trimester and 450 in the third. This app does not set weight-loss targets for you.','Ask your provider about prenatal vitamins and folate.']}
+};
+
+const RESTRICTIONS = [
+ ['vegetarian','Vegetarian','MPKFS'],['vegan','Vegan','MPKFSDE'],['pescatarian','Pescatarian','MPK'],
+ ['gluten','Gluten-free','G'],['dairy','Dairy-free','D'],['nuts','Nut allergy','N'],['shellfish','Shellfish allergy','S'],
+ ['fish','No fish','F'],['egg','Egg allergy','E'],['soy','Soy-free','Y'],['sesame','Sesame allergy','Z'],
+ ['pork','No pork (halal / kosher)','K'],['beef','No beef','M'],
+ ['lowcarb','Low carb','',r=>r.c<=25],['keto','Keto',  '',r=>r.c<=12],['lowsodium','Low sodium','',r=>r.na<=500]
+];
+
+</script>
+<script>
+(function(){
+const $=(s,el=document)=>el.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const KEY='coressence.kitchen.v1';
+const uid=()=>Math.random().toString(36).slice(2,9);
+const EXAMPLE={id:'ex1',name:'Me (example)',age:45,sex:'f',ft:5,inch:6,lb:185,act:'light',goal:'lose',meals:4,cond:['glp1'],restr:['shellfish']};
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){S=null}
+if(!S||!Array.isArray(S.people)||!S.people.length)S={people:[structuredClone(EXAMPLE)],active:'ex1',saved:[],example:true};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const me=()=>S.people.find(p=>p.id===S.active)||S.people[0];
+
+let tt;function toast(m){let t=$('#toast');if(!t){t=document.createElement('div');t.id='toast';t.className='toast';t.setAttribute('role','status');document.body.appendChild(t)}t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2400)}
+
+/* ---------- Targets ---------- */
+const ACT={sed:[1.2,'Mostly sitting'],light:[1.375,'Light (walks, 1–3 workouts/wk)'],mod:[1.55,'Moderate (3–5 workouts/wk)'],high:[1.725,'Very active / physical job']};
+const GOALS={lose:'Lose weight',maintain:'Stay the same',muscle:'Build muscle',heal:'Recover and heal'};
+function targets(p){
+  const kg=p.lb*0.4536, cm=(p.ft*12+(+p.inch||0))*2.54, age=+p.age||30;
+  const bmr=10*kg+6.25*cm-5*age+(p.sex==='m'?5:-161);
+  const tdee=bmr*(ACT[p.act]||ACT.light)[0];
+  const c=p.cond||[];const kid=age<18, preg=c.includes('pregnancy'), healing=c.includes('illness')||c.includes('cancer')||p.goal==='heal';
+  let kcal=tdee, notes=[];
+  if(kid){notes.push('Under 18: we never set a calorie deficit. Portions follow growth needs; ask the pediatrician.')}
+  else if(preg){kcal=tdee+340;notes.push('Pregnancy: no weight-loss target. About +340 to +450 calories in later trimesters.')}
+  else if(healing){notes.push('Healing comes first, so no deficit is applied.')}
+  else if(p.goal==='lose'){kcal=Math.max(tdee*0.8,p.sex==='m'?1500:1200)}
+  else if(p.goal==='muscle'){kcal=tdee*1.1}
+  let gkg=1.0;
+  if(p.goal==='lose')gkg=1.4; if(p.goal==='muscle')gkg=1.8; if(c.includes('glp1'))gkg=Math.max(gkg,1.4);
+  if(c.includes('muscle')||age>=65)gkg=Math.max(gkg,1.3); if(healing)gkg=Math.max(gkg,1.3); if(preg)gkg=Math.max(gkg,1.1);
+  if(kid)gkg=Math.max(0.95,gkg>1.2?1.2:gkg);
+  if(c.includes('kidney')){gkg=0.8;notes.push('Kidney disease: protein set to 0.8 g/kg. Use your renal dietitian’s number if it differs.')}
+  /* protein by goal weight-ish: cap body weight used at BMI 27 equivalent for very high weights */
+  const m=cm/100, refKg=Math.min(kg,27*m*m>0?Math.max(27*m*m,kg*0.8):kg);
+  let protein=Math.round(gkg*refKg);
+  let fatPct=c.includes('diabetes')?0.35:0.3;
+  let fat=Math.round(kcal*fatPct/9);
+  let carbs=Math.round((kcal-protein*4-fat*9)/4);
+  if(c.includes('diabetes')&&carbs*4>kcal*0.4){carbs=Math.round(kcal*0.4/4);fat=Math.round((kcal-protein*4-carbs*4)/9)}
+  const meals=+p.meals||3;
+  const fiber=Math.round(kcal/1000*14);
+  const sodium=c.includes('heart')||c.includes('kidney')?1500:2300;
+  return {kcal:Math.round(kcal/10)*10,tdee:Math.round(tdee),protein,carbs,fat,fiber,sodium,meals,notes,
+    perMeal:{kcal:Math.round(kcal/meals),protein:Math.round(protein/meals),carbs:Math.round(carbs/meals),fat:Math.round(fat/meals)}};
+}
+/* hand portions per meal: palm ~25 g protein, cupped hand ~25 g carbs, thumb ~8 g fat, fist of veg */
+function hands(t){const pm=t.perMeal;return{palm:Math.max(1,Math.round(pm.protein/25*2)/2),cup:Math.max(.5,Math.round(pm.carbs/25*2)/2),thumb:Math.max(1,Math.round(pm.fat/8*2)/2),fist:pm.kcal>450?2:1}}
+function portionFor(p,r){const t=targets(p);let x=t.perMeal.kcal/r.k;if(r.cat==='Snack')x=Math.min(x,1.5);return Math.min(2.5,Math.max(.5,Math.round(x*4)/4))}
+const fmtQ=x=>{const w=Math.floor(x),f=x-w,fr={0.25:'¼',0.5:'½',0.75:'¾'}[f]||'';return (w?w:'')+fr||'0'};
+
+/* ---------- Recipe filtering ---------- */
+function blocked(r,list){
+  for(const id of list){const R=RESTRICTIONS.find(x=>x[0]===id);if(!R)continue;
+    if(R[2]&&[...R[2]].some(ch=>r.x.includes(ch)))return R[1];
+    if(R[3]&&!R[3](r))return R[1]}
+  return null}
+const householdRestr=()=>[...new Set(S.people.flatMap(p=>p.restr||[]))];
+const householdCond=()=>[...new Set(S.people.flatMap(p=>p.cond||[]))];
+const glpFriendly=r=>r.p>=20&&r.k<=480&&r.f<=18;
+
+/* ---------- AI ---------- */
+let samplePromise=null;
+function getSample(){if(!samplePromise)samplePromise=(window.claude&&window.claude.use)?window.claude.use('sample').catch(()=>null):Promise.resolve(null);return samplePromise}
+const AI_ENDPOINT=window.KITCHEN_AI_ENDPOINT||null;
+async function askAI(prompt,blob){
+  const s=await getSample();
+  if(s){const opts={modelTier:'default',cache:false};if(blob)opts.images=[blob];return await s.json(prompt,opts)}
+  if(AI_ENDPOINT){
+    let image=null;if(blob){image=await new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(',')[1]);fr.onerror=rej;fr.readAsDataURL(blob)})}
+    const r=await fetch(AI_ENDPOINT,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({prompt,image,mediaType:'image/jpeg'})});
+    if(!r.ok)throw{code:'server',message:'The AI service did not answer ('+r.status+').'};
+    const j=await r.json();return j.data;
+  }
+  throw{code:'offline'};
+}
+function aiErr(e){const c=e&&e.code;
+  return {not_granted:'Claude was not allowed to help on this page. Turn it on from the page’s permissions to use photo features.',
+   rate_limited:'Too many requests right now. Wait a minute and try again.',
+   images_unavailable:'Photos can’t be sent from this view. Paste the text instead.',
+   offline:'Photo and AI features need the Coressence AI connection, which is on in the app and in the claude.ai preview.'}[c]
+   ||'That didn’t work. Try a clearer, closer photo, or paste the text instead.'}
+async function shrink(file){
+  const url=URL.createObjectURL(file);
+  try{const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});
+    const sc=Math.min(1,1568/Math.max(img.naturalWidth,img.naturalHeight));const cv=document.createElement('canvas');
+    cv.width=Math.round(img.naturalWidth*sc);cv.height=Math.round(img.naturalHeight*sc);cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+    return await new Promise(res=>cv.toBlob(res,'image/jpeg',.85));
+  }finally{URL.revokeObjectURL(url)}}
+function profileText(scope){
+  const ppl=scope==='me'?[me()]:S.people;
+  return ppl.map(p=>{const t=targets(p);
+    const cond=(p.cond||[]).map(c=>CONDITIONS[c].n).join('; ')||'none';
+    const res=(p.restr||[]).map(id=>(RESTRICTIONS.find(x=>x[0]===id)||[])[1]).join(', ')||'none';
+    return `- ${p.name}: age ${p.age}, ${p.sex==='m'?'male':'female'}, ${p.ft}'${p.inch}", ${p.lb} lb, goal: ${GOALS[p.goal]}. Daily target about ${t.kcal} kcal, ${t.protein} g protein, ${t.carbs} g carbs, ${t.fat} g fat, sodium under ${t.sodium} mg, ${t.meals} meals a day (about ${t.perMeal.kcal} kcal and ${t.perMeal.protein} g protein per meal). Health notes: ${cond}. Must avoid: ${res}.`}).join('\n')}
+const SAFETY='Give general healthy-eating guidance only, never medical advice or dosing. Treat every "must avoid" item as a strict allergy or rule: never include it, including hidden sources (e.g. fish sauce, butter, soy sauce containing wheat). Use US units.';
+
+/* ---------- Shell ---------- */
+const ICONS={plan:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>',recipes:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/>',cook:'<path d="M3 11h18v3a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6z"/><path d="M8 7c0-2 2-2 2-4M13 7c0-2 2-2 2-4"/>',healthy:'<rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="4"/><path d="M8 6l2-3h4l2 3"/>',out:'<path d="M4 3v8a3 3 0 0 0 6 0V3M7 3v18M17 21V3c-2 0-4 2-4 7v3h4"/>'};
+const TABS=[['plan','My plan'],['recipes','Recipes'],['cook','How to cook'],['healthy','Make healthy'],['out','Eat out']];
+const nav=document.createElement('nav');nav.className='tabs';nav.setAttribute('aria-label','Sections');
+nav.innerHTML='<div class="in">'+TABS.map(([id,l])=>`<button data-tab="${id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[id]}</svg>${l}</button>`).join('')+'</div>';
+document.body.appendChild(nav);
+nav.addEventListener('click',e=>{const b=e.target.closest('button');if(b){location.hash=b.dataset.tab}});
+const main=$('#main');
+function renderPeople(){
+  $('#people').innerHTML=S.people.map(p=>`<button class="chip" data-p="${p.id}" aria-pressed="${p.id===S.active}">${esc(p.name)}</button>`).join('')+`<button class="chip" data-add>+ Add family member</button>`}
+$('#people').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.add){const p={id:uid(),name:'Family member '+(S.people.length+1),age:35,sex:'m',ft:5,inch:10,lb:180,act:'light',goal:'maintain',meals:3,cond:[],restr:[]};S.people.push(p);S.active=p.id;save();location.hash='plan';go(true);toast('Added. Fill in their details below.');return}
+  S.active=b.dataset.p;save();go()});
+function go(openEdit){
+  const id=(location.hash.slice(1)||'plan');const tab=TABS.find(t=>t[0]===id)?id:'plan';
+  nav.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===tab?'page':'false'));
+  renderPeople();main.innerHTML='';({plan:renderPlan,recipes:renderRecipes,cook:renderCook,healthy:renderHealthy,out:renderOut})[tab](main,openEdit);
+}
+addEventListener('hashchange',()=>{go();scrollTo(0,0)});
+const disclaimer='<p class="disclaimer"><b>General guidance, not medical advice.</b> Coressence Kitchen gives everyday healthy-eating information. It does not diagnose, treat or replace your doctor, dietitian or pharmacist. If you have a medical condition, take a GLP-1 or other medicine, are pregnant, or are managing a child’s diet, check changes with your care team first. Nutrition numbers are estimates.</p>';
+function card(html){const s=document.createElement('section');s.className='card';s.innerHTML=html;main.appendChild(s);return s}
+
+/* ---------- My plan ---------- */
+function renderPlan(el,openEdit){
+  const p=me(),t=targets(p),h=hands(t);
+  if(S.example)card(`<p class="example"><b>This is an example profile.</b> Open “Edit ${esc(p.name)}” below and put in your own height, weight, goals and limits. Everything stays on this device.</p>`);
+  const tot=t.protein*4+t.carbs*4+t.fat*9;
+  card(`<div class="row spread"><div><p class="eyebrow">Daily target for ${esc(p.name)}</p><h2>${t.kcal.toLocaleString()} calories</h2></div><p class="small muted">Burns about ${t.tdee.toLocaleString()} a day · ${GOALS[p.goal]}</p></div>
+   <div class="stats"><div class="stat p"><b>${t.protein} g</b><span>Protein</span></div><div class="stat c"><b>${t.carbs} g</b><span>Carbs</span></div><div class="stat f"><b>${t.fat} g</b><span>Fat</span></div><div class="stat"><b>${t.fiber} g</b><span>Fiber</span></div></div>
+   <div class="macro-bar" aria-hidden="true"><i class="mp" style="width:${t.protein*400/tot}%"></i><i class="mc" style="width:${t.carbs*400/tot}%"></i><i class="mf" style="width:${t.fat*900/tot}%"></i></div>
+   <p class="small muted">Sodium under ${t.sodium.toLocaleString()} mg. ${t.meals} meals a day at about <b>${t.perMeal.kcal} calories and ${t.perMeal.protein} g protein</b> each.</p>
+   <div><p class="eyebrow">Each meal, by hand (no scale needed)</p></div>
+   <div class="hands"><div class="hand"><b>${fmtQ(h.palm)}</b> palm${h.palm>1?'s':''} of protein<br><span class="muted small">meat, fish, tofu, eggs</span></div><div class="hand"><b>${fmtQ(h.fist)}</b> fist${h.fist>1?'s':''} of vegetables<br><span class="muted small">more is fine</span></div><div class="hand"><b>${fmtQ(h.cup)}</b> cupped hand${h.cup>1?'s':''} of carbs<br><span class="muted small">grains, fruit, beans, potato</span></div><div class="hand"><b>${fmtQ(h.thumb)}</b> thumb${h.thumb>1?'s':''} of fat<br><span class="muted small">oil, nuts, cheese, avocado</span></div></div>
+   ${t.notes.map(n=>`<p class="note">${esc(n)}</p>`).join('')}`);
+
+  /* edit form */
+  const f=card(`<details ${openEdit||S.example?'open':''} style="border:0;padding:0"><summary><span>Edit ${esc(p.name)}</span></summary><div>
+   <div class="grid2"><label>Name<input id="f-name" value="${esc(p.name)}"></label><label>Age<input id="f-age" type="number" min="2" max="110" value="${p.age}"></label>
+   <label>Sex<select id="f-sex"><option value="f" ${p.sex==='f'?'selected':''}>Female</option><option value="m" ${p.sex==='m'?'selected':''}>Male</option></select></label>
+   <label>Weight (lb)<input id="f-lb" type="number" min="30" max="700" value="${p.lb}"></label>
+   <label>Height (ft)<input id="f-ft" type="number" min="2" max="8" value="${p.ft}"></label><label>Height (in)<input id="f-in" type="number" min="0" max="11" value="${p.inch}"></label>
+   <label>Activity<select id="f-act">${Object.entries(ACT).map(([k,v])=>`<option value="${k}" ${p.act===k?'selected':''}>${v[1]}</option>`).join('')}</select></label>
+   <label>Goal<select id="f-goal">${Object.entries(GOALS).map(([k,v])=>`<option value="${k}" ${p.goal===k?'selected':''}>${v}</option>`).join('')}</select></label>
+   <label>Meals a day<select id="f-meals">${[2,3,4,5].map(n=>`<option ${+p.meals===n?'selected':''}>${n}</option>`).join('')}</select></label></div>
+   <p class="eyebrow">Health situations</p><div class="chips" id="f-cond">${Object.entries(CONDITIONS).map(([k,v])=>`<button class="chip" data-k="${k}" aria-pressed="${(p.cond||[]).includes(k)}">${esc(v.n)}</button>`).join('')}</div>
+   <p class="eyebrow">Diet needs and allergies</p><div class="chips" id="f-restr">${RESTRICTIONS.map(r=>`<button class="chip" data-k="${r[0]}" aria-pressed="${(p.restr||[]).includes(r[0])}">${esc(r[1])}</button>`).join('')}</div>
+   <div class="row"><button class="pri" id="f-save">Save</button>${S.people.length>1?`<button id="f-del">Remove ${esc(p.name)}</button>`:''}</div></div></details>`);
+  f.querySelectorAll('#f-cond .chip,#f-restr .chip').forEach(b=>b.onclick=()=>b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')!=='true'));
+  $('#f-save',f).onclick=()=>{const v=id=>$(id,f).value;
+    Object.assign(p,{name:v('#f-name').trim()||'Me',age:+v('#f-age')||30,sex:v('#f-sex'),lb:+v('#f-lb')||150,ft:+v('#f-ft')||5,inch:+v('#f-in')||0,act:v('#f-act'),goal:v('#f-goal'),meals:+v('#f-meals'),
+      cond:[...f.querySelectorAll('#f-cond .chip[aria-pressed="true"]')].map(b=>b.dataset.k),restr:[...f.querySelectorAll('#f-restr .chip[aria-pressed="true"]')].map(b=>b.dataset.k)});
+    if(p.id==='ex1'){p.id=uid();S.active=p.id}S.example=false;save();go();toast('Saved')};
+  const del=$('#f-del',f);if(del){let armed=false;del.onclick=()=>{if(!armed){armed=true;del.textContent='Tap again to remove';return}S.people=S.people.filter(x=>x.id!==p.id);S.active=S.people[0].id;save();go()}}
+
+  /* condition guidance */
+  (p.cond||[]).forEach(k=>{const c=CONDITIONS[k];card(`<p class="eyebrow">Eating with</p><h3>${esc(c.n)}</h3><ul class="tips">${c.tips.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`)});
+
+  /* household */
+  if(S.people.length>1){const rows=S.people.map(q=>{const tq=targets(q);return `<tr><td>${esc(q.name)}</td><td class="num">${tq.kcal}</td><td class="num">${tq.protein} g</td><td class="num">${tq.perMeal.kcal}</td></tr>`}).join('');
+    const total=S.people.reduce((a,q)=>a+targets(q).perMeal.kcal,0);
+    card(`<p class="eyebrow">Family</p><h3>Cooking for ${S.people.length}</h3><div class="tbl"><table><thead><tr><th>Person</th><th>Cal/day</th><th>Protein</th><th>Cal/meal</th></tr></thead><tbody>${rows}</tbody></table></div><p class="small muted">One dinner for everyone is about ${total.toLocaleString()} calories. Each recipe shows how big a portion each person should take.</p>`)}
+
+  /* day plan */
+  const dp=card(`<div class="row spread"><div><p class="eyebrow">A day of eating</p><h3>Sample day for ${esc(p.name)}</h3></div><button id="shuffle">Shuffle</button></div><div id="day"></div>`);
+  const drawDay=()=>{const plan=dayPlan(p);const sum=k=>Math.round(plan.reduce((a,x)=>a+x.r[k]*x.q,0));
+    $('#day',dp).innerHTML=`<div class="list">${plan.map(x=>`<button class="rcard" data-r="${x.r.id}"><span class="nm">${esc(x.slot)}: ${esc(x.r.n)}</span><span class="kc">${Math.round(x.r.k*x.q)} cal</span><span class="meta"><span>${fmtQ(x.q)} serving${x.q>1?'s':''}</span><span>${Math.round(x.r.p*x.q)} g protein</span></span></button>`).join('')}</div>
+     <p class="small muted">Total about <b>${sum('k')} calories, ${sum('p')} g protein, ${sum('c')} g carbs, ${sum('f')} g fat</b> against your ${t.kcal} / ${t.protein} g target.</p>`;
+    dp.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>openRecipe(b.dataset.r))};
+  $('#shuffle',dp).onclick=()=>{seed++;drawDay()};drawDay();
+
+  /* AI meal ideas */
+  const ai=card(`<p class="eyebrow">Ask the kitchen</p><h3>Meal ideas for my macros</h3><label>What sounds good, or what’s in the fridge?<textarea id="ai-want" placeholder="e.g. chicken thighs, rice, frozen broccoli. Something fast, kid friendly."></textarea></label>
+   <div class="row"><select id="ai-scope" style="width:auto"><option value="me">Just ${esc(p.name)}</option><option value="all">Whole family</option></select><button class="pri" id="ai-go">Get 3 meal ideas</button></div><div id="ai-out" class="list"></div>`);
+  $('#ai-go',ai).onclick=async()=>{const btn=$('#ai-go',ai),out=$('#ai-out',ai);btn.disabled=true;out.innerHTML='<p class="status">Thinking about your meals… this can take up to a minute.</p>';
+    const prompt=`You are the cooking coach in Coressence Kitchen, a healthy cooking app. ${SAFETY}\nPeople being cooked for:\n${profileText($('#ai-scope',ai).value)}\nThey say: "${$('#ai-want',ai).value||'Surprise me'}"\nSuggest 3 healthy meals that fit the per-meal targets and every restriction. Return only JSON: {"meals":[{"name":"","why":"one sentence on why it fits","ingredients":["with amounts for the whole group"],"steps":["short steps with temps and times"],"perServing":{"kcal":0,"protein":0,"carbs":0,"fat":0},"portions":"who eats how much, one sentence"}]}`;
+    try{const j=await askAI(prompt);out.innerHTML=(j.meals||[]).map(m=>`<div class="pick"><h3>${esc(m.name)}</h3><p class="small muted">${esc(m.why)}</p>${macroLine(m.perServing)}<details><summary>Ingredients and steps</summary><div><ul class="tips">${(m.ingredients||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul><ol class="steps">${(m.steps||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div></details><p class="small">${esc(m.portions||'')}</p></div>`).join('')||'<p class="err">No ideas came back. Try again.</p>'}
+    catch(e){out.innerHTML=`<p class="err">${esc(aiErr(e))}</p>`}finally{btn.disabled=false}};
+  card(disclaimer);
+}
+let seed=0;
+function dayPlan(p){const t=targets(p),restr=p.restr||[];const glp=(p.cond||[]).includes('glp1');
+  const ok=RECIPES.filter(r=>!blocked(r,restr)).filter(r=>!glp||r.f<=26);
+  const slots=t.meals>=4?['Breakfast','Lunch','Snack','Dinner'].concat(t.meals>4?['Snack']:[]):t.meals===2?['Lunch','Dinner']:['Breakfast','Lunch','Dinner'];
+  const used=new Set();
+  return slots.map((slot,i)=>{let pool=ok.filter(r=>r.cat===slot&&!used.has(r.id));if(slot==='Lunch')pool=pool.concat(ok.filter(r=>r.cat==='Dinner'&&!used.has(r.id)));if(!pool.length)pool=ok.filter(r=>!used.has(r.id));if(!pool.length)pool=RECIPES;
+    pool=pool.slice().sort((a,b)=>(b.p/b.k)-(a.p/a.k));const r=pool[(seed*3+i*7+seed*i)%Math.min(pool.length,Math.max(3,Math.ceil(pool.length/2)))];used.add(r.id);
+    const target=slot==='Snack'?t.kcal*.12:(t.kcal-(slots.filter(s=>s==='Snack').length*t.kcal*.12))/slots.filter(s=>s!=='Snack').length;
+    return {slot,r,q:Math.min(2.5,Math.max(.5,Math.round(target/r.k*4)/4))}})}
+function macroLine(m){if(!m)return'';return `<p class="small"><b>${Math.round(m.kcal||0)} cal</b> · <span style="color:var(--herb)">${Math.round(m.protein||0)} g protein</span> · <span style="color:var(--saffron)">${Math.round(m.carbs||0)} g carbs</span> · <span style="color:var(--plum)">${Math.round(m.fat||0)} g fat</span>${m.fiber!=null?` · ${Math.round(m.fiber)} g fiber`:''}${m.sodium!=null?` · ${Math.round(m.sodium)} mg sodium`:''}</p>`}
+
+/* ---------- Recipes ---------- */
+let rf={q:'',cat:'All',fit:true,glp:false,hp:false,lc:false,quick:false};
+function renderRecipes(){
+  const c=card(`<p class="eyebrow">${RECIPES.length} recipes${S.saved.length?` + ${S.saved.length} saved`:''}</p><h2>Recipes</h2>
+   <input id="rq" type="search" placeholder="Search chicken, salmon, soup…" value="${esc(rf.q)}" aria-label="Search recipes">
+   <div class="chips" id="rcat">${['All','Breakfast','Lunch','Dinner','Snack'].concat(S.saved.length?['Saved']:[]).map(x=>`<button class="chip" data-c="${x}" aria-pressed="${rf.cat===x}">${x}</button>`).join('')}</div>
+   <div class="chips" id="rflt">${[['fit','Fits our family’s limits'],['glp','GLP-1 friendly'],['hp','High protein'],['lc','Lower carb'],['quick','30 min or less']].map(([k,l])=>`<button class="chip" data-f="${k}" aria-pressed="${rf[k]}">${l}</button>`).join('')}</div>
+   <div class="list" id="rlist"></div>`);
+  const draw=()=>{const restr=householdRestr();
+    let L=rf.cat==='Saved'?S.saved:RECIPES.filter(r=>rf.cat==='All'||r.cat===rf.cat);
+    if(rf.q)L=L.filter(r=>(r.n+' '+(r.ing||[]).join(' ')).toLowerCase().includes(rf.q.toLowerCase()));
+    if(rf.cat!=='Saved'){
+    if(rf.fit)L=L.filter(r=>!blocked(r,restr));if(rf.glp)L=L.filter(glpFriendly);if(rf.hp)L=L.filter(r=>r.p>=28||r.p/r.k>=.08);if(rf.lc)L=L.filter(r=>r.c<=25);if(rf.quick)L=L.filter(r=>r.t<=30);}
+    $('#rlist',c).innerHTML=L.length?L.map(r=>`<button class="rcard" data-r="${esc(r.id)}"><span class="nm">${esc(r.n)}</span><span class="kc">${r.k} cal</span><span class="meta"><span>${r.p} g protein</span><span>${r.c} g carbs</span><span>${r.f} g fat</span>${r.t?`<span>${r.t} min</span>`:''}${glpFriendly(r)?'<span class="tag good">GLP-1 friendly</span>':''}</span></button>`).join(''):`<p class="muted">Nothing matches. ${rf.fit&&restr.length?'Your family’s limits are on; turn off “Fits our family’s limits” to see everything.':'Try fewer filters.'}</p>`;
+    c.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>openRecipe(b.dataset.r))};
+  $('#rq',c).oninput=e=>{rf.q=e.target.value;draw()};
+  $('#rcat',c).onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;rf.cat=b.dataset.c;c.querySelectorAll('#rcat .chip').forEach(x=>x.setAttribute('aria-pressed',x===b));draw()};
+  $('#rflt',c).onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;rf[b.dataset.f]=!rf[b.dataset.f];b.setAttribute('aria-pressed',rf[b.dataset.f]);draw()};
+  draw();
+  card(`<p class="small muted">Calories and macros are per serving and are estimates. “Fits our family’s limits” uses every family member’s allergies and diet needs.</p>`);
+}
+function sheet(html){let s=$('#sheet');if(!s){s=document.createElement('div');s.id='sheet';s.className='sheet';s.innerHTML='<div class="panel" role="dialog" aria-modal="true"></div>';document.body.appendChild(s);s.onclick=e=>{if(e.target===s)s.hidden=true}}
+  $('.panel',s).innerHTML=html;s.hidden=false;$('.panel',s).scrollTop=0;return $('.panel',s)}
+addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#sheet'))$('#sheet').hidden=true});
+function openRecipe(id){const r=RECIPES.find(x=>x.id===id)||S.saved.find(x=>x.id===id);if(!r)return;
+  const restr=householdRestr();const warn=S.people.map(p=>[p,blocked(r,p.restr||[])]).filter(x=>x[1]);
+  const portions=S.people.map(p=>[p,portionFor(p,r)]);const need=portions.reduce((a,x)=>a+x[1],0);const batch=Math.ceil(need/r.s*2)/2;
+  const pan=sheet(`<div class="row spread"><p class="eyebrow">${esc(r.cat||'Saved')}${r.t?` · ${r.t} min`:''} · makes ${r.s}</p><button id="x" aria-label="Close">Close</button></div><h2>${esc(r.n)}</h2>
+   ${macroLine({kcal:r.k,protein:r.p,carbs:r.c,fat:r.f,fiber:r.fi,sodium:r.na})}
+   ${warn.length?`<p class="disclaimer"><b>Heads up:</b> ${warn.map(([p,w])=>`not a fit for ${esc(p.name)} (${esc(w)})`).join('; ')}. Try “Make it healthy” to adapt it.</p>`:''}
+   <section class="card"><p class="eyebrow">Portions for your family</p><div class="tbl"><table><tbody>${portions.map(([p,q])=>`<tr><td>${esc(p.name)}</td><td class="num">${fmtQ(q)} serving${q>1?'s':''}</td><td class="num">${Math.round(r.k*q)} cal</td><td class="num">${Math.round(r.p*q)} g protein</td></tr>`).join('')}</tbody></table></div>
+   <p class="small muted">Your family eats about ${fmtQ(Math.round(need*4)/4)} servings, so make <b>${batch===1?'the recipe as written':fmtQ(batch)+'× the recipe'}</b>${batch*r.s-need>=1?`, with about ${fmtQ(Math.floor((batch*r.s-need)*4)/4)} serving${batch*r.s-need>=2?'s':''} left for tomorrow`:''}.</p></section>
+   <h3>Ingredients</h3><ul class="tips">${(r.ing||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+   <h3>Steps</h3><ol class="steps">${(r.st||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
+   ${r.notes?`<ul class="tips small">${r.notes.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+   ${r.saved?'<button id="unsave">Remove from saved</button>':''}`);
+  $('#x',pan).onclick=()=>$('#sheet').hidden=true;
+  const u=$('#unsave',pan);if(u)u.onclick=()=>{S.saved=S.saved.filter(x=>x.id!==r.id);save();$('#sheet').hidden=true;go();toast('Removed')};
+}
+
+/* ---------- How to cook ---------- */
+function renderCook(){
+  card(`<p class="eyebrow">Basics</p><h2>Healthy cooking principles</h2><div class="list">${PRINCIPLES.map(([h,b])=>`<div><b>${esc(h)}.</b> <span class="muted">${esc(b)}</span></div>`).join('')}</div>`);
+  const c=card(`<p class="eyebrow">Every way to cook it</p><h2>Methods, temps and times</h2><label>Pick a food<select id="pro">${PROTEINS.map((x,i)=>`<option value="${i}">${esc(x.n)}</option>`).join('')}</select></label><div id="pm"></div>`);
+  const draw=()=>{const x=PROTEINS[+$('#pro',c).value];$('#pm',c).innerHTML=`<p><b>Done at:</b> ${esc(x.safe)}</p><div class="tbl"><table><thead><tr><th>Method</th><th>How</th></tr></thead><tbody>${x.m.map(([a,b])=>`<tr><td>${esc(a)}</td><td>${esc(b)}</td></tr>`).join('')}</tbody></table></div><p class="note">${esc(x.tip)}</p>`};
+  $('#pro',c).onchange=draw;draw();
+  card(`<p class="eyebrow">Swap it</p><h2>Healthy swaps</h2><div class="tbl"><table><thead><tr><th>Instead of</th><th>Use</th><th>Why</th></tr></thead><tbody>${SWAPS.map(([a,b,w])=>`<tr><td>${esc(a)}</td><td><b>${esc(b)}</b></td><td class="muted">${esc(w)}</td></tr>`).join('')}</tbody></table></div>`);
+  card(`<p class="eyebrow">Food safety</p><h2>Safe internal temperatures</h2><div class="tbl"><table><tbody>
+   <tr><td>Chicken, turkey, any poultry</td><td class="num">165°F</td></tr><tr><td>Ground beef, pork, lamb</td><td class="num">160°F</td></tr>
+   <tr><td>Beef, pork, lamb steaks, chops, roasts</td><td class="num">145°F + 3 min rest</td></tr><tr><td>Fish and shellfish</td><td class="num">145°F / opaque</td></tr>
+   <tr><td>Egg dishes, casseroles, leftovers</td><td class="num">160–165°F</td></tr></tbody></table></div><p class="small muted">Based on USDA guidance. Use an instant-read thermometer in the thickest part.</p>`);
+}
+
+/* ---------- Make it healthy (photo a recipe) ---------- */
+let lastHealthy=null;
+function photoBox(id,label){return `<div class="drop" id="${id}-drop"><img id="${id}-img" alt="" hidden><p class="small muted">${label}</p><div class="row"><label class="btn" style="font-weight:600">Take or choose a photo<input id="${id}-file" type="file" accept="image/*" capture="environment" hidden></label><button id="${id}-clear" hidden>Remove photo</button></div></div>`}
+function wirePhoto(c,id){let blob=null;const f=$('#'+id+'-file',c),img=$('#'+id+'-img',c),clr=$('#'+id+'-clear',c),drop=$('#'+id+'-drop',c);
+  const set=async file=>{if(!file||!file.type.startsWith('image/'))return;img.src=URL.createObjectURL(file);img.hidden=false;clr.hidden=false;blob=await shrink(file)};
+  f.onchange=()=>set(f.files[0]);clr.onclick=()=>{blob=null;img.hidden=true;clr.hidden=true;f.value=''};
+  drop.ondragover=e=>{e.preventDefault()};drop.ondrop=e=>{e.preventDefault();set(e.dataTransfer.files[0])};
+  c.addEventListener('paste',e=>{const it=[...(e.clipboardData||{}).items||[]].find(i=>i.type.startsWith('image/'));if(it)set(it.getAsFile())});
+  return ()=>blob}
+function renderHealthy(){
+  const c=card(`<p class="eyebrow">Any recipe, made healthier</p><h2>Make it healthy</h2><p class="muted">Snap a recipe card, cookbook page or screenshot, or paste the recipe. You’ll get a healthier version built for your family’s goals, limits and portions.</p>
+   ${photoBox('hp','A clear, flat photo of the whole recipe works best.')}
+   <label>Or paste the recipe / name a dish<textarea id="h-text" placeholder="e.g. Grandma’s chicken fried steak with cream gravy"></textarea></label>
+   <label>Make it for<select id="h-scope"><option value="all">Whole family (${S.people.length})</option><option value="me">Just ${esc(me().name)}</option></select></label>
+   <div class="chips" id="h-style">${['Keep it close to the original','Make it as light as possible','Kid friendly','Budget friendly','Under 30 minutes'].map((x,i)=>`<button class="chip" data-s="${esc(x)}" aria-pressed="${i===0}">${x}</button>`).join('')}</div>
+   <button class="pri" id="h-go">Make it healthy</button><div id="h-out"></div>`);
+  const getBlob=wirePhoto(c,'hp');
+  $('#h-style',c).onclick=e=>{const b=e.target.closest('.chip');if(b)b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')!=='true')};
+  if(lastHealthy)drawHealthy($('#h-out',c),lastHealthy);
+  $('#h-go',c).onclick=async()=>{const blob=getBlob(),txt=$('#h-text',c).value.trim(),out=$('#h-out',c),btn=$('#h-go',c);
+    if(!blob&&!txt){out.innerHTML='<p class="err">Add a photo or paste a recipe first.</p>';return}
+    btn.disabled=true;out.innerHTML='<p class="status">Reading the recipe and rebuilding it… this can take up to a minute.</p>';
+    const styles=[...c.querySelectorAll('#h-style .chip[aria-pressed="true"]')].map(b=>b.dataset.s).join('; ');
+    const prompt=`You are the chef-nutritionist in Coressence Kitchen, a healthy cooking app. ${SAFETY}\nThe user ${blob?'sent a photo of a recipe':'typed a recipe or dish'}${txt?`: """${txt.slice(0,6000)}"""`:''}.\nPeople eating it:\n${profileText($('#h-scope',c).value)}\nStyle wishes: ${styles||'none'}.\nRewrite it as a healthier version that keeps what makes the dish good (texture, flavor), fits the per-meal targets and avoids every restricted item. Use healthy methods (bake, air fry, grill, steam, sauté with little oil). Estimate nutrition for one serving of the original and the new version. Return only JSON:\n{"title":"","summary":"2 sentences","servings":4,"original":{"kcal":0,"protein":0,"carbs":0,"fat":0,"sodium":0},"perServing":{"kcal":0,"protein":0,"carbs":0,"fat":0,"fiber":0,"sodium":0},"swaps":[{"from":"","to":"","why":""}],"ingredients":["amount + item"],"steps":["step with temp/time"],"portions":"one sentence per person on how much to eat","notes":["tips, e.g. GLP-1 or make-ahead"]}\nIf the photo or text is not a recipe or dish, return {"error":"short reason"}.`;
+    try{const j=await askAI(prompt,blob);if(j.error){out.innerHTML=`<p class="err">${esc(j.error)}</p>`;return}lastHealthy=j;drawHealthy(out,j)}
+    catch(e){out.innerHTML=`<p class="err">${esc(aiErr(e))}</p>`}finally{btn.disabled=false}};
+  card(`<p class="eyebrow">Works best with</p><ul class="tips small"><li>Recipe cards, cookbook pages, magazine clippings and phone screenshots.</li><li>Typed dish names like “chicken alfredo” or “Mom’s meatloaf”.</li><li>Your family profile filled in on My plan, so portions and limits are right.</li></ul>`);
+  card(disclaimer);
+}
+function drawHealthy(out,j){const o=j.original||{},n=j.perServing||{};const d=(a,b)=>a&&b?Math.round((b-a)):null;const dk=d(o.kcal,n.kcal);
+  out.innerHTML=`<div class="pick" style="border-color:var(--herb)"><p class="eyebrow">Healthier version</p><h3>${esc(j.title)}</h3><p class="small">${esc(j.summary||'')}</p>
+   <div class="tbl"><table><thead><tr><th></th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fat</th><th>Sodium</th></tr></thead><tbody>
+   <tr><td>Original</td><td class="num">${o.kcal??'–'}</td><td class="num">${o.protein??'–'} g</td><td class="num">${o.carbs??'–'} g</td><td class="num">${o.fat??'–'} g</td><td class="num">${o.sodium??'–'} mg</td></tr>
+   <tr><td><b>Healthier</b></td><td class="num"><b>${n.kcal??'–'}</b></td><td class="num"><b>${n.protein??'–'} g</b></td><td class="num">${n.carbs??'–'} g</td><td class="num">${n.fat??'–'} g</td><td class="num">${n.sodium??'–'} mg</td></tr></tbody></table></div>
+   ${dk!=null&&dk<0?`<p class="note">About <b>${-dk} fewer calories</b> per serving.</p>`:''}
+   ${(j.swaps||[]).length?`<h3>What changed</h3><div class="tbl"><table><tbody>${j.swaps.map(s=>`<tr><td>${esc(s.from)}</td><td><b>${esc(s.to)}</b></td><td class="muted small">${esc(s.why)}</td></tr>`).join('')}</tbody></table></div>`:''}
+   <h3>Ingredients${j.servings?` (serves ${esc(j.servings)})`:''}</h3><ul class="tips">${(j.ingredients||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+   <h3>Steps</h3><ol class="steps">${(j.steps||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
+   ${j.portions?`<p class="note">${esc(j.portions)}</p>`:''}${(j.notes||[]).length?`<ul class="tips small">${j.notes.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+   <div class="row"><button class="pri" id="h-save">Save to my recipes</button></div></div>`;
+  $('#h-save',out).onclick=()=>{S.saved.unshift({id:'s'+uid(),saved:true,n:j.title||'Saved recipe',cat:'Saved',s:+j.servings||4,k:Math.round(n.kcal||0),p:Math.round(n.protein||0),c:Math.round(n.carbs||0),f:Math.round(n.fat||0),fi:Math.round(n.fiber||0),na:Math.round(n.sodium||0),x:'',ing:j.ingredients||[],st:j.steps||[],notes:j.notes||[]});save();toast('Saved to Recipes → Saved')}}
+
+/* ---------- Eat out ---------- */
+let lastMenu=null;
+function renderOut(){
+  const c=card(`<p class="eyebrow">Eating out or on the run</p><h2>Best picks off any menu</h2><p class="muted">Take a photo of the menu board or menu, or type the restaurant. You’ll get your top 3 choices and exactly how to order them.</p>
+   ${photoBox('mp','Get as much of the menu in the photo as you can. Two photos? Do the side you’re most likely to order from.')}
+   <label>Or type the restaurant<input id="m-name" placeholder="e.g. Chick-fil-A, Chipotle, Olive Garden, a gas station"></label>
+   <label>Picking for<select id="m-scope"><option value="me">${esc(me().name)}</option><option value="all">Whole family</option></select></label>
+   <button class="pri" id="m-go">Show my top 3</button><div id="m-out"></div>`);
+  const getBlob=wirePhoto(c,'mp');
+  if(lastMenu)drawMenu($('#m-out',c),lastMenu);
+  $('#m-go',c).onclick=async()=>{const blob=getBlob(),name=$('#m-name',c).value.trim(),out=$('#m-out',c),btn=$('#m-go',c);
+    if(!blob&&!name){out.innerHTML='<p class="err">Add a menu photo or type a restaurant first.</p>';return}
+    btn.disabled=true;out.innerHTML='<p class="status">Reading the menu… this can take up to a minute.</p>';
+    const prompt=`You are the eating-out coach in Coressence Kitchen, a healthy eating app. ${SAFETY}\n${blob?'The user sent a photo of a restaurant menu.':''}${name?` Restaurant: "${name.slice(0,200)}".`:''}\nPeople ordering:\n${profileText($('#m-scope',c).value)}\nPick the 3 best choices on this menu for their goals and limits (protein first, reasonable calories, fits restrictions). ${blob?'Only pick items you can see on the menu.':'Use items this restaurant commonly offers; if you are not sure what it serves, pick sensible choices for its type and say so.'} For each give how to order it (swaps, sauce on side, size). Estimate nutrition. Return only JSON:\n{"restaurant":"","top":[{"item":"","order":"how to order it","why":"one sentence","estimate":{"kcal":0,"protein":0,"carbs":0,"fat":0}}],"avoid":["2-3 items or traps to skip"],"tips":["1-3 short tips"]}\nIf the image is not a menu, return {"error":"short reason"}.`;
+    try{const j=await askAI(prompt,blob);if(j.error){out.innerHTML=`<p class="err">${esc(j.error)}</p>`;return}lastMenu=j;drawMenu(out,j)}
+    catch(e){out.innerHTML=`<p class="err">${esc(aiErr(e))}</p>`}finally{btn.disabled=false}};
+  card(`<p class="eyebrow">No menu handy?</p><h2>Quick guide by restaurant type</h2><div>${EATOUT.map(x=>`<details><summary>${esc(x.n)}</summary><div><p><b>Best bets</b></p><ul class="tips">${x.best.map(i=>`<li>${esc(i)}</li>`).join('')}</ul><p><b>Order it this way</b></p><ul class="tips">${x.tweak.map(i=>`<li>${esc(i)}</li>`).join('')}</ul><p><b>Skip</b></p><ul class="tips muted">${x.avoid.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div></details>`).join('')}</div>`);
+  card(disclaimer);
+}
+function drawMenu(out,j){out.innerHTML=`<p class="eyebrow">${esc(j.restaurant||'Your menu')}</p><div class="list">${(j.top||[]).slice(0,3).map((t,i)=>`<div class="pick"><div class="row" style="align-items:flex-start;flex-wrap:nowrap"><span class="rank">${i+1}</span><div style="min-width:0"><h3>${esc(t.item)}</h3><p class="small"><b>Order it:</b> ${esc(t.order)}</p><p class="small muted">${esc(t.why)}</p>${macroLine(t.estimate)}</div></div></div>`).join('')}</div>
+  ${(j.avoid||[]).length?`<p class="small"><b>Skip:</b> ${j.avoid.map(esc).join('; ')}</p>`:''}${(j.tips||[]).length?`<ul class="tips small muted">${j.tips.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}<p class="small muted">Nutrition numbers are estimates. Check the restaurant’s posted nutrition when you can.</p>`}
+
+/* hide AI-only controls when no AI is reachable */
+getSample().then(s=>{if(!s&&!AI_ENDPOINT){document.documentElement.dataset.noai='1'}});
+go();
+})();
+
+</script>
+<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});</script>
+</body></html>

@@ -1,0 +1,97 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Coressence Coach Portal</title><meta name="theme-color" content="#0e8a94">
+<style>
+:root{--bg:#f4f8f9;--card:#fff;--ink:#0d2a3a;--muted:#4b6070;--line:#d6e6ea;--teal:#0e8a94;--teal2:#0a6a72;--soft:#eef7f8;--warn:#b5641a}
+*{box-sizing:border-box;margin:0}body{background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}aside{background:#0d2a3a;color:#cfe3e8;padding:18px 12px}aside h1{font-size:17px;color:#fff;margin:0 8px 18px}aside h1 small{display:block;font-size:10px;letter-spacing:.2em;color:#5fcad2}
+aside button{display:block;width:100%;text-align:left;background:none;border:0;color:inherit;padding:10px 12px;border-radius:9px;font:inherit;cursor:pointer}aside button.on{background:#13414f;color:#fff;font-weight:700}aside .cnt{float:right;background:#0e8a94;color:#fff;border-radius:9px;padding:0 7px;font-size:12px}
+main{padding:22px;max-width:1100px}h2{font-size:22px;margin-bottom:12px}h3{font-size:16px;margin:14px 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}.muted{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+button.b{font:inherit;border-radius:9px;border:1px solid var(--line);background:#fff;padding:8px 12px;cursor:pointer;color:var(--ink)}button.pri{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700}
+input,select,textarea{font:inherit;width:100%;padding:9px;border:1px solid var(--line);border-radius:9px;background:#fff}label{display:block;font-weight:600;margin:10px 0 4px;font-size:14px}
+table{width:100%;border-collapse:collapse}td,th{padding:8px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;background:var(--soft);color:var(--teal2);font-weight:700}.pill.w{background:#fdf0e3;color:var(--warn)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.sp{flex:1}
+video{width:100%;max-height:380px;background:#000;border-radius:10px}.cm{border-left:3px solid var(--teal);padding:6px 10px;margin:6px 0;background:var(--soft);border-radius:0 8px 8px 0}.cm b{cursor:pointer;color:var(--teal2)}
+.hide{display:none!important}.banner{background:#fff8e6;border:1px solid #f1dfae;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:14px}
+@media(max-width:760px){.layout{grid-template-columns:1fr}aside{display:flex;overflow-x:auto;gap:4px;padding:10px}aside h1{display:none}aside button{white-space:nowrap;width:auto}}
+</style></head><body><div class="layout">
+<aside><h1><small>CORESSENCE</small>Coach Portal</h1><button data-v="roster" class="on">Clients</button><button data-v="review">Review queue <span class="cnt" id="qc">0</span></button><button data-v="programs">Programs</button><button data-v="messages">Messages</button><button data-v="settings">Settings & billing</button></aside>
+<main id="main"></main></div>
+<input type="file" id="fileIn" class="hide">
+<script>
+const K='coressence.coach.v1',$=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let S;try{S=JSON.parse(localStorage.getItem(K))}catch(e){}
+S=S||{coach:{name:'',focus:'Vocal'},clients:[],programs:[],msgs:[],seats:10};
+const TEMPLATES=[{name:'Live at Your Peak: 4-week reset',weeks:['Week 1: Assess your starting point (baseline brief)','Week 2: Build a plan you can carry out (first plan + minimum plan)','Week 3: Execute and troubleshoot (dated adjustment)','Week 4: Review and build the next 30 days']},
+{name:'Perform at Your Peak: show prep',weeks:['Week 1: Instrument baseline + voice load log','Week 2: Fuel, sleep and recovery around rehearsals','Week 3: Practice labs + mock performance','Week 4: Performance day plan and recovery']},
+{name:'Vocal health: 2-week voice rest return',weeks:['Days 1-7: Gentle warmups, hydration, voice load under 60 minutes/day','Days 8-14: Graded return, add range work, log any strain']},
+{name:'Strength foundations (3 days/week)',weeks:['Week 1: Learn the patterns: squat, hinge, push, pull, carry','Week 2: Add load, 2 sets','Week 3: 3 sets, log effort','Week 4: Deload and re-test']}];
+if(!S.programs.length)S.programs=TEMPLATES.map(t=>({...t,id:id()}));
+function id(){return Math.random().toString(36).slice(2,10)}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+// Video files live in IndexedDB on this computer only
+const DB=new Promise(r=>{const q=indexedDB.open('coach-media',1);q.onupgradeneeded=()=>q.result.createObjectStore('m');q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)});
+const putM=async(k,b)=>{const d=await DB;if(!d)return;return new Promise(r=>{const t=d.transaction('m','readwrite');t.objectStore('m').put(b,k);t.oncomplete=r})};
+const getM=async k=>{const d=await DB;if(!d)return null;return new Promise(r=>{const q=d.transaction('m').objectStore('m').get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)})};
+let view='roster',cur=null;
+document.querySelectorAll('aside button').forEach(b=>b.onclick=()=>go(b.dataset.v));
+function go(v,c){view=v;cur=c||null;document.querySelectorAll('aside button').forEach(x=>x.classList.toggle('on',x.dataset.v===v));render()}
+const pend=()=>S.clients.flatMap(c=>(c.uploads||[]).filter(u=>!u.done).map(u=>({c,u})));
+function pick(accept){return new Promise(r=>{const f=$('#fileIn');f.accept=accept;f.value='';f.onchange=()=>r(f.files[0]);f.click()})}
+function render(){$('#qc').textContent=pend().length;const V={roster,client,review,watch,programs,messages,settings};$('#main').innerHTML='';V[view]();scrollTo(0,0)}
+function roster(){const used=S.clients.length;$('#main').innerHTML=`<div class="row"><h2>Clients</h2><span class="sp"></span><span class="muted">${used} of ${S.seats} seats used</span></div>
+<div class="banner">How sharing works in this version: your client taps <b>Share with my coach</b> in the Coressence Life app and sends you their summary file. Import it here. Nothing is shared unless the client chooses to, and they can stop at any time.</div>
+<div class="card"><div class="row"><input id="nName" placeholder="Client name" style="max-width:260px"><input id="nGoal" placeholder="Main goal" style="max-width:320px"><button class="b pri" id="add">Add client</button><button class="b" id="imp">Import a client's shared file</button></div></div>
+<div class="grid">${S.clients.map(c=>`<div class="card" style="cursor:pointer" data-c="${c.id}"><b>${esc(c.name)}</b><p class="muted">${esc(c.goal||'No goal set')}</p><p style="margin-top:8px">${c.program?`<span class="pill">${esc(c.program)}</span>`:'<span class="pill w">No program</span>'} ${(c.uploads||[]).filter(u=>!u.done).length?`<span class="pill w">${(c.uploads||[]).filter(u=>!u.done).length} to review</span>`:''}</p><p class="muted" style="margin-top:6px">Last data: ${c.last||'none yet'}</p></div>`).join('')||'<p class="muted">No clients yet. Add one above.</p>'}</div>`;
+$('#add').onclick=()=>{const n=$('#nName').value.trim();if(!n)return;if(S.clients.length>=S.seats)return alert('All seats are used. Add seats in Settings.');S.clients.push({id:id(),name:n,goal:$('#nGoal').value.trim(),uploads:[],notes:[],data:null,consent:{track:false,measure:false,practice:true}});save();render()};
+$('#imp').onclick=async()=>{const f=await pick('.json');if(!f)return;try{const d=JSON.parse(await f.text());const name=d.name||d.client||'Shared client';let c=S.clients.find(x=>x.name===name);if(!c){c={id:id(),name,goal:d.goal||'',uploads:[],notes:[]};S.clients.push(c)}c.data=d;c.consent=d.consent||{track:true,measure:true,practice:true};c.last=new Date().toLocaleDateString();save();go('client',c.id)}catch(e){alert('That file is not a Coressence share file.')}};
+document.querySelectorAll('[data-c]').forEach(e=>e.onclick=()=>go('client',e.dataset.c))}
+function client(){const c=S.clients.find(x=>x.id===cur);if(!c)return go('roster');const d=c.data||{};
+$('#main').innerHTML=`<div class="row"><button class="b" id="back">← Clients</button><h2 style="margin:0 0 0 8px">${esc(c.name)}</h2><span class="sp"></span><button class="b" id="del">Remove client</button></div>
+<div class="grid" style="margin-top:12px"><div class="card"><h3 style="margin-top:0">Goal</h3><input id="goal" value="${esc(c.goal)}"><label>Program</label><select id="prog"><option value="">None</option>${S.programs.map(p=>`<option ${p.name===c.program?'selected':''}>${esc(p.name)}</option>`).join('')}</select><label>Program start</label><input type="date" id="start" value="${c.start||''}">${c.program&&c.start?`<p class="muted" style="margin-top:8px">${esc(weekNow(c))}</p>`:''}</div>
+<div class="card"><h3 style="margin-top:0">What ${esc(c.name.split(' ')[0])} shares</h3><p class="muted">The client controls these in their app.</p>${['track','measure','practice'].map(k=>`<p>${c.consent?.[k]?'✅':'⛔'} ${({track:'Daily check-ins',measure:'Body measurements and wearables',practice:'Practice videos and audio'})[k]}</p>`).join('')}</div>
+<div class="card"><h3 style="margin-top:0">Shared summary</h3>${d.summary?Object.entries(d.summary).map(([k,v])=>`<p><b>${esc(k)}:</b> ${esc(v)}</p>`).join(''):'<p class="muted">No shared data yet. Ask your client to send their share file from the app.</p>'}</div></div>
+<div class="card"><div class="row"><h3 style="margin:0">Practice uploads</h3><span class="sp"></span><button class="b" id="up">Add a video or audio file</button></div>${(c.uploads||[]).map(u=>`<p style="margin-top:8px">${u.done?'✅':'🟠'} <a href="#" data-u="${u.id}">${esc(u.title)}</a> <span class="muted">${u.date} · ${u.comments.length} comment(s)</span></p>`).join('')||'<p class="muted">Nothing uploaded yet.</p>'}</div>
+<div class="card"><h3 style="margin-top:0">Private coach notes</h3>${(c.notes||[]).map(n=>`<div class="cm"><span class="muted">${n.d}</span><br>${esc(n.t)}</div>`).join('')}<textarea id="nt" rows="2" placeholder="Only you see these notes" style="margin-top:8px"></textarea><p style="margin-top:8px"><button class="b" id="addN">Save note</button></p></div>`;
+$('#back').onclick=()=>go('roster');$('#goal').onchange=e=>{c.goal=e.target.value;save()};$('#prog').onchange=e=>{c.program=e.target.value;save();render()};$('#start').onchange=e=>{c.start=e.target.value;save();render()};
+$('#del').onclick=()=>{if(confirmTwice('#del')){S.clients=S.clients.filter(x=>x!==c);save();go('roster')}};
+$('#addN').onclick=()=>{const t=$('#nt').value.trim();if(t){(c.notes=c.notes||[]).push({d:new Date().toLocaleString(),t});save();render()}};
+$('#up').onclick=async()=>{const f=await pick('video/*,audio/*');if(!f)return;const u={id:id(),title:f.name,date:new Date().toLocaleDateString(),type:f.type,comments:[],done:false};await putM(u.id,f);c.uploads.push(u);save();go('watch',c.id+':'+u.id)};
+document.querySelectorAll('[data-u]').forEach(a=>a.onclick=e=>{e.preventDefault();go('watch',c.id+':'+a.dataset.u)})}
+function weekNow(c){const p=S.programs.find(x=>x.name===c.program);if(!p)return'';const w=Math.floor((Date.now()-new Date(c.start))/6048e5);return w<0?'Starts '+c.start:w>=p.weeks.length?'Program complete':'Now: '+p.weeks[w]}
+function confirmTwice(sel){const b=$(sel);if(b.dataset.c)return true;b.dataset.c=1;b.textContent='Click again to confirm';return false}
+function review(){const p=pend();$('#main').innerHTML=`<h2>Review queue</h2>${p.length?p.map(({c,u})=>`<div class="card row"><div><b>${esc(u.title)}</b><p class="muted">${esc(c.name)} · ${u.date}</p></div><span class="sp"></span><button class="b pri" data-w="${c.id}:${u.id}">Review</button></div>`).join(''):'<div class="card"><p class="muted">Nothing waiting. Nice work.</p></div>'}`;document.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>go('watch',b.dataset.w))}
+async function watch(){const[cid,uid]=cur.split(':'),c=S.clients.find(x=>x.id===cid),u=c?.uploads.find(x=>x.id===uid);if(!u)return go('review');const blob=await getM(uid);
+$('#main').innerHTML=`<div class="row"><button class="b" id="back">← ${esc(c.name)}</button><h2 style="margin:0 0 0 8px">${esc(u.title)}</h2></div><div class="card" style="margin-top:12px">${blob?(u.type.startsWith('audio')?'<audio id="vid" controls style="width:100%"></audio>':'<video id="vid" controls playsinline></video>'):'<p class="muted">The file is stored on the computer it was added from.</p>'}
+<label>Comment at the current moment</label><div class="row"><input id="cmt" placeholder="e.g. Great breath support here; relax the jaw on the high note" style="flex:1"><button class="b pri" id="addC">Add at <span id="tnow">0:00</span></button></div>
+<h3>Comments</h3><div id="cms">${u.comments.sort((a,b)=>a.t-b.t).map(x=>`<div class="cm"><b data-t="${x.t}">${fmt(x.t)}</b> ${esc(x.text)}</div>`).join('')||'<p class="muted">No comments yet.</p>'}</div>
+<label>Overall feedback</label><textarea id="ov" rows="3">${esc(u.overall||'')}</textarea>
+<div class="row" style="margin-top:10px"><button class="b" id="rec">🎙 Record a voice reply</button><span class="muted" id="recS">${u.voice?'Voice reply saved':''}</span><span class="sp"></span><button class="b" id="exp">Download feedback for client</button><button class="b pri" id="done">${u.done?'Reopen':'Mark reviewed'}</button></div></div>`;
+const v=$('#vid');if(v&&blob){v.src=URL.createObjectURL(blob);v.ontimeupdate=()=>$('#tnow').textContent=fmt(v.currentTime)}
+$('#back').onclick=()=>go('client',c.id);$('#addC').onclick=()=>{const t=$('#cmt').value.trim();if(!t)return;u.comments.push({t:v?v.currentTime:0,text:t});save();watch()};
+document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{if(v){v.currentTime=+b.dataset.t;v.play()}});
+$('#ov').onchange=e=>{u.overall=e.target.value;save()};$('#done').onclick=()=>{u.done=!u.done;save();render()};
+$('#exp').onclick=()=>{const fb={type:'coressence-coach-feedback',coach:S.coach.name,client:c.name,file:u.title,overall:u.overall||'',comments:u.comments.map(x=>({at:fmt(x.t),text:x.text})),date:new Date().toISOString()};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(fb,null,2)],{type:'application/json'}));a.download='feedback-'+c.name.replace(/\W+/g,'-')+'.json';a.click()};
+let mr;$('#rec').onclick=async()=>{if(mr){mr.stop();return}try{const st=await navigator.mediaDevices.getUserMedia({audio:true});mr=new MediaRecorder(st);const ch=[];mr.ondataavailable=e=>ch.push(e.data);mr.onstop=async()=>{st.getTracks().forEach(t=>t.stop());await putM(uid+':voice',new Blob(ch,{type:mr.mimeType}));u.voice=true;save();mr=null;$('#rec').textContent='🎙 Record a voice reply';$('#recS').textContent='Voice reply saved'};mr.start();$('#rec').textContent='⏹ Stop';$('#recS').textContent='Recording…'}catch(e){$('#recS').textContent='Microphone not available'}}}
+const fmt=t=>Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');
+function programs(){$('#main').innerHTML=`<h2>Programs</h2><p class="muted" style="margin-bottom:12px">Start from a Coressence template or build your own. Assign programs from a client's page.</p>${S.programs.map(p=>`<div class="card"><div class="row"><b>${esc(p.name)}</b><span class="sp"></span><button class="b" data-d="${p.id}">Duplicate</button><button class="b" data-x="${p.id}">Delete</button></div><ol style="margin:8px 0 0 20px">${p.weeks.map(w=>`<li>${esc(w)}</li>`).join('')}</ol></div>`).join('')}
+<div class="card"><h3 style="margin-top:0">New program</h3><input id="pn" placeholder="Program name"><label>One step or week per line</label><textarea id="pw" rows="4"></textarea><p style="margin-top:8px"><button class="b pri" id="pa">Save program</button></p></div>`;
+document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{const p=S.programs.find(x=>x.id===b.dataset.d);S.programs.push({...p,id:id(),name:p.name+' (copy)',weeks:[...p.weeks]});save();render()});
+document.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>{S.programs=S.programs.filter(x=>x.id!==b.dataset.x);save();render()});
+$('#pa').onclick=()=>{const n=$('#pn').value.trim(),w=$('#pw').value.split('\n').map(s=>s.trim()).filter(Boolean);if(n&&w.length){S.programs.push({id:id(),name:n,weeks:w});save();render()}}}
+function messages(){$('#main').innerHTML=`<h2>Messages</h2><div class="banner">Messages are for coaching, not emergencies. If a client may be in danger, tell them to call 911, or call or text 988 for a mental health crisis.</div>
+<div class="card"><label style="margin-top:0">To</label><select id="to">${S.clients.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select><label>Message</label><textarea id="mt" rows="3"></textarea><p style="margin-top:8px"><button class="b pri" id="ms">Save and copy to send</button> <span class="muted">Copies the message so you can paste it into email or text.</span></p></div>
+${S.msgs.slice().reverse().map(m=>`<div class="card"><span class="muted">${m.d} · to ${esc((S.clients.find(c=>c.id===m.to)||{}).name||'removed client')}</span><p>${esc(m.t)}</p></div>`).join('')}`;
+$('#ms').onclick=()=>{const t=$('#mt').value.trim();if(!t||!$('#to').value)return;S.msgs.push({to:$('#to').value,t,d:new Date().toLocaleString()});save();navigator.clipboard?.writeText(t).catch(()=>{});render()}}
+function settings(){$('#main').innerHTML=`<h2>Settings & billing</h2><div class="card"><label style="margin-top:0">Your name</label><input id="cn" value="${esc(S.coach.name)}"><label>Coaching focus</label><select id="cf">${['Vocal','Fitness','Performance','Wellness'].map(x=>`<option ${x===S.coach.focus?'selected':''}>${x}</option>`).join('')}</select></div>
+<div class="card"><h3 style="margin-top:0">Plan</h3><p>Coach plan: <b>$29/month</b> or $290/year, includes 10 client seats with Coressence+ All-Access. Extra clients $2/month each. 14-day free trial.</p><p class="muted" style="margin-top:6px">Billing opens when Coressence accounts launch. You're in the free preview.</p></div>
+<div class="card"><h3 style="margin-top:0">Your data</h3><p class="muted">In this preview, everything (clients, notes, videos) stays in this browser on this computer. Download a backup regularly.</p><p style="margin-top:8px"><button class="b" id="bk">Download backup</button> <button class="b" id="rs">Restore backup</button> <button class="b" id="wipe">Delete everything</button></p></div>
+<p class="muted">Coressence Coach Portal is for non-clinical coaching. Do not store medical records here.</p>`;
+$('#cn').onchange=e=>{S.coach.name=e.target.value;save()};$('#cf').onchange=e=>{S.coach.focus=e.target.value;save()};
+$('#bk').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='coach-portal-backup.json';a.click()};
+$('#rs').onclick=async()=>{const f=await pick('.json');if(!f)return;try{const d=JSON.parse(await f.text());if(!d.clients)throw 0;S=d;save();go('roster')}catch(e){alert('Not a Coach Portal backup.')}};
+$('#wipe').onclick=()=>{if(confirmTwice('#wipe')){localStorage.removeItem(K);indexedDB.deleteDatabase('coach-media');location.reload()}}}
+render();
+</script></body></html>

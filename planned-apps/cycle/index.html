@@ -1,0 +1,120 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Coressence Cycle</title><meta name="theme-color" content="#0e8a94"><link rel="manifest" href="manifest.json">
+<style>
+:root{--bg:#f6fafb;--card:#fff;--navy:#0d2a3a;--teal:#0e8a94;--teal2:#0a6a72;--rose:#c4567a;--rose2:#f6e3ea;--muted:#4b6070;--line:#d6e6ea}
+*{box-sizing:border-box;margin:0}body{background:var(--bg);color:var(--navy);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding-bottom:84px}
+header{background:linear-gradient(160deg,#f4fbfc,#e3f2f4);padding:18px 16px 14px;border-bottom:1px solid var(--line)}
+header small{letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--teal);font-size:11px}header h1{font-size:22px}
+main{max-width:620px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+h2{font-size:18px;margin-bottom:8px}.muted{color:var(--muted);font-size:14px}
+button{font:inherit;border-radius:10px;border:1px solid var(--line);background:#fff;padding:10px 14px;cursor:pointer;color:var(--navy)}
+button.pri{background:var(--teal);color:#fff;border-color:var(--teal);font-weight:700}button.warn{color:#a3243b;border-color:#e8c0c8}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{padding:7px 12px;border-radius:999px;font-size:14px}.chip.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+label{display:block;font-weight:600;margin:12px 0 6px}input,textarea,select{font:inherit;width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+input[type=range]{padding:0}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;border:0;border-radius:0;padding:12px 4px;font-size:13px;color:var(--muted)}nav button.on{color:var(--teal);font-weight:700}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}.cal div{padding:8px 0;border-radius:8px;font-size:14px}
+.cal .h{font-size:11px;color:var(--muted)}.cal .p{background:var(--rose);color:#fff}.cal .e{background:var(--rose2);border:1px dashed var(--rose)}.cal .t{outline:2px solid var(--teal)}.cal .l:after{content:'•';display:block;line-height:0;color:var(--teal)}
+.big{font-size:34px;font-weight:800}.row{display:flex;gap:10px;align-items:center;justify-content:space-between}
+.bar{height:10px;border-radius:6px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--teal)}
+.note{background:#fff8e6;border:1px solid #f1dfae;border-radius:12px;padding:12px;font-size:14px}
+#lock{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:9}
+.hide{display:none!important}
+</style></head><body>
+<div id="lock" class="hide"><h2>Coressence Cycle is locked</h2><input id="pinIn" type="password" inputmode="numeric" maxlength="6" placeholder="Enter your PIN" style="max-width:220px;text-align:center"><button class="pri" id="unlock">Unlock</button><p class="muted" id="lockMsg"></p></div>
+<header><small>Coressence</small><h1>Cycle</h1></header>
+<main>
+<section id="v-today">
+ <div class="card" id="statusCard"></div>
+ <div class="card"><h2>Log today</h2><p class="muted" id="logDate"></p>
+  <label>Period</label><div class="chips" data-f="flow"><button class="chip" data-v="none">None</button><button class="chip" data-v="spotting">Spotting</button><button class="chip" data-v="light">Light</button><button class="chip" data-v="medium">Medium</button><button class="chip" data-v="heavy">Heavy</button></div>
+  <label>Symptoms</label><div class="chips multi" data-f="sym"><button class="chip" data-v="cramps">Cramps</button><button class="chip" data-v="headache">Headache</button><button class="chip" data-v="bloating">Bloating</button><button class="chip" data-v="tender">Breast tenderness</button><button class="chip" data-v="acne">Skin</button><button class="chip" data-v="backache">Back ache</button><button class="chip" data-v="cravings">Cravings</button><button class="chip" data-v="nausea">Nausea</button></div>
+  <label>Mood</label><div class="chips" data-f="mood"><button class="chip" data-v="great">Great</button><button class="chip" data-v="good">Good</button><button class="chip" data-v="okay">Okay</button><button class="chip" data-v="low">Low</button><button class="chip" data-v="irritable">Irritable</button><button class="chip" data-v="anxious">Anxious</button></div>
+  <label>Energy <span class="muted" id="enV"></span></label><input type="range" min="1" max="5" id="energy">
+  <label>Sleep (hours)</label><input type="number" min="0" max="16" step="0.5" id="sleep">
+  <label>Training today</label><div class="chips" data-f="train"><button class="chip" data-v="rest">Rest</button><button class="chip" data-v="easy">Easy</button><button class="chip" data-v="moderate">Moderate</button><button class="chip" data-v="hard">Hard</button></div>
+  <label>Voice / performance note</label><textarea id="note" rows="2" placeholder="How did your voice, practice or performance feel?"></textarea>
+  <p style="margin-top:12px"><button class="pri" id="save">Save today</button> <span class="muted" id="saved"></span></p>
+ </div>
+</section>
+<section id="v-cal" class="hide"><div class="card"><div class="row"><button id="prevM">‹</button><h2 id="mTitle"></h2><button id="nextM">›</button></div><div class="cal" id="cal"></div>
+<p class="muted" style="margin-top:10px"><span style="color:var(--rose)">■</span> logged period · <span style="color:var(--rose)">▢</span> estimated next period · • a day you logged. Estimates are based only on what you've logged and can be wrong.</p></div>
+<div class="card" id="dayDetail"></div></section>
+<section id="v-guide" class="hide"><div class="card" id="phaseNow"></div><div class="card" id="phaseAll"></div></section>
+<section id="v-insights" class="hide"><div class="card" id="ins"></div></section>
+<section id="v-me" class="hide">
+ <div class="card"><h2>Your privacy</h2><p class="muted">Everything stays on this device. There's no account, no ads and no sharing. Nothing you log is sent anywhere.</p></div>
+ <div class="card"><h2>Cycle basics</h2><label>Typical cycle length (days)</label><input type="number" id="cLen" min="18" max="45"><label>Typical period length (days)</label><input type="number" id="pLen" min="2" max="10"><p class="muted" style="margin-top:8px">Used until you've logged two or more periods, then your own history takes over.</p><p style="margin-top:10px"><button class="pri" id="saveBasics">Save</button></p></div>
+ <div class="card"><h2>App lock</h2><p class="muted" id="lockState"></p><label>New PIN (4–6 digits)</label><input id="pinSet" type="password" inputmode="numeric" maxlength="6"><p style="margin-top:10px"><button id="setPin">Set PIN</button> <button id="clearPin">Turn off lock</button></p></div>
+ <div class="card"><h2>Backup</h2><p class="muted">Download a backup file you keep yourself, or restore one.</p><p style="margin-top:10px"><button id="exp">Download backup</button> <label style="display:inline;font-weight:400"><input type="file" id="imp" accept=".json" class="hide"><span class="chip" style="border:1px solid var(--line);display:inline-block;padding:10px 14px;border-radius:10px;cursor:pointer">Restore backup</span></label></p></div>
+ <div class="card"><h2>Talk to a clinician</h2><p class="muted">If your periods are very painful, very heavy, have stopped unexpectedly, or anything worries you, talk with a doctor or nurse. In an emergency call 911.</p></div>
+ <div class="card"><h2>Delete everything</h2><button class="warn" id="wipe">Delete all my data</button></div>
+ <div class="note"><b>Important:</b> Coressence Cycle is a wellness journal. It is <b>not</b> birth control and must not be used to prevent or plan pregnancy. It does not diagnose any condition.</div>
+</section>
+</main>
+<nav><button data-v="today" class="on">Today</button><button data-v="cal">Calendar</button><button data-v="guide">Phases</button><button data-v="insights">Insights</button><button data-v="me">Privacy</button></nav>
+<script>
+const K='coressence.cycle.v1',$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+let S;try{S=JSON.parse(localStorage.getItem(K))}catch(e){}S=S||{logs:{},cLen:28,pLen:5,pin:null};
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+const iso=d=>d.toISOString().slice(0,10),day=s=>new Date(s+'T12:00:00'),add=(s,n)=>{const d=day(s);d.setDate(d.getDate()+n);return iso(d)},diff=(a,b)=>Math.round((day(b)-day(a))/864e5);
+const today=iso(new Date());let sel=today,month=new Date();month.setDate(1);
+const isP=l=>l&&l.flow&&l.flow!=='none';
+function starts(){const ds=Object.keys(S.logs).filter(d=>isP(S.logs[d])).sort();const st=[];ds.forEach(d=>{if(!st.length||diff(st[st.length-1].last,d)>2)st.push({start:d,last:d});else st[st.length-1].last=d});return st}
+function stats(){const st=starts();let cl=S.cLen,pl=S.pLen;if(st.length>=2){const g=[];for(let i=1;i<st.length;i++)g.push(diff(st[i-1].start,st[i].start));const r=g.slice(-6).filter(x=>x>=18&&x<=45);if(r.length)cl=Math.round(r.reduce((a,b)=>a+b)/r.length)}
+ if(st.length){const lens=st.slice(-6).map(s=>diff(s.start,s.last)+1);pl=Math.round(lens.reduce((a,b)=>a+b)/lens.length)}
+ const last=st.length?st[st.length-1].start:null;let next=null;if(last){next=add(last,cl);while(diff(today,next)<-3)next=add(next,cl)}return{st,cl,pl,last,next}}
+function phase(d){const s=stats();const b=s.st.filter(x=>x.start<=d).pop();if(!b)return null;let cd=diff(b.start,d)%s.cl+1;const ov=s.cl-14;
+ let p=cd<=s.pl?'menstrual':cd<ov-1?'follicular':cd<=ov+1?'mid':'luteal';return{cd,p,cl:s.cl}}
+const PH={menstrual:{n:'Menstrual',t:'Many people feel lower energy. Gentle movement, iron-rich foods and extra sleep can help. Lighter or technique-focused training is a fine choice if you feel flat.',v:'Some singers notice their voice feels heavier; warm up longer and hydrate.'},
+ follicular:{n:'Follicular',t:'Energy often rises. Many people feel ready for harder training, new skills and bigger challenges.',v:'Often a good window for demanding practice and learning new material.'},
+ mid:{n:'Mid-cycle',t:'Energy and confidence often peak around mid-cycle. Warm up well, since some people feel looser joints.',v:'Many performers feel their strongest here; keep up hydration.'},
+ luteal:{n:'Luteal',t:'Later in this phase some people notice cravings, bloating, poorer sleep or mood changes. Steady meals, protein, a consistent bedtime and moderate training can help.',v:'Some voices feel swollen or less flexible before a period; plan rest days and gentle warm-ups.'}};
+function show(v){$$('section').forEach(s=>s.classList.add('hide'));$('#v-'+v).classList.remove('hide');$$('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));R[v]&&R[v]();scrollTo(0,0)}
+$$('nav button').forEach(b=>b.onclick=()=>show(b.dataset.v));
+function fmt(s){return day(s).toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}
+const R={today(){const s=stats(),ph=phase(today);let h='';
+ if(!s.last)h='<h2>Welcome</h2><p class="muted">Log the first day of your period when it comes, and Cycle will start estimating your phases. Everything stays on this phone.</p>';
+ else{const dn=diff(today,s.next);h=`<div class="row"><div><div class="muted">Cycle day</div><div class="big">${ph?ph.cd:'–'}</div></div><div style="text-align:right"><div class="muted">${PH[ph?.p]?.n||''} phase</div><div><b>${dn<=0?'Period may start any day':'Next period in about '+dn+' day'+(dn==1?'':'s')}</b></div><div class="muted">estimate</div></div></div><div class="bar" style="margin-top:12px"><i style="width:${ph?Math.min(100,ph.cd/s.cl*100):0}%"></i></div><p class="muted" style="margin-top:10px">${PH[ph?.p]?.t||''}</p>`}
+ $('#statusCard').innerHTML=h;loadDay(sel=today)},
+ cal(){const y=month.getFullYear(),m=month.getMonth();$('#mTitle').textContent=month.toLocaleDateString(undefined,{month:'long',year:'numeric'});
+ const s=stats(),est=new Set();if(s.next)for(let k=0;k<3;k++){const b=add(s.next,k*s.cl);for(let i=0;i<s.pl;i++)est.add(add(b,i))}
+ let h='SMTWTFS'.split('').map(x=>`<div class="h">${x}</div>`).join('');const first=new Date(y,m,1).getDay(),n=new Date(y,m+1,0).getDate();h+='<div></div>'.repeat(first);
+ for(let d=1;d<=n;d++){const k=iso(new Date(y,m,d,12)),l=S.logs[k];h+=`<div data-d="${k}" class="${isP(l)?'p':est.has(k)&&k>=today?'e':''} ${k===today?'t':''} ${l?'l':''}">${d}</div>`}
+ $('#cal').innerHTML=h;$$('#cal [data-d]').forEach(c=>c.onclick=()=>{sel=c.dataset.d;dayView()});dayView()},
+ guide(){const ph=phase(today);$('#phaseNow').innerHTML=ph?`<h2>Now: ${PH[ph.p].n} phase (day ${ph.cd})</h2><p>${PH[ph.p].t}</p><p class="muted" style="margin-top:8px">🎤 ${PH[ph.p].v}</p>`:'<h2>Phases</h2><p class="muted">Log a period to see your current phase.</p>';
+ $('#phaseAll').innerHTML='<h2>About each phase</h2>'+Object.values(PH).map(p=>`<p style="margin-top:10px"><b>${p.n}</b><br><span class="muted">${p.t}</span></p>`).join('')+'<p class="muted" style="margin-top:12px">Everyone is different. These are general wellness ideas, not medical advice.</p>'},
+ insights(){const s=stats(),L=Object.entries(S.logs);if(L.length<5){$('#ins').innerHTML='<h2>Insights</h2><p class="muted">Log a few more days and patterns will show up here: your average cycle, and how energy, sleep and mood move with your phases.</p>';return}
+ const by={};L.forEach(([d,l])=>{const p=phase(d);if(!p)return;(by[p.p]=by[p.p]||[]).push(l)});
+ const avg=(a,f)=>{const v=a.map(f).filter(x=>x!=null&&!isNaN(x));return v.length?(v.reduce((x,y)=>x+y,0)/v.length).toFixed(1):'–'};
+ let h=`<h2>Your patterns</h2><p>Average cycle: <b>${s.cl} days</b> · average period: <b>${s.pl} days</b> · periods logged: <b>${s.st.length}</b></p><table style="width:100%;margin-top:12px;font-size:14px;border-collapse:collapse"><tr><th align=left>Phase</th><th>Energy</th><th>Sleep</th><th>Days</th></tr>`;
+ ['menstrual','follicular','mid','luteal'].forEach(p=>{const a=by[p]||[];h+=`<tr><td>${PH[p].n}</td><td align=center>${avg(a,l=>+l.energy)}</td><td align=center>${avg(a,l=>l.sleep===''?null:+l.sleep)}</td><td align=center>${a.length}</td></tr>`});
+ const sy={};L.forEach(([,l])=>(l.sym||[]).forEach(x=>sy[x]=(sy[x]||0)+1));const top=Object.entries(sy).sort((a,b)=>b[1]-a[1]).slice(0,3);
+ h+='</table>'+(top.length?`<p style="margin-top:12px">Most logged: ${top.map(t=>t[0]+' ('+t[1]+')').join(', ')}</p>`:'');
+ const g=[];for(let i=1;i<s.st.length;i++)g.push(diff(s.st[i-1].start,s.st[i].start));if(g.some(x=>x<21||x>35))h+='<div class="note" style="margin-top:12px">Some of your cycles were shorter than 21 or longer than 35 days. That can be normal, but it is worth mentioning to a clinician.</div>';
+ $('#ins').innerHTML=h},
+ me(){$('#cLen').value=S.cLen;$('#pLen').value=S.pLen;$('#lockState').textContent=S.pin?'A PIN lock is on.':'No lock is set.'}};
+function dayView(){const l=S.logs[sel];$('#dayDetail').innerHTML=`<h2>${fmt(sel)}</h2>`+(l?`<p>${isP(l)?'Period: '+l.flow+'<br>':''}${l.sym?.length?'Symptoms: '+l.sym.join(', ')+'<br>':''}${l.mood?'Mood: '+l.mood+'<br>':''}${l.energy?'Energy: '+l.energy+'/5<br>':''}${l.sleep?'Sleep: '+l.sleep+' h<br>':''}${l.note?'Note: '+l.note.replace(/</g,'&lt;'):''}</p>`:'<p class="muted">Nothing logged.</p>')+`<p style="margin-top:10px"><button id="editDay">${l?'Edit':'Log'} this day</button></p>`;$('#editDay').onclick=()=>{show('today');loadDay(sel)}}
+let cur={};function loadDay(d){sel=d;cur=JSON.parse(JSON.stringify(S.logs[d]||{sym:[],energy:3,sleep:''}));$('#logDate').textContent=fmt(d);
+ $$('.chips[data-f]').forEach(g=>{const f=g.dataset.f;g.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',g.classList.contains('multi')?(cur[f]||[]).includes(c.dataset.v):cur[f]===c.dataset.v))});
+ $('#energy').value=cur.energy||3;$('#enV').textContent=($('#energy').value)+'/5';$('#sleep').value=cur.sleep??'';$('#note').value=cur.note||'';$('#saved').textContent=''}
+$$('.chips[data-f]').forEach(g=>g.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{const f=g.dataset.f;if(g.classList.contains('multi')){cur[f]=cur[f]||[];const i=cur[f].indexOf(c.dataset.v);i<0?cur[f].push(c.dataset.v):cur[f].splice(i,1);c.classList.toggle('on')}else{cur[f]=cur[f]===c.dataset.v?null:c.dataset.v;g.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x.dataset.v===cur[f]))}}));
+$('#energy').oninput=()=>$('#enV').textContent=$('#energy').value+'/5';
+$('#save').onclick=()=>{cur.energy=+$('#energy').value;cur.sleep=$('#sleep').value;cur.note=$('#note').value.trim();S.logs[sel]=cur;save();$('#saved').textContent='Saved ✓';if(sel===today)R.today()};
+$('#prevM').onclick=()=>{month.setMonth(month.getMonth()-1);R.cal()};$('#nextM').onclick=()=>{month.setMonth(month.getMonth()+1);R.cal()};
+$('#saveBasics').onclick=()=>{S.cLen=Math.min(45,Math.max(18,+$('#cLen').value||28));S.pLen=Math.min(10,Math.max(2,+$('#pLen').value||5));save();alertMsg('Saved')};
+async function h(p){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('cyc:'+p));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+$('#setPin').onclick=async()=>{const p=$('#pinSet').value;if(!/^\d{4,6}$/.test(p))return alertMsg('Use 4 to 6 digits.');S.pin=await h(p);save();$('#pinSet').value='';R.me()};
+$('#clearPin').onclick=()=>{S.pin=null;save();R.me()};
+$('#unlock').onclick=async()=>{if(await h($('#pinIn').value)===S.pin){$('#lock').classList.add('hide');$('#pinIn').value=''}else $('#lockMsg').textContent='That PIN is not right.'};
+$('#exp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='coressence-cycle-backup-'+today+'.json';a.click()};
+$('#imp').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const d=JSON.parse(t);if(!d.logs)throw 0;S=d;save();alertMsg('Backup restored');show('today')}catch(x){alertMsg('That file is not a Cycle backup.')}})};
+$('#wipe').onclick=()=>{if($('#wipe').dataset.c){S={logs:{},cLen:28,pLen:5,pin:null};try{localStorage.removeItem(K)}catch(e){}$('#wipe').textContent='Delete all my data';delete $('#wipe').dataset.c;show('today')}else{$('#wipe').dataset.c=1;$('#wipe').textContent='Tap again to permanently delete'}};
+function alertMsg(m){const n=document.createElement('div');n.textContent=m;n.style.cssText='position:fixed;left:50%;top:16px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:10px;z-index:20';document.body.appendChild(n);setTimeout(()=>n.remove(),1800)}
+if(S.pin)$('#lock').classList.remove('hide');
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&S.pin)$('#lock').classList.remove('hide')});
+if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+R.today();
+</script></body></html>
