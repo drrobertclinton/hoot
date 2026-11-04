@@ -3,28 +3,38 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Hoot Tutor</title>
+<title>My Own Tutor</title>
 <meta name="description" content="A tutor for every course from kindergarten through calculus, AP, ACT, SAT and state tests.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
 <link rel="stylesheet" href="/style.css">
+<style>
+.level-sub { margin: 0 }
+.prep-cta { display: grid; gap: 4px; text-align: left; width: 100% }
+/* K-5: bigger, friendlier type and buttons for young readers */
+body.k5 { font-size: 18px }
+body.k5 .set .name { font-size: 19px }
+body.k5 .chip { min-height: 48px; font-size: 17px }
+body.k5 .choice { font-size: 19px }
+</style>
 </head>
 <body>
 <div class="wrap">
   <header class="brand">
     <svg class="logo" viewBox="0 0 38 38" aria-hidden="true"><rect width="38" height="38" rx="11" fill="var(--accent)"/><path d="M9 9l5 4M29 9l-5 4" stroke="var(--bolt)" stroke-width="3" stroke-linecap="round"/><circle cx="13.5" cy="19" r="6" fill="var(--bolt)"/><circle cx="24.5" cy="19" r="6" fill="var(--bolt)"/><circle cx="13.5" cy="19" r="2.6" fill="#16213a"/><circle cx="24.5" cy="19" r="2.6" fill="#16213a"/><path d="M19 23l-2.6 3.2h5.2z" fill="var(--bolt)"/></svg>
-    <h1>Hoot Tutor</h1>
+    <div><h1 id="appName">My Own Tutor</h1><p class="small muted level-sub" id="appSub">by Hoot</p></div>
   </header>
 
   <!-- PICK A COURSE -->
   <section id="pick" class="wrap" style="padding:0;gap:16px">
-    <p class="muted">Pick a course. Hoot teaches it one step at a time, from kindergarten through calculus.</p>
+    <p class="muted" id="pickIntro">Pick a course. Hoot teaches it one step at a time, from kindergarten through calculus.</p>
+    <button class="panel feature prep-cta" id="prepBtn" hidden><strong>ACT, SAT, PSAT and state test prep</strong><span class="small muted">Timed practice that matches the real test, plus a quick check to find your weak spots.</span></button>
     <p class="small muted" id="stateLine"></p>
     <div class="chips" id="bands" role="tablist"></div>
     <div class="sets" id="courses"></div>
     <p class="small muted note">Hoot is extra help for learning and practice. It can't promise a passing grade or test score.</p>
-    <nav class="foot"><a href="/">Flashcards from my pages</a><button class="ghost small" id="grownBtn">Grown-up settings</button><a href="/privacy.html">Privacy</a></nav>
+    <nav class="foot"><a href="/">Flashcards from my pages</a><a id="otherLevel" href="/tutor.html?level=612"></a><button class="ghost small" id="grownBtn">Grown-up settings</button><a href="/privacy.html">Privacy</a></nav>
   </section>
 
   <!-- ONE COURSE -->
@@ -167,7 +177,32 @@ const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; 
 const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 
 // The grown-up agreement lives on the main page.
-try { if (localStorage.getItem("hoot-consent-v1") !== "yes") location.replace("/?next=tutor"); } catch {}
+try { if (localStorage.getItem("hoot-consent-v1") !== "yes") location.replace("/?next=tutor" + location.search.replace("?", "&")); } catch {}
+
+// Two apps from one page: My Own Tutor K-5 and My Own Tutor 6-12.
+// The level comes from ?level= (k5 or 612) and is remembered on this device.
+const LEVELS = {
+  k5: { name: "My Own Tutor K-5", sub: "Kindergarten to 5th grade, by Hoot", bands: ["elem", "state"], intro: "Pick a subject. Hoot teaches it one small step at a time.",
+        state: c => /3–8|5, 8/.test(c.grade) },
+  "612": { name: "My Own Tutor 6-12", sub: "Middle school, high school, AP and test prep, by Hoot", bands: ["middle", "high", "ap", "prep", "state"], intro: "Pick a course. Hoot teaches it step by step, helps with homework and gets you ready for the test.",
+        state: () => true },
+};
+const LEVEL_KEY = "hoot-tutor-level-v1";
+const asked = new URLSearchParams(location.search).get("level");
+let level = LEVELS[asked] ? asked : (() => { try { return localStorage.getItem(LEVEL_KEY); } catch { return null; } })();
+if (!LEVELS[level]) level = null;
+if (level) { try { localStorage.setItem(LEVEL_KEY, level); } catch {} }
+const L = LEVELS[level];
+const inLevel = c => !L || (L.bands.includes(c.band) && (c.band !== "state" || L.state(c)));
+const here = () => location.pathname + (level ? `?level=${level}` : "");
+if (L) {
+  document.title = L.name; $("appName").textContent = L.name; $("appSub").textContent = L.sub; $("pickIntro").textContent = L.intro;
+  document.body.classList.toggle("k5", level === "k5");
+  $("prepBtn").hidden = level !== "612";
+  $("prepBtn").onclick = () => { settings.band = "prep"; save(SETTINGS, settings); showPick(); };
+}
+const other = level === "k5" ? "612" : "k5";
+$("otherLevel").href = `/tutor.html?level=${other}`; $("otherLevel").textContent = LEVELS[other].name;
 
 const SETTINGS = "hoot-tutor-settings-v1", PROGRESS = "hoot-tutor-progress-v1", CHATS = "hoot-tutor-chats-v1";
 let settings = load(SETTINGS, { help: "teach", state: "North Carolina", pin: null, band: "elem" });
@@ -188,7 +223,9 @@ const unitsDone = c => Object.values(progress[c.id] || {}).filter(u => u.mastere
 function showPick() {
   show("pick");
   const bands = $("bands"); bands.replaceChildren();
-  for (const b of BANDS) {
+  const shown = L ? L.bands.map(id => BANDS.find(b => b.id === id)) : BANDS;
+  if (!shown.some(b => b.id === settings.band)) settings.band = shown[0].id;
+  for (const b of shown) {
     const btn = el("button", "chip", b.name); btn.setAttribute("role", "tab");
     btn.setAttribute("aria-selected", String(settings.band === b.id));
     btn.onclick = () => { settings.band = b.id; save(SETTINGS, settings); showPick(); };
@@ -196,7 +233,7 @@ function showPick() {
   }
   $("stateLine").textContent = `Lessons match ${settings.state}'s standards. A grown-up can change the state in Grown-up settings.`;
   const list = $("courses"); list.replaceChildren();
-  for (const c of COURSES.filter(c => c.band === settings.band)) {
+  for (const c of COURSES.filter(c => c.band === settings.band && inLevel(c))) {
     const row = el("button", "set");
     const info = el("div", "info");
     info.append(el("div", "name", title(c)), el("div", "muted small", `${c.subject} · ${c.units.length} units`));
@@ -229,7 +266,7 @@ function openCourse(id) {
     row.onclick = () => openUnit(i, "learn");
     list.append(row);
   });
-  history.replaceState(null, "", `/tutor.html#${c.id}`);
+  history.replaceState(null, "", `${here()}#${c.id}`);
 }
 
 function show(id) { for (const s of ["pick", "courseView", "unitView", "diagView"]) $(s).hidden = s !== id; window.scrollTo(0, 0); }
@@ -240,7 +277,7 @@ function openUnit(i, mode) {
   $("unitCourse").textContent = cur.c.name;
   $("unitName").textContent = cur.c.units[i];
   $("unitCourse").textContent = title(cur.c);
-  history.replaceState(null, "", `/tutor.html#${cur.c.id}/${i}`);
+  history.replaceState(null, "", `${here()}#${cur.c.id}/${i}`);
   setMode(mode);
 }
 const key = () => `${cur.c.id}|${cur.unit}|${cur.mode}`;

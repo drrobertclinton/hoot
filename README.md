@@ -9,6 +9,15 @@ and give students a class code.
 Claude is called only from the server, with the key in an environment variable.
 The browser can only ask for fixed jobs (named course, unit and mode) and never sends its own prompt.
 
+## Two apps: My Own Tutor K-5 and My Own Tutor 6-12
+
+The same tutor page runs as two apps, picked by `?level=`:
+
+- **My Own Tutor K-5**: `/k5.html` (or `/tutor.html?level=k5`). Elementary courses and the grade 3-5 state tests, with bigger text and buttons.
+- **My Own Tutor 6-12**: `/6-12.html` (or `/tutor.html?level=612`). Middle school, high school, AP, ACT/SAT/PSAT and state tests, with test prep up front.
+
+The level is remembered on the device. `/tutor.html` with no level shows every course.
+
 ## What's where
 
 - `public/index.html` – the kids' app (sets and scores stay in the browser), with the grown-up agreement screen.
@@ -38,6 +47,7 @@ The browser can only ask for fixed jobs (named course, unit and mode) and never 
 2. Storage → Create Database → Upstash Redis (free) → connect it to the project.
 3. Settings → Environment Variables → add `ANTHROPIC_API_KEY`, then redeploy.
 4. Settings → Domains to add a domain.
+5. Share `https://<your-domain>/k5.html` and `https://<your-domain>/6-12.html` as the two apps.
 
 ## Run locally
 
