@@ -9,6 +9,11 @@ and give students a class code.
 Claude is called only from the server, with the key in an environment variable.
 The browser can only ask for fixed jobs (named course, unit and mode) and never sends its own prompt.
 
+## Kinboard and Snapdeck
+
+- **Kinboard** (`/kinboard.html`): the family board. This week's plans, chores with points for each kid, and rewards kids ask for and a grown-up approves with a PIN. Everything stays on the device, so it fits a family tablet or kitchen screen. Sharing one board across several phones will need a server later.
+- **Snapdeck** (`/snapdeck.html`): the photo-to-flashcards study deck maker on its own, without the tutor and Kinboard cards.
+
 ## What's where
 
 - `public/index.html` – the kids' app (sets and scores stay in the browser), with the grown-up agreement screen.
