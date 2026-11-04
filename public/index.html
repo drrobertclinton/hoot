@@ -20,9 +20,13 @@
 
   <!-- HOME -->
   <section id="home" class="wrap" style="padding:0;gap:18px">
-    <a class="panel feature" href="/tutor.html">
-      <h2>Learn with the tutor</h2>
-      <p class="small muted">Every course from kindergarten through calculus, plus AP, ACT, SAT and state tests. Hoot teaches step by step and helps with homework.</p>
+    <a class="panel feature" href="/tutor.html?level=k5">
+      <h2>My Own Tutor K-5</h2>
+      <p class="small muted">Reading, math, science and social studies from kindergarten to 5th grade. Hoot teaches one small step at a time and helps with homework.</p>
+    </a>
+    <a class="panel feature" href="/tutor.html?level=612">
+      <h2>My Own Tutor 6-12</h2>
+      <p class="small muted">Middle school, high school and AP courses through calculus, plus ACT, SAT, PSAT and state test prep.</p>
     </a>
     <div class="panel">
       <div>
@@ -194,7 +198,8 @@
   $("gate").hidden = agreed;
   $("agreeBtn").onclick = () => {
     try { localStorage.setItem(CONSENT, "yes"); } catch {}
-    if (new URLSearchParams(location.search).get("next") === "tutor") return location.replace("/tutor.html");
+    const q = new URLSearchParams(location.search);
+    if (q.get("next") === "tutor") return location.replace("/tutor.html" + (/^(k5|612)$/.test(q.get("level") || "") ? "?level=" + q.get("level") : ""));
     $("gate").hidden = true;
   };
 
