@@ -17,7 +17,7 @@ export default {
     if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: h });
     const url = new URL(req.url);
     const send = (s, j) => new Response(JSON.stringify(j), { status: s, headers: { ...h, "content-type": "application/json" } });
-    if (url.pathname === "/" ) return send(200, { ok: true, app: "hoot-tutor", key: Boolean(env.ANTHROPIC_API_KEY), classes: Boolean(env.HOOT) });
+    if (url.pathname === "/" ) return send(200, { ok: true, app: "hoot-tutor", version: 3, key: Boolean(env.ANTHROPIC_API_KEY), classes: Boolean(env.HOOT) });
     const route = url.pathname === "/api/study" ? study : url.pathname === "/api/class" ? klass : null;
     if (!route) return send(404, { code: "not_found" });
     let body = null;
