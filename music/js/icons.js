@@ -1,0 +1,63 @@
+// Line icons (24px grid) and instrument illustrations (48px grid). All drawn for this app.
+const s = (d, extra = '') => `<svg viewBox="0 0 24 24" aria-hidden="true" class="ic" ${extra}>${d}</svg>`;
+export const ICONS = {
+  home: s('<path d="M3.5 10.5 12 4l8.5 6.5V20a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/>'),
+  learn: s('<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/>'),
+  theory: s('<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>'),
+  songs: s('<path d="M4 6h11M4 11h11M4 16h7"/><path d="M19 6v10"/><circle cx="16.5" cy="16.5" r="2.5"/>'),
+  tools: s('<path d="M8 21h8l-1.6-15.5a1 1 0 0 0-1-.9h-2.8a1 1 0 0 0-1 .9z"/><path d="M12 15 16.5 6.5"/>'),
+  me: s('<circle cx="12" cy="8" r="4"/><path d="M4 21c1.2-4.2 4.3-6 8-6s6.8 1.8 8 6"/>'),
+  gear: s('<circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.4M12 18.8v2.4M21.2 12h-2.4M5.2 12H2.8M18.5 5.5l-1.7 1.7M7.2 16.8l-1.7 1.7M18.5 18.5l-1.7-1.7M7.2 7.2 5.5 5.5"/>'),
+  play: s('<path d="M7 4.5v15l12.5-7.5z" fill="currentColor" stroke="none"/>'),
+  pause: s('<path d="M7 4h3.5v16H7zM13.5 4H17v16h-3.5z" fill="currentColor" stroke="none"/>'),
+  stop: s('<rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor" stroke="none"/>'),
+  restart: s('<path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/>'),
+  back: s('<path d="M15 5 8 12l7 7"/>'),
+  close: s('<path d="M6 6l12 12M18 6 6 18"/>'),
+  check: s('<path d="M5 12.5 9.5 17 19 7.5"/>'),
+  lock: s('<rect x="5" y="10.5" width="14" height="10" rx="2.2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>'),
+  star: s('<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z" fill="currentColor" stroke="none"/>'),
+  flame: s('<path d="M12 21c-4 0-6.5-2.6-6.5-6.2 0-3.3 2.4-5.4 3.6-8.3.4 1.6 1.4 2.6 2.4 3 .1-2.6 1.3-5 3.5-6.5-.3 2.6.6 4.3 2 6 1.2 1.5 1.5 3.1 1.5 4.6C18.5 18.2 16 21 12 21z" fill="currentColor" stroke="none"/>'),
+  bolt: s('<path d="M13 2.5 4.5 13.5H11L10 21.5l9.5-12H13z" fill="currentColor" stroke="none"/>'),
+  mic: s('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/>'),
+  midi: s('<rect x="3" y="7" width="18" height="11" rx="2"/><path d="M7 7v6M11 7v6M15 7v6M19 7v6" /><path d="M8 3.5h8"/>'),
+  touch: s('<path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11m0-1.5a1.5 1.5 0 0 1 3 0V11m0-.5a1.5 1.5 0 0 1 3 0V15c0 3.3-2.2 6-5.5 6-2.4 0-3.7-1-5-3l-2.4-3.8a1.4 1.4 0 0 1 2.3-1.6L9 14"/>'),
+  metronome: s('<path d="M8 21h8l-1.6-15.5a1 1 0 0 0-1-.9h-2.8a1 1 0 0 0-1 .9z"/><path d="M12 15 16.5 6.5"/><path d="M8.6 15.5h6.8"/>'),
+  tuner: s('<path d="M4 17a8 8 0 0 1 16 0"/><path d="M12 17 15 9.5"/><path d="M4 20h16"/>'),
+  drone: s('<path d="M3 12h3l2-6 3 12 3-9 2 6 2-3h3"/>'),
+  ear: s('<path d="M7 9a5 5 0 1 1 10 0c0 3-2.5 4-3 6.5S12 21 9.5 20.5 7 18 7 18"/><path d="M10 10a2 2 0 1 1 4 0"/>'),
+  cards: s('<rect x="3.5" y="6" width="13" height="14" rx="2"/><path d="M8 3.5h10.5a2 2 0 0 1 2 2V16"/>'),
+  calendar: s('<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),
+  chart: s('<path d="M4 20V4M4 20h16"/><path d="M8 16v-4M12 16V8M16 16v-6"/>'),
+  trophy: s('<path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 14v4M8 21h8M9 18h6"/>'),
+  share: s('<path d="M12 15V3M7.5 7.5 12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>'),
+  plus: s('<path d="M12 5v14M5 12h14"/>'),
+  minus: s('<path d="M5 12h14"/>'),
+  sliders: s('<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>'),
+  headphones: s('<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3.5" y="14" width="4" height="7" rx="1.5"/><rect x="16.5" y="14" width="4" height="7" rx="1.5"/>'),
+  info: s('<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>'),
+  sound: s('<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>'),
+  eye: s('<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>'),
+  loop: s('<path d="M17 3l3 3-3 3"/><path d="M4 11V9a3 3 0 0 1 3-3h13M7 21l-3-3 3-3"/><path d="M20 13v2a3 3 0 0 1-3 3H4"/>'),
+  doc: s('<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>'),
+  sparkle: s('<path d="M12 3c.6 4.4 2.6 6.4 7 7-4.4.6-6.4 2.6-7 7-.6-4.4-2.6-6.4-7-7 4.4-.6 6.4-2.6 7-7z" fill="currentColor" stroke="none"/>'),
+};
+
+// 48px instrument illustrations, two-tone: currentColor plus a translucent fill.
+const g = (d) => `<svg viewBox="0 0 48 48" aria-hidden="true" class="inst-ic">${d}</svg>`;
+export const INST_ICONS = {
+  piano: g('<rect x="5" y="12" width="38" height="25" rx="4" class="f"/><rect x="5" y="12" width="38" height="25" rx="4"/><path d="M11.3 24v13M17.6 24v13M23.9 24v13M30.2 24v13M36.5 24v13"/><path d="M5 24h38"/><rect x="9.6" y="24" width="3.4" height="7.5" rx=".8" class="k"/><rect x="15.9" y="24" width="3.4" height="7.5" rx=".8" class="k"/><rect x="28.5" y="24" width="3.4" height="7.5" rx=".8" class="k"/><rect x="34.8" y="24" width="3.4" height="7.5" rx=".8" class="k"/>'),
+  guitar: g('<path d="M19.5 26.5c-3.4-.6-7.6 1.2-8.9 5-1.6 4.6 1.5 9.6 6.6 10.1 3.6.4 5.8-1.6 6.6-3.6.7-1.7 2.1-2.4 3.6-2.6 2.6-.4 4.1-2.6 3.2-5.2-.8-2.2-3-3-4.8-2.5l-.8-1.2z" class="f"/><path d="M19.5 26.5c-3.4-.6-7.6 1.2-8.9 5-1.6 4.6 1.5 9.6 6.6 10.1 3.6.4 5.8-1.6 6.6-3.6.7-1.7 2.1-2.4 3.6-2.6 2.6-.4 4.1-2.6 3.2-5.2-.8-2.2-3-3-4.8-2.5"/><circle cx="20.2" cy="33" r="2.6"/><path d="M22.4 30.8 37 9.5"/><path d="M35.2 8.2l3.6-3 3 2.6-2.8 3.8z" class="k"/><path d="M14.8 37.5l3.6-3.6"/>'),
+  bass: g('<path d="M16 28c-3.6-.4-7.4 1.8-8.2 5.8-.9 4.7 2.8 8.9 7.6 8.6 3.2-.2 5-2.4 5.6-4.4.5-1.8 1.8-2.8 3.4-3.2 2.4-.6 3.6-2.8 2.6-5.1-.6-1.4-1.6-2-2.6-2.2l1.4-3.4-3.6 1.4z" class="f"/><path d="M16 28c-3.6-.4-7.4 1.8-8.2 5.8-.9 4.7 2.8 8.9 7.6 8.6 3.2-.2 5-2.4 5.6-4.4.5-1.8 1.8-2.8 3.4-3.2 2.4-.6 3.6-2.8 2.6-5.1-.6-1.4-1.6-2-2.6-2.2"/><path d="M18 32.5 40 4.5"/><path d="M38.2 3.2l4 1.5-1.4 4.3-3.4-1.2z" class="k"/><path d="M11.6 37.2l4-4M15.5 34.8l1.6 1.6"/>'),
+  violin: g('<path d="M24 19c-3.2 0-5.6 1.6-5.6 4.4 0 1.6 1.2 2.4 1.2 3.4s-2.6 2-2.6 5.6c0 4.4 3.2 7.6 7 7.6s7-3.2 7-7.6c0-3.6-2.6-4.6-2.6-5.6s1.2-1.8 1.2-3.4c0-2.8-2.4-4.4-5.6-4.4z" class="f"/><path d="M24 19c-3.2 0-5.6 1.6-5.6 4.4 0 1.6 1.2 2.4 1.2 3.4s-2.6 2-2.6 5.6c0 4.4 3.2 7.6 7 7.6s7-3.2 7-7.6c0-3.6-2.6-4.6-2.6-5.6s1.2-1.8 1.2-3.4c0-2.8-2.4-4.4-5.6-4.4z"/><path d="M24 19V7"/><circle cx="24" cy="5.2" r="2" class="k"/><path d="M21 28.5v4.5M27 28.5v4.5"/><path d="M21.5 36.5h5"/><path d="M38 9 13 42" class="bow"/>'),
+  cello: g('<path d="M24 12c-4 0-7 2-7 5.6 0 2 1.5 3 1.5 4.3S15 24.4 15 29c0 6 4 10 9 10s9-4 9-10c0-4.6-3.5-5.8-3.5-7.1s1.5-2.3 1.5-4.3c0-3.6-3-5.6-7-5.6z" class="f"/><path d="M24 12c-4 0-7 2-7 5.6 0 2 1.5 3 1.5 4.3S15 24.4 15 29c0 6 4 10 9 10s9-4 9-10c0-4.6-3.5-5.8-3.5-7.1s1.5-2.3 1.5-4.3c0-3.6-3-5.6-7-5.6z"/><path d="M24 12V3.5"/><path d="M24 39v6"/><path d="M20.5 24v6M27.5 24v6M21 34h6"/>'),
+  altosax: g('<path d="M25 5.5c2 0 3 1 3 3v22c0 5.5-3.4 10-9 10-4.4 0-7.5-3-7.5-7 0-2.2 1-3.8 2.5-4.8l3 2.4c-.8.6-1.2 1.4-1.2 2.4 0 1.7 1.3 3 3.2 3 2.6 0 4-2.2 4-5.2V9.5" class="f"/><path d="M25 5.5c2 0 3 1 3 3v22c0 5.5-3.4 10-9 10-4.4 0-7.5-3-7.5-7 0-2.2 1-3.8 2.5-4.8l3 2.4c-.8.6-1.2 1.4-1.2 2.4 0 1.7 1.3 3 3.2 3 2.6 0 4-2.2 4-5.2V9.5"/><path d="M25 5.5c-2.5 0-5-1-7-3"/><circle cx="25" cy="14" r="1.2" class="k"/><circle cx="25" cy="19" r="1.2" class="k"/><circle cx="25" cy="24" r="1.2" class="k"/><path d="m12 28.7 5.4-1.9"/>'),
+  tenorsax: g('<path d="M25 5.5c2 0 3 1 3 3v22c0 5.5-3.4 10-9 10-4.4 0-7.5-3-7.5-7 0-2.2 1-3.8 2.5-4.8l3 2.4c-.8.6-1.2 1.4-1.2 2.4 0 1.7 1.3 3 3.2 3 2.6 0 4-2.2 4-5.2V9.5" class="f"/><path d="M25 5.5c2 0 3 1 3 3v22c0 5.5-3.4 10-9 10-4.4 0-7.5-3-7.5-7 0-2.2 1-3.8 2.5-4.8l3 2.4c-.8.6-1.2 1.4-1.2 2.4 0 1.7 1.3 3 3.2 3 2.6 0 4-2.2 4-5.2V9.5"/><path d="M25 5.5c-1.5-2.5-4.5-3.5-7.5-3 1 .3 2 1.3 2.3 2.4"/><circle cx="25" cy="14" r="1.2" class="k"/><circle cx="25" cy="19" r="1.2" class="k"/><circle cx="25" cy="24" r="1.2" class="k"/><path d="m12 28.7 5.4-1.9"/>'),
+  trumpet: g('<path d="M5 22.5h6v3H5z" class="k"/><path d="M11 23h20c3 0 6-2.5 7-6.5h3.5v15H38c-1-4-4-6.5-7-6.5H11" class="f"/><path d="M11 23h20c3 0 6-2.5 7-6.5h3.5v15H38c-1-4-4-6.5-7-6.5H11z"/><path d="M14 26v5.5a3.5 3.5 0 0 0 3.5 3.5h9a3.5 3.5 0 0 0 3.5-3.5V26"/><path d="M17.5 23v-6.5M21.5 23v-6.5M25.5 23v-6.5"/><path d="M16 16.5h3M20 16.5h3M24 16.5h3"/>'),
+  clarinet: g('<path d="M21.5 9h5l.6 27h-6.2z" class="f"/><path d="M21.5 9h5l.6 27h-6.2z"/><path d="M22.5 9 23 3.5h2L25.5 9"/><path d="M21 36c-.3 3.5-2.2 5.6-4 7h14c-1.8-1.4-3.7-3.5-4-7"/><circle cx="24" cy="14" r="1.1" class="k"/><circle cx="24" cy="18.5" r="1.1" class="k"/><circle cx="24" cy="23" r="1.1" class="k"/><circle cx="24" cy="28" r="1.1" class="k"/><circle cx="24" cy="32" r="1.1" class="k"/>'),
+  harp: g('<path d="M11 42V9.5c4.5-3 9.5-4.6 14.5-3.4 3.8.9 6 3.4 9.5 3.4 1.4 0 2.6-.4 3.6-1L14.5 42z" class="f"/><path d="M11 43V9.5c4.5-3 9.5-4.6 14.5-3.4 3.8.9 6 3.4 9.5 3.4 1.4 0 2.6-.4 3.6-1L14.5 43"/><path d="M15 10.5v26M19 8.6v22M23 7.6v17.5M27 7.4v13M31 8.6v8.2M35 9.5v4.3" class="str"/><path d="M8 43h9"/>'),
+  voice: g('<rect x="17.5" y="5" width="13" height="22" rx="6.5" class="f"/><rect x="17.5" y="5" width="13" height="22" rx="6.5"/><path d="M17.5 13h4M26.5 13h4M17.5 18h4M26.5 18h4"/><path d="M12 22c0 7 5.4 12 12 12s12-5 12-12"/><path d="M24 34v8M17 42.5h14"/>'),
+  theory: g('<path d="M6 13h36M6 19h36M6 25h36M6 31h36M6 37h36" class="str"/><ellipse cx="17.5" cy="31" rx="4.5" ry="3.4" transform="rotate(-20 17.5 31)" class="k"/><path d="M21.6 29.6V10"/><ellipse cx="32.5" cy="25" rx="4.5" ry="3.4" transform="rotate(-20 32.5 25)" class="k"/><path d="M36.6 23.6V6"/><path d="M21.6 10 36.6 6v5l-15 4z" class="k"/>'),
+};
+export const icon = (name) => ICONS[name] || '';
+export const instIcon = (id) => INST_ICONS[id] || INST_ICONS.theory;

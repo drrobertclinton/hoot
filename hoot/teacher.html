@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hoot for Teachers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="brand">
+    <svg class="logo" viewBox="0 0 38 38" aria-hidden="true"><rect width="38" height="38" rx="11" fill="var(--accent)"/><path d="M9 9l5 4M29 9l-5 4" stroke="var(--bolt)" stroke-width="3" stroke-linecap="round"/><circle cx="13.5" cy="19" r="6" fill="var(--bolt)"/><circle cx="24.5" cy="19" r="6" fill="var(--bolt)"/><circle cx="13.5" cy="19" r="2.6" fill="#16213a"/><circle cx="24.5" cy="19" r="2.6" fill="#16213a"/><path d="M19 23l-2.6 3.2h5.2z" fill="var(--bolt)"/></svg>
+    <h1>Hoot for Teachers</h1>
+  </header>
+
+  <!-- no class yet -->
+  <section id="start" class="panel" hidden>
+    <div>
+      <h2>Make a class</h2>
+      <p class="muted small">You'll get a class code to give your students. Upload a study guide and Hoot turns it into flashcards and a practice test for everyone with the code. No student accounts or names needed.</p>
+    </div>
+    <input type="text" id="className" placeholder="Class name, like 5th Grade Science" maxlength="60" autocomplete="off">
+    <input type="text" id="teacherName" placeholder="Your name as students know you, like Ms. Rivera" maxlength="60" autocomplete="off">
+    <button class="go" id="createBtn">Make my class</button>
+    <div class="status" id="createStatus" hidden></div>
+  </section>
+
+  <!-- managing a class -->
+  <section id="manage" class="wrap" style="padding:0;gap:18px" hidden>
+    <div class="panel">
+      <p class="label">Class code for students</p>
+      <div class="big-code" id="codeShow"></div>
+      <p id="classTitle"></p>
+      <p class="muted small">Students open Hoot, tap <strong>Join your class</strong> and type this code.</p>
+      <details>
+        <summary class="small">Your private teacher link</summary>
+        <p class="small muted" style="margin-top:8px">Save this link to manage the class from another computer. Don't share it with students.</p>
+        <div class="row" style="margin-top:8px">
+          <input type="text" id="teacherLink" readonly style="flex:3 1 200px">
+          <button id="copyBtn" style="flex:1 1 90px">Copy</button>
+        </div>
+      </details>
+    </div>
+
+    <div class="panel">
+      <div>
+        <h2>Add a study guide</h2>
+        <p class="muted small">Upload the review sheet or study guide: PDFs, Word documents or photos, as many pages as it has.</p>
+      </div>
+      <input type="text" id="setName" placeholder="Name, like Chapter 4 test review" maxlength="80" autocomplete="off">
+      <label class="btn primary picker">
+        <input type="file" id="files" accept="image/*,.pdf,application/pdf,.docx,.txt" multiple>
+        <span>Choose files</span>
+      </label>
+      <p class="small" id="pageTally" hidden></p>
+      <div class="thumbs" id="thumbs" hidden></div>
+      <button class="go" id="addBtn" disabled>Make and share with the class</button>
+      <div class="status" id="addStatus" hidden></div>
+    </div>
+
+    <div class="panel">
+      <h2>Shared with the class</h2>
+      <div class="sets" id="sets"></div>
+    </div>
+  </section>
+
+  <nav class="foot"><a href="./">Open Hoot</a><a href="privacy.html">Privacy</a></nav>
+</div>
+
+<script>window.HOOT_API="https://hoot-tutor.robert-1f2.workers.dev"</script><script src="maker.js"></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const SAVED = "hoot-teacher-v1";
+
+  // The class code and teacher key come from the link (?class=&key=) or from this device.
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(SAVED) || "null"); } catch {}
+  const q = new URLSearchParams(location.search);
+  if (q.get("class") && q.get("key")) saved = { code: q.get("class").toUpperCase(), key: q.get("key") };
+  const remember = () => { try { localStorage.setItem(SAVED, JSON.stringify(saved)); } catch {} };
+  let cls = null, busy = false, pick = null;
+
+  function show() {
+    $("start").hidden = !!cls; $("manage").hidden = !cls;
+    if (!cls) return;
+    $("codeShow").textContent = cls.code;
+    $("classTitle").textContent = cls.name + (cls.teacher ? " · " + cls.teacher : "");
+    $("teacherLink").value = `${location.origin}/teacher.html?class=${cls.code}&key=${encodeURIComponent(saved.key)}`;
+    renderSets();
+  }
+  let pendingRemove = null;
+  function renderSets() {
+    const box = $("sets"); box.replaceChildren();
+    if (!cls.sets.length) { const p = document.createElement("p"); p.className = "muted small"; p.textContent = "Nothing shared yet. Add a study guide above."; box.append(p); return; }
+    for (const s of cls.sets) {
+      const row = document.createElement("div"); row.className = "set";
+      const info = document.createElement("div"); info.className = "info";
+      const nm = document.createElement("div"); nm.className = "name"; nm.textContent = s.name;
+      const meta = document.createElement("div"); meta.className = "muted small";
+      meta.textContent = `${s.cards.length} cards · ${s.quiz.length} test questions · ${new Date(s.created).toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
+      info.append(nm, meta);
+      const c = document.createElement("div"); c.className = "confirm";
+      if (pendingRemove === s.id) {
+        const y = document.createElement("button"); y.className = "ghost"; y.style.color = "var(--bad)"; y.textContent = "Remove";
+        y.onclick = async () => {
+          try { await Maker.post("/api/class", { action: "removeSet", code: cls.code, key: saved.key, setId: s.id }); cls.sets = cls.sets.filter(x => x.id !== s.id); }
+          catch (e) { Maker.status($("addStatus"), Maker.errText(e), "err"); }
+          pendingRemove = null; renderSets();
+        };
+        const n = document.createElement("button"); n.className = "ghost"; n.textContent = "Keep";
+        n.onclick = () => { pendingRemove = null; renderSets(); };
+        c.append(y, n);
+      } else {
+        const r = document.createElement("button"); r.className = "ghost small"; r.textContent = "Remove";
+        r.onclick = () => { pendingRemove = s.id; renderSets(); };
+        c.append(r);
+      }
+      row.append(info, c); box.append(row);
+    }
+  }
+
+  $("createBtn").onclick = async () => {
+    const name = $("className").value.trim();
+    if (!name) { Maker.status($("createStatus"), "Give the class a name first.", "err"); return; }
+    $("createBtn").disabled = true;
+    Maker.status($("createStatus"), "Making your class…", "busy");
+    try {
+      cls = await Maker.post("/api/class", { action: "create", name, teacher: $("teacherName").value.trim() });
+      saved = { code: cls.code, key: cls.key }; remember();
+      Maker.status($("createStatus"), ""); show();
+    } catch (e) { Maker.status($("createStatus"), Maker.errText(e), "err"); }
+    finally { $("createBtn").disabled = false; }
+  };
+
+  function updateAdd() {
+    const n = pick ? pick.count : 0;
+    $("addBtn").disabled = !n || busy;
+    $("addBtn").textContent = n ? `Make and share ${n} page${n > 1 ? "s" : ""} with the class` : "Make and share with the class";
+  }
+  pick = Maker.picker({ files: $("files"), thumbs: $("thumbs"), tally: $("pageTally"), status: $("addStatus") }, updateAdd);
+  $("addBtn").onclick = async () => {
+    if (busy || !pick.count) return;
+    busy = true; updateAdd();
+    try {
+      const set = await Maker.build(pick.sources, $("setName").value.trim(), m => Maker.status($("addStatus"), m, "busy"));
+      Maker.status($("addStatus"), "Sharing with the class…", "busy");
+      const { set: stored } = await Maker.post("/api/class", { action: "addSet", code: cls.code, key: saved.key, set });
+      cls.sets.unshift(stored);
+      pick.clear(); $("setName").value = "";
+      Maker.status($("addStatus"), `Shared "${stored.name}" with ${stored.cards.length} cards and ${stored.quiz.length} test questions.` + (set.warning ? " " + set.warning : ""));
+      renderSets();
+    } catch (e) { Maker.status($("addStatus"), Maker.errText(e), "err"); }
+    finally { busy = false; updateAdd(); }
+  };
+
+  $("copyBtn").onclick = async () => {
+    try { await navigator.clipboard.writeText($("teacherLink").value); $("copyBtn").textContent = "Copied"; }
+    catch { $("teacherLink").select(); }
+  };
+
+  (async () => {
+    if (saved && saved.code && saved.key) {
+      try {
+        cls = await Maker.post("/api/class", { action: "manage", code: saved.code, key: saved.key });
+        remember();
+        if (location.search) history.replaceState(null, "", "teacher.html");
+      } catch (e) { cls = null; Maker.status($("createStatus"), Maker.errText(e), "err"); }
+    }
+    show();
+  })();
+})();
+</script>
+</body>
+</html>

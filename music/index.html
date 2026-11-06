@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<title>Vilasi Music</title>
+<meta name="description" content="Learn piano, guitar, violin, cello, bass, saxophone, trumpet, clarinet, harp and voice, plus music theory. The app listens as you play."/>
+<meta content="#16133a" name="theme-color"/>
+<meta content="light dark" name="color-scheme"/>
+<link href="manifest.webmanifest" rel="manifest"/>
+<link href="icons/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="icons/apple-touch-icon.png" rel="apple-touch-icon"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="Vilasi Music" name="apple-mobile-web-app-title"/>
+<meta content="default" name="apple-mobile-web-app-status-bar-style"/>
+<link rel="preload" href="fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin/>
+<link rel="preload" href="fonts/fraunces-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin/>
+<link href="styles.css" rel="stylesheet"/>
+<link rel="stylesheet" href="js/vilasi/paywall.css"/><link rel="stylesheet" href="native/native.css"/><script src="native/config.js"></script><script src="native/native.js"></script></head>
+<body>
+<a class="skiplink" href="#app">Skip to content</a>
+<div class="shell">
+<nav aria-label="Main" class="tabs" id="tabs"></nav>
+<main id="app" tabindex="-1"><div aria-hidden="true" class="splash"></div></main>
+</div>
+<div aria-live="polite" class="toast" id="toast" role="status"></div>
+<noscript><p style="padding:24px">Vilasi Music needs JavaScript to run.</p></noscript>
+<script src="js/app.js" type="module"></script>
+</body>
+</html>

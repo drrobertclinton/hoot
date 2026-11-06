@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1b2d"><link rel="icon" href="favicon-32.png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Vilasi Dance Studio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: phone-first studio app; sticky tab bar, one view at a time (Learn, Practice, Mirror) */
+:root{
+  --bg:#f6f3ee; --surface:#ffffff; --ink:#0f1b2d; --muted:#5c6474; --line:#e3dccf; --gold:#b8975a; --gold-ink:#0f1b2d; --navy:#0f1b2d; --good:#2f7a4c;
+  --display:"Cormorant Garamond",Georgia,"Times New Roman",serif; --body:"Montserrat",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0b1422;--surface:#122034;--ink:#f1ece2;--muted:#a7afbd;--line:#24344c;--gold:#d2b47a;--navy:#060c16;--good:#6fd39c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b1422;--surface:#122034;--ink:#f1ece2;--muted:#a7afbd;--line:#24344c;--gold:#d2b47a;--navy:#060c16;--good:#6fd39c;color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--body)}
+.wrap{max-width:720px;margin:0 auto;padding-block:18px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:18px}
+[hidden]{display:none!important}
+section,.wrap>*{min-width:0}
+section>*{min-width:0}
+header.brand{display:flex;align-items:center;gap:14px}
+.mono{min-width:52px;height:52px;padding:0 9px;white-space:nowrap;flex:none;border:1.5px solid var(--gold);outline:1px solid var(--gold);outline-offset:3px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:.02em}
+.mono b{color:var(--gold);font-weight:700}
+.word{display:grid;line-height:1}
+.word strong{font-family:var(--display);font-size:28px;letter-spacing:.22em;font-weight:600}
+.word span{font-size:10.5px;letter-spacing:.42em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+nav.tabs button{min-height:44px;border:0;border-radius:9px;background:none;color:var(--ink);font:600 13px var(--body);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+nav.tabs button[aria-selected="true"]{background:var(--navy);color:#f1ece2}
+h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance}
+h2{font-size:26px} h3{font-size:21px}
+.muted{color:var(--muted)} .small{font-size:13px}
+.label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.chip{flex:none;min-height:40px;padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 13px var(--body);cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 18%,var(--surface))}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.step{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;padding:12px 0;border-top:1px solid var(--line)}
+.step:first-child{border-top:0}
+.count{font-family:var(--body);font-size:14px;font-weight:700;padding-top:4px;color:var(--gold);min-width:56px;font-variant-numeric:tabular-nums}
+.step p{margin:2px 0 0}
+.tick{width:40px;height:40px;border-radius:10px;border:1.5px solid var(--line);background:none;color:var(--ink);font-size:18px;cursor:pointer}
+.tick[aria-pressed="true"]{background:var(--good);border-color:var(--good);color:#fff}
+.btn{min-height:46px;padding:10px 18px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 14px var(--body);cursor:pointer}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.beat{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.beat i{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-style:normal;font-weight:700;font-variant-numeric:tabular-nums}
+.beat i.on{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
+.bignum{font-family:var(--display);font-size:64px;font-weight:700;line-height:1;text-align:center;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;margin:0;accent-color:var(--gold)}
+.video{position:relative;background:var(--navy);border-radius:12px;overflow:hidden;aspect-ratio:9/16;max-height:62vh;max-width:100%;margin:0 auto;width:100%}
+.video video{width:100%;height:100%;object-fit:contain;display:block}
+.video.mirror video{transform:scaleX(-1)}
+.video .empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#c9cfda;padding:20px}
+.picker{position:relative;overflow:hidden}
+.picker input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold);width:0}
+.note{font-size:12px;color:var(--muted)}
+button:focus-visible,.picker:focus-within{outline:2px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="brand">
+    <div class="mono" aria-hidden="true">V<b>DS</b></div>
+    <div class="word"><strong>VILASI</strong><span>Dance Studio</span></div>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs">
+    <button role="tab" data-tab="learn" aria-selected="true">Learn</button>
+    <button role="tab" data-tab="practice" aria-selected="false">Practice</button>
+    <button role="tab" data-tab="mirror" aria-selected="false">Mirror</button>
+  </nav>
+
+  <!-- LEARN -->
+  <section id="learn" style="display:grid;gap:14px">
+    <div class="chips" id="styles" aria-label="Dance styles"></div>
+    <div class="panel">
+      <div><p class="label" id="lvl"></p><h2 id="styleName"></h2><p class="muted small" id="styleAbout"></p></div>
+      <div class="bar"><i id="styleBar"></i></div>
+      <ol class="steps" id="moves"></ol>
+    </div>
+  </section>
+
+  <!-- PRACTICE -->
+  <section id="practice" style="display:grid;gap:14px" hidden>
+    <div class="panel">
+      <div><p class="label">Count it out</p><h2>Beat counter</h2><p class="muted small">Dancers count in eights. Set the tempo of your song and practice your steps on the count.</p></div>
+      <div class="bignum" id="bpmShow">96</div>
+      <p class="center muted small" style="text-align:center;margin:0">beats per minute</p>
+      <input type="range" id="bpm" min="60" max="160" value="96" aria-label="Tempo in beats per minute">
+      <div class="row" style="justify-content:center"><button class="chip" data-bpm="72">Slow 72</button><button class="chip" data-bpm="96">Medium 96</button><button class="chip" data-bpm="120">Pop 120</button><button class="chip" data-bpm="128">Club 128</button></div>
+      <div class="beat" id="beat"></div>
+      <div class="row" style="justify-content:center"><button class="btn gold" id="countBtn">Start counting</button><button class="btn" id="tapBtn">Tap the tempo</button></div>
+      <p class="note" style="text-align:center">Sound starts when you press Start. Count 1 is the higher click.</p>
+    </div>
+    <div class="panel">
+      <div><p class="label">Daily routine</p><h2>10-minute warm-up</h2><p class="muted small">Do this before every practice. Move gently and stop if anything hurts.</p></div>
+      <div class="bignum" id="wuTime">0:45</div>
+      <p style="text-align:center;margin:0;font-weight:600" id="wuName">Neck rolls and shoulder circles</p>
+      <div class="bar"><i id="wuBar"></i></div>
+      <div class="row" style="justify-content:center"><button class="btn gold" id="wuGo">Start warm-up</button><button class="btn" id="wuSkip">Next</button></div>
+    </div>
+  </section>
+
+  <!-- MIRROR -->
+  <section id="mirror" style="display:grid;gap:14px" hidden>
+    <div class="panel">
+      <div><p class="label">Study a routine</p><h2>Mirror and slow down</h2><p class="muted small">Open a dance video from your phone, like a tutorial or a clip of yourself. Flip it so it moves like a mirror, slow it down, and loop the hard part.</p></div>
+      <div class="video" id="vbox"><video id="vid" playsinline></video><div class="empty" id="vEmpty">No video open yet.<br>Tap "Open a video" below.</div></div>
+      <div class="row">
+        <label class="btn gold picker">Open a video<input type="file" id="vfile" accept="video/*"></label>
+        <button class="btn" id="vPlay" disabled>Play</button>
+        <button class="btn" id="vMirror" aria-pressed="true">Mirror on</button>
+      </div>
+      <div><p class="label">Speed</p><div class="row" id="speeds"></div></div>
+      <div><p class="label">Loop a section</p><div class="row"><button class="btn" id="setA" disabled>Set start</button><button class="btn" id="setB" disabled>Set end</button><button class="btn" id="clearAB" disabled>Clear loop</button><span class="small muted" id="abShow">No loop</span></div></div>
+      <p class="note">Your video stays on your device. It is never uploaded.</p>
+    </div>
+  </section>
+
+  <p class="note">Vilasi Dance Studio is part of the Vilasi Performance Suite. Warm up first, dance on a non-slip floor, and stop if you feel pain. © 2026 Vilasi, Inc.</p>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
+const store=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+
+// Each move: [count, name, how]
+const STYLES=[
+ {id:"hiphop",name:"Hip-hop",level:"Beginner · 8 moves",about:"Groove first. Keep your knees soft and let the bounce come from the beat.",moves:[
+  ["1–8","The bounce","Bend and straighten your knees on every beat. Stay loose through the chest."],
+  ["1–8","Two-step","Step right, bring left in. Step left, bring right in. Bounce through it."],
+  ["1–8","Body roll","Push the chest forward, then the stomach, then the hips, like a wave going down."],
+  ["1–4","Running man","Slide one foot back as the other knee lifts. Switch on every count."],
+  ["1–8","Cabbage patch","Fists together at the chest, circle them out and around while the hips rock."],
+  ["1–4","Rock step","Step forward and rock your weight in, then rock back. Add arms on the second eight."],
+  ["5–8","Freeze","Hit a strong pose on count 5 and hold it through 8. Look at your audience."],
+  ["1–8 ×4","Put it together","Bounce, two-step, body roll, freeze. Run it four times without stopping."]]},
+ {id:"ballet",name:"Ballet",level:"Beginner · 8 moves",about:"Stand tall, shoulders down, and turn out from the hips, never from the knees.",moves:[
+  ["Hold","First position","Heels together, toes turned out. Pull up through the legs and the top of the head."],
+  ["1–4","Demi-plié","Bend the knees over the toes, heels down. Rise back up with control."],
+  ["1–4","Tendu","Slide the foot out along the floor until only the toes touch. Slide it back in."],
+  ["1–4","Relevé","Rise onto the balls of the feet, hold, and lower slowly."],
+  ["1–8","Port de bras","Arms travel from low, to the front, to above the head, then open to the side."],
+  ["1–2","Sauté","A small jump from plié, landing softly through the feet."],
+  ["1–8","Chassé","Step, bring the feet together in the air, land, and travel across the floor."],
+  ["Bow","Révérence","Finish every class with a slow, graceful bow."]]},
+ {id:"jazz",name:"Jazz",level:"Beginner · 7 moves",about:"Sharp, stylish and full of energy. Sell every move with your face.",moves:[
+  ["1–4","Jazz square","Cross right over left, step left back, step right side, step left forward."],
+  ["1–2","Jazz hands","Spread the fingers wide and shake them. Small and fast looks best."],
+  ["1–4","Ball change","Shift weight quickly from the ball of one foot to the other."],
+  ["1–8","Kick ball change","Kick, step down on the ball of that foot, change weight. Repeat."],
+  ["1–4","Pas de bourrée","Back, side, front. A quick three-step that changes direction."],
+  ["1–2","Pivot turn","Step forward and turn half way on the balls of the feet."],
+  ["1–8 ×2","Put it together","Jazz square, kick ball change, pivot, jazz hands. Two times through."]]},
+ {id:"latin",name:"Salsa",level:"Beginner · 6 moves",about:"Salsa counts 1-2-3, pause, 5-6-7, pause. The pause is where the style lives.",moves:[
+  ["1-2-3","Basic forward","Step forward on 1, rock back on 2, bring the feet together on 3."],
+  ["5-6-7","Basic back","Step back on 5, rock forward on 6, together on 7."],
+  ["1–8","Side basic","Step to the side and back to center on each half of the count."],
+  ["1–8","Cuban motion","Let the hips move as each knee bends and straightens."],
+  ["1–8","Right turn","On 1-2-3, turn right in three small steps. Spot a point on the wall."],
+  ["1–8 ×4","Put it together","Basic, side basic, right turn. Four eights with music."]]},
+ {id:"contemporary",name:"Contemporary",level:"Beginner · 6 moves",about:"Use the floor, your breath and the space around you. There are no wrong shapes.",moves:[
+  ["1–8","Breath and swing","Swing the arms down and up with a full breath, letting the knees give."],
+  ["1–4","Spiral","Twist from the waist while the hips stay square, then unwind."],
+  ["1–8","Contraction","Round the spine as if you were hit in the stomach, then release long."],
+  ["1–4","Floor roll","Sit, roll across the back of one shoulder, and come up to kneeling."],
+  ["1–8","Reach and fall","Reach far past your fingertips, then let the weight fall into a lunge."],
+  ["1–8 ×2","Put it together","Make your own 16 counts from these moves. Film it in the Mirror tab."]]},
+ {id:"tap",name:"Tap",level:"Beginner · 6 moves",about:"Tap is music you make with your feet. Keep the ankles loose and the sounds clear.",moves:[
+  ["1","Toe tap","Tap the ball of the foot on the floor without putting weight on it."],
+  ["1–2","Shuffle","Brush the foot forward, then back. Two clear sounds."],
+  ["1–2","Flap","Brush forward and step down, putting your weight on it."],
+  ["1–4","Ball change","Weight to the ball of the back foot, then step on the front foot."],
+  ["1–8","Shuffle ball change","Shuffle, ball change, on each foot."],
+  ["1–8 ×2","Put it together","Flap, flap, shuffle ball change. Two times through, then speed up."]]},
+];
+let st=load("vds-state",{style:"hiphop",done:{}});
+const save=()=>store("vds-state",st);
+
+function renderLearn(){
+  const box=$("styles");box.replaceChildren();
+  for(const s of STYLES){const b=el("button","chip",s.name);b.setAttribute("aria-pressed",String(s.id===st.style));b.onclick=()=>{st.style=s.id;save();renderLearn()};box.append(b)}
+  const s=STYLES.find(x=>x.id===st.style)||STYLES[0];
+  $("styleName").textContent=s.name;$("lvl").textContent=s.level;$("styleAbout").textContent=s.about;
+  const list=$("moves");list.replaceChildren();let n=0;
+  s.moves.forEach((m,i)=>{
+    const key=s.id+":"+i,on=!!st.done[key];if(on)n++;
+    const li=el("li","step"),txt=el("div");txt.append(el("h3",null,m[1]),el("p","muted small",m[2]));
+    const t=el("button","tick",on?"✓":"");t.setAttribute("aria-pressed",String(on));t.setAttribute("aria-label",(on?"Mark not learned: ":"Mark learned: ")+m[1]);
+    t.onclick=()=>{st.done[key]=!on;save();renderLearn()};
+    li.append(el("span","count",m[0]),txt,t);list.append(li);
+  });
+  $("styleBar").style.width=(100*n/s.moves.length)+"%";
+}
+
+// Beat counter: WebAudio clicks, eight counts.
+let ctx=null,timer=null,beatN=0,nextT=0;
+const beatBox=$("beat");for(let i=1;i<=8;i++)beatBox.append(el("i",null,String(i)));
+const bpm=()=>+$("bpm").value;
+$("bpm").oninput=()=>{$("bpmShow").textContent=bpm()};
+document.querySelectorAll("[data-bpm]").forEach(b=>b.onclick=()=>{$("bpm").value=b.dataset.bpm;$("bpmShow").textContent=b.dataset.bpm});
+function click(t,accent){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=accent?1320:880;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.5,t+.005);g.gain.exponentialRampToValueAtTime(.0001,t+.08);o.connect(g).connect(ctx.destination);o.start(t);o.stop(t+.1)}
+function tick(){
+  while(nextT<ctx.currentTime+.12){
+    const n=beatN%8;click(nextT,n===0);
+    const at=(nextT-ctx.currentTime)*1000;setTimeout(()=>{[...beatBox.children].forEach((c,i)=>c.classList.toggle("on",i===n))},Math.max(0,at));
+    beatN++;nextT+=60/bpm();
+  }
+}
+$("countBtn").onclick=()=>{
+  if(timer){clearInterval(timer);timer=null;$("countBtn").textContent="Start counting";[...beatBox.children].forEach(c=>c.classList.remove("on"));return}
+  try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();ctx.resume()}catch{ctx=null}
+  if(!ctx)return;beatN=0;nextT=ctx.currentTime+.05;timer=setInterval(tick,25);$("countBtn").textContent="Stop";
+};
+let taps=[];$("tapBtn").onclick=()=>{const now=performance.now();taps=taps.filter(t=>now-t<3000);taps.push(now);if(taps.length>=3){const gaps=taps.slice(1).map((t,i)=>t-taps[i]);const v=Math.round(60000/(gaps.reduce((a,b)=>a+b)/gaps.length));const c=Math.max(60,Math.min(160,v));$("bpm").value=c;$("bpmShow").textContent=c}};
+
+// Warm-up: timed blocks.
+const WU=[["Neck rolls and shoulder circles",45],["Arm swings and side reaches",60],["Hip circles",45],["March in place, knees high",60],["Ankle rolls and calf raises",60],["Lunges with a twist",60],["Hamstring reach, legs straight",60],["Jumping jacks",45],["Slow body rolls",45],["Shake it out and breathe",30]];
+let wi=0,left=WU[0][1],wt=null;
+const fmt=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+function wuShow(){$("wuName").textContent=`${wi+1} of ${WU.length}: ${WU[wi][0]}`;$("wuTime").textContent=fmt(left);$("wuBar").style.width=(100*(1-left/WU[wi][1]))+"%"}
+function wuNext(){wi++;if(wi>=WU.length){clearInterval(wt);wt=null;wi=0;left=WU[0][1];$("wuGo").textContent="Start warm-up";wuShow();$("wuName").textContent="Warm-up done. Time to dance.";return}left=WU[wi][1];wuShow()}
+$("wuGo").onclick=()=>{if(wt){clearInterval(wt);wt=null;$("wuGo").textContent="Resume";return}$("wuGo").textContent="Pause";wt=setInterval(()=>{left--;if(left<=0)wuNext();else wuShow()},1000)};
+$("wuSkip").onclick=wuNext;wuShow();
+
+// Mirror: local video, flip, speed, A-B loop.
+const v=$("vid");let A=null,B=null,url=null;
+$("vfile").onchange=e=>{const f=e.target.files[0];if(!f)return;if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(f);v.src=url;$("vEmpty").hidden=true;["vPlay","setA","setB","clearAB"].forEach(id=>$(id).disabled=false);A=B=null;abShow()};
+$("vPlay").onclick=()=>{if(v.paused){v.play().catch(()=>{});}else v.pause()};
+v.onplay=()=>$("vPlay").textContent="Pause";v.onpause=()=>$("vPlay").textContent="Play";
+$("vMirror").onclick=()=>{const on=!$("vbox").classList.toggle("mirror")?false:true;$("vMirror").textContent=on?"Mirror on":"Mirror off";$("vMirror").setAttribute("aria-pressed",String(on))};
+$("vbox").classList.add("mirror");
+const sp=$("speeds");[0.25,0.5,0.75,1].forEach(r=>{const b=el("button","chip",r===1?"Normal":r+"×");b.setAttribute("aria-pressed",String(r===1));b.onclick=()=>{v.playbackRate=r;[...sp.children].forEach(c=>c.setAttribute("aria-pressed",String(c===b)))};sp.append(b)});
+const t2=s=>s==null?"—":`${Math.floor(s/60)}:${(s%60).toFixed(1).padStart(4,"0")}`;
+function abShow(){$("abShow").textContent=A==null&&B==null?"No loop":`Loop ${t2(A)} to ${t2(B)}`}
+$("setA").onclick=()=>{A=v.currentTime;if(B!=null&&B<=A)B=null;abShow()};
+$("setB").onclick=()=>{B=v.currentTime;if(A==null)A=0;if(B<=A)B=null;abShow()};
+$("clearAB").onclick=()=>{A=B=null;abShow()};
+v.ontimeupdate=()=>{if(A!=null&&B!=null&&v.currentTime>=B)v.currentTime=A};
+
+// Tabs
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{for(const t of ["learn","practice","mirror"])$(t).hidden=t!==b.dataset.tab;document.querySelectorAll("#tabs button").forEach(x=>x.setAttribute("aria-selected",String(x===b)))});
+renderLearn();
+})();
+</script>

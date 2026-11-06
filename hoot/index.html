@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hoot</title>
+<meta name="description" content="Snap your review pages and Hoot makes flashcards and a practice test.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="wrap">
+  <header class="brand">
+    <svg class="logo" viewBox="0 0 38 38" aria-hidden="true"><rect width="38" height="38" rx="11" fill="var(--accent)"/><path d="M9 9l5 4M29 9l-5 4" stroke="var(--bolt)" stroke-width="3" stroke-linecap="round"/><circle cx="13.5" cy="19" r="6" fill="var(--bolt)"/><circle cx="24.5" cy="19" r="6" fill="var(--bolt)"/><circle cx="13.5" cy="19" r="2.6" fill="#16213a"/><circle cx="24.5" cy="19" r="2.6" fill="#16213a"/><path d="M19 23l-2.6 3.2h5.2z" fill="var(--bolt)"/></svg>
+    <h1 id="appName">Hoot</h1>
+  </header>
+
+  <!-- HOME -->
+  <section id="home" class="wrap" style="padding:0;gap:18px">
+    <a class="panel feature" href="tutor.html?level=k5">
+      <h2>My Own Tutor K-5</h2>
+      <p class="small muted">Reading, math, science and social studies from kindergarten to 5th grade. Hoot teaches one small step at a time and helps with homework.</p>
+    </a>
+    <a class="panel feature" href="tutor.html?level=612">
+      <h2>My Own Tutor 6-12</h2>
+      <p class="small muted">Middle school, high school and AP courses through calculus, plus ACT, SAT, PSAT and state test prep.</p>
+    </a>
+    <a class="panel feature" href="kinboard.html">
+      <h2>Kinboard</h2>
+      <p class="small muted">The family board: this week's plans, chores with points, and rewards kids can earn.</p>
+    </a>
+    <div class="panel">
+      <div>
+        <h2>Make a new study set</h2>
+        <p class="muted small">Take a photo of each review page. Hoot reads them and makes flashcards and a practice test.</p>
+      </div>
+      <input type="text" id="setName" placeholder="Test name, like Science test Thursday" autocomplete="off">
+      <div class="row">
+        <label class="btn primary picker" id="pickBtn">
+          <input type="file" id="photos" accept="image/*" capture="environment">
+          <span id="pickLabel">Take photos of the pages</span>
+        </label>
+        <label class="btn picker" id="fileBtn">
+          <input type="file" id="files" accept="image/*,.pdf,application/pdf,.docx,.txt" multiple>
+          <span>Add files or pictures</span>
+        </label>
+      </div>
+      <p class="muted small">Add as many pages as you need. Files can be pictures, PDFs (including scans), or Word documents.</p>
+      <p class="small" id="pageTally" hidden></p>
+      <div class="thumbs" id="thumbs" hidden></div>
+      <button class="go" id="makeBtn" disabled>Make my flashcards</button>
+      <div class="status" id="makeStatus" hidden></div>
+    </div>
+
+    <div class="panel">
+      <div>
+        <h2>Join your class</h2>
+        <p class="muted small">Got a class code from your teacher? Type it here to get their study guides.</p>
+      </div>
+      <div class="row">
+        <input type="text" id="classCode" class="code-input" placeholder="Class code" autocomplete="off" maxlength="8" style="flex:2 1 160px">
+        <button class="primary" id="joinBtn" style="flex:1 1 100px">Join</button>
+      </div>
+      <div class="status" id="joinStatus" hidden></div>
+    </div>
+
+    <div class="panel">
+      <h2>My study sets</h2>
+      <div class="sets" id="sets"></div>
+    </div>
+    <nav class="foot"><a href="teacher.html">For teachers</a><a href="privacy.html">Privacy</a></nav>
+  </section>
+
+  <!-- STUDY -->
+  <section id="study" class="wrap" style="padding:0;gap:16px" hidden>
+    <div class="topbar">
+      <button class="ghost" id="backBtn">‹ All sets</button>
+      <span class="label" id="studySubject"></span>
+    </div>
+    <div>
+      <h2 id="studyTitle"></h2>
+      <p class="muted small" id="studySummary"></p>
+      <p class="status err" id="studyWarn" hidden></p>
+    </div>
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tabCards" aria-selected="true">Flashcards</button>
+      <button role="tab" id="tabTest" aria-selected="false">Practice test</button>
+    </div>
+
+    <!-- flashcards -->
+    <div id="cardsView" class="wrap" style="padding:0;gap:14px">
+      <div id="cardPlay" class="wrap" style="padding:0;gap:14px">
+        <div class="count"><span id="cardCount"></span><span id="cardKnown"></span></div>
+        <div class="progress"><i id="cardBar"></i></div>
+        <div class="card-stage">
+          <button class="card" id="card" aria-label="Flip card">
+            <div class="face front"><span class="which">Question</span><div class="txt" id="cardFront"></div><span class="hint">Tap to flip</span></div>
+            <div class="face back"><span class="which">Answer</span><div class="txt" id="cardBack"></div><span class="hint">Did you know it?</span></div>
+          </button>
+        </div>
+        <div class="judge">
+          <button class="no" id="noBtn">Still learning</button>
+          <button class="yes" id="yesBtn">Got it</button>
+        </div>
+      </div>
+      <div id="cardDone" class="panel" hidden>
+        <p class="label">Round done</p>
+        <div class="big-score" id="cardDoneScore"></div>
+        <p id="cardDoneText"></p>
+        <div class="row">
+          <button class="primary" id="redoMissedBtn">Practice the ones I missed</button>
+          <button id="restartCardsBtn">Start over with all cards</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- practice test -->
+    <div id="testView" class="wrap" style="padding:0;gap:14px" hidden>
+      <div id="testPlay" class="wrap" style="padding:0;gap:14px">
+        <div class="count"><span id="testCount"></span><span id="testRight"></span></div>
+        <div class="progress"><i id="testBar"></i></div>
+        <div class="panel">
+          <div class="q" id="testQ"></div>
+          <div class="choices" id="testChoices"></div>
+          <div class="why" id="testWhy" hidden></div>
+          <button class="primary" id="nextBtn" hidden>Next question</button>
+        </div>
+      </div>
+      <div id="testDone" class="panel" hidden>
+        <p class="label">Practice test score</p>
+        <div class="big-score" id="testDoneScore"></div>
+        <p id="testDoneText"></p>
+        <div id="missList" class="wrap" style="padding:0;gap:10px"></div>
+        <div class="row">
+          <button class="go" id="moreQBtn">Give me new questions</button>
+          <button id="retakeBtn">Retake this test</button>
+        </div>
+        <div class="status" id="moreStatus" hidden></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="gate" id="gate" hidden>
+  <div class="panel">
+    <h2>Hi, grown-up!</h2>
+    <p>Hoot is a tutor and study helper. It teaches school courses step by step and turns review pages into flashcards and practice tests. Before a child uses it, please read this and agree.</p>
+    <ul>
+      <li>Photos, files and messages to the tutor are sent to our AI helper (Claude, made by Anthropic) to be answered. We don't keep them on our server.</li>
+      <li>We don't ask for a child's name, email or any account.</li>
+      <li>Study sets, tutor chats and scores stay on this device.</li>
+      <li>Please help kids take pictures of school pages only, not faces or personal papers.</li>
+    </ul>
+    <p class="small"><a href="privacy.html">Read the full privacy notice</a></p>
+    <button class="go" id="agreeBtn">I'm a parent or guardian, and I agree</button>
+  </div>
+</div>
+
+<script>window.HOOT_API="https://hoot-tutor.robert-1f2.workers.dev"</script><script src="maker.js"></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const STORE = "hoot-sets-v1";
+
+  const EXAMPLE = {
+    id: "example", example: true, name: "The Water Cycle", subject: "Science",
+    summary: "An example so you can see how Hoot works. Make your own from your review pages on the main screen.",
+    created: Date.now(), best: null, notes: "",
+    cards: [
+      { front: "What is evaporation?", back: "When liquid water heats up and turns into water vapor (a gas)." },
+      { front: "What is condensation?", back: "When water vapor cools and turns back into tiny liquid drops, which form clouds." },
+      { front: "What is precipitation?", back: "Water falling from clouds as rain, snow, sleet, or hail." },
+      { front: "What gives the water cycle its energy?", back: "The sun." },
+      { front: "What is runoff?", back: "Water that flows over the ground into streams, rivers, lakes, and the ocean." },
+      { front: "What is transpiration?", back: "Plants giving off water vapor through their leaves." }
+    ],
+    quiz: [
+      { q: "Which step of the water cycle forms clouds?", choices: ["Condensation", "Evaporation", "Runoff", "Precipitation"], answer: 0, why: "Clouds form when water vapor cools and condenses into tiny drops." },
+      { q: "A puddle disappears on a hot day. What happened to the water?", choices: ["It evaporated", "It condensed", "It precipitated", "It froze"], answer: 0, why: "Heat from the sun turned the liquid water into water vapor." },
+      { q: "What powers the water cycle?", choices: ["The sun", "The moon", "Wind", "Ocean currents"], answer: 0, why: "The sun's heat drives evaporation, which keeps the cycle moving." },
+      { q: "Snow falling from a cloud is an example of…", choices: ["Precipitation", "Transpiration", "Condensation", "Runoff"], answer: 0, why: "Any water falling from clouds is precipitation." }
+    ]
+  };
+
+  // ---------- storage (per-device convenience) ----------
+  function loadSets() {
+    try { const s = JSON.parse(localStorage.getItem(STORE) || "null"); if (Array.isArray(s)) return s; } catch {}
+    return [];
+  }
+  function saveSets() { try { localStorage.setItem(STORE, JSON.stringify(sets.filter(s => !s.example))); } catch {} }
+  let sets = loadSets();
+  const allSets = () => sets.length ? sets : [EXAMPLE];
+
+  // ---------- grown-up agreement ----------
+  const CONSENT = "hoot-consent-v1";
+  let agreed = false;
+  try { agreed = localStorage.getItem(CONSENT) === "yes"; } catch {}
+  $("gate").hidden = agreed;
+  $("agreeBtn").onclick = () => {
+    try { localStorage.setItem(CONSENT, "yes"); } catch {}
+    const q = new URLSearchParams(location.search);
+    if (q.get("next") === "tutor") return location.replace("tutor.html" + (/^(k5|612)$/.test(q.get("level") || "") ? "?level=" + q.get("level") : ""));
+    $("gate").hidden = true;
+  };
+
+  // ---------- making a set ----------
+  let busy = false, pick = null;
+  function updateMake() {
+    const btn = $("makeBtn"), n = pick ? pick.count : 0;
+    btn.disabled = !n || busy;
+    btn.textContent = n ? `Make my flashcards from ${n} page${n > 1 ? "s" : ""}` : "Make my flashcards";
+  }
+  pick = Maker.picker({ photos: $("photos"), files: $("files"), thumbs: $("thumbs"), tally: $("pageTally"), pickLabel: $("pickLabel"), status: $("makeStatus") }, updateMake);
+  $("makeBtn").onclick = async () => {
+    if (busy || !pick.count) return;
+    busy = true; updateMake();
+    try {
+      const set = await Maker.build(pick.sources, $("setName").value.trim(), m => Maker.status($("makeStatus"), m, "busy"));
+      sets.unshift(set); saveSets();
+      pick.clear(); $("setName").value = "";
+      Maker.status($("makeStatus"), "");
+      openSet(set.id);
+    } catch (e) {
+      Maker.status($("makeStatus"), Maker.errText(e), "err");
+    } finally { busy = false; updateMake(); }
+  };
+
+  // ---------- classes ----------
+  // Joined class codes are remembered on this device; new study guides from
+  // the teacher are added each time the page opens.
+  const CLASSES = "hoot-classes-v1", REMOVED = "hoot-removed-v1";
+  const readList = k => { try { const v = JSON.parse(localStorage.getItem(k) || "[]"); return Array.isArray(v) ? v : []; } catch { return []; } };
+  const writeList = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+  async function syncClass(code) {
+    const c = await Maker.api("/api/class?code=" + encodeURIComponent(code));
+    const have = new Set(sets.map(s => s.id)), removed = new Set(readList(REMOVED));
+    const fresh = c.sets.filter(s => !have.has(s.id) && !removed.has(s.id))
+      .map(s => ({ ...s, best: null, fromClass: c.name, classCode: c.code }));
+    if (fresh.length) { sets = [...fresh, ...sets]; saveSets(); renderSets(); }
+    return { c, added: fresh.length };
+  }
+  $("joinBtn").onclick = async () => {
+    const code = $("classCode").value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+    if (!code) return;
+    $("joinBtn").disabled = true;
+    Maker.status($("joinStatus"), "Finding your class…", "busy");
+    try {
+      const { c, added } = await syncClass(code);
+      const list = readList(CLASSES); if (!list.includes(c.code)) { list.push(c.code); writeList(CLASSES, list); }
+      $("classCode").value = "";
+      Maker.status($("joinStatus"), `You joined ${c.name}${c.teacher ? " with " + c.teacher : ""}. ` +
+        (added ? `${added} study guide${added > 1 ? "s were" : " was"} added below.` : "New study guides from your teacher will show up below."));
+    } catch (e) { Maker.status($("joinStatus"), Maker.errText(e), "err"); }
+    finally { $("joinBtn").disabled = false; }
+  };
+  for (const code of readList(CLASSES)) syncClass(code).catch(() => {});
+
+  // ---------- home list ----------
+  let pendingDelete = null;
+  function renderSets() {
+    const box = $("sets"); box.replaceChildren();
+    for (const s of allSets()) {
+      const wrap = document.createElement("div"); wrap.style.display = "flex"; wrap.style.flexDirection = "column"; wrap.style.gap = "6px";
+      const b = document.createElement("button"); b.className = "set";
+      const info = document.createElement("div"); info.className = "info";
+      const nm = document.createElement("div"); nm.className = "name"; nm.textContent = s.name;
+      if (s.example || s.fromClass) { const t = document.createElement("span"); t.className = "tag"; t.textContent = s.example ? "Example" : s.fromClass; nm.append(t); }
+      const meta = document.createElement("div"); meta.className = "muted small";
+      meta.textContent = `${s.cards.length} cards · ${s.quiz.length} test questions` + (s.example ? "" : " · " + new Date(s.created).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }));
+      info.append(nm, meta);
+      const sc = document.createElement("div"); sc.className = "score";
+      sc.textContent = s.best != null ? s.best + "%" : ""; sc.title = "Best practice test score";
+      b.append(info, sc); b.onclick = () => openSet(s.id);
+      wrap.append(b);
+      if (!s.example) {
+        const c = document.createElement("div"); c.className = "confirm";
+        if (pendingDelete === s.id) {
+          const q = document.createElement("span"); q.textContent = "Delete this set?";
+          const y = document.createElement("button"); y.className = "ghost"; y.style.color = "var(--bad)"; y.textContent = "Delete";
+          y.onclick = () => { if (s.fromClass) writeList(REMOVED, [...readList(REMOVED), s.id]); sets = sets.filter(x => x.id !== s.id); pendingDelete = null; saveSets(); renderSets(); };
+          const n = document.createElement("button"); n.className = "ghost"; n.textContent = "Keep";
+          n.onclick = () => { pendingDelete = null; renderSets(); };
+          c.append(q, y, n);
+        } else {
+          const d = document.createElement("button"); d.className = "ghost small"; d.style.color = "var(--muted)"; d.style.fontWeight = "400"; d.textContent = "Delete";
+          d.onclick = () => { pendingDelete = s.id; renderSets(); };
+          c.append(d);
+        }
+        c.style.justifyContent = "flex-end"; wrap.append(c);
+      }
+      box.append(wrap);
+    }
+  }
+
+  // ---------- study ----------
+  let cur = null;
+  const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+  function openSet(id) {
+    cur = allSets().find(s => s.id === id); if (!cur) return;
+    $("home").hidden = true; $("study").hidden = false;
+    $("studyTitle").textContent = cur.name;
+    $("studySubject").textContent = cur.subject || "";
+    $("studySummary").textContent = cur.summary || "";
+    $("studyWarn").textContent = cur.warning || ""; $("studyWarn").hidden = !cur.warning;
+    startCards(cur.cards);
+    startTest();
+    showTab("cards");
+    window.scrollTo(0, 0);
+  }
+  $("backBtn").onclick = () => { $("study").hidden = true; $("home").hidden = false; renderSets(); window.scrollTo(0, 0); };
+  function showTab(t) {
+    $("tabCards").setAttribute("aria-selected", t === "cards"); $("tabTest").setAttribute("aria-selected", t === "test");
+    $("cardsView").hidden = t !== "cards"; $("testView").hidden = t !== "test";
+  }
+  $("tabCards").onclick = () => showTab("cards");
+  $("tabTest").onclick = () => showTab("test");
+
+  // flashcards
+  let deck = [], ci = 0, known = 0, missed = [];
+  function startCards(list) {
+    deck = shuffle(list); ci = 0; known = 0; missed = [];
+    $("cardPlay").hidden = false; $("cardDone").hidden = true;
+    showCard();
+  }
+  function showCard() {
+    const c = deck[ci];
+    $("card").classList.remove("flipped");
+    $("cardFront").textContent = c.front; $("cardBack").textContent = c.back;
+    $("cardCount").textContent = `Card ${ci + 1} of ${deck.length}`;
+    $("cardKnown").textContent = `${known} known`;
+    $("cardBar").style.width = (ci / deck.length * 100) + "%";
+    fitCard();
+  }
+  function fitCard() {
+    // grow the card to fit the longer face
+    const card = $("card"); card.style.minHeight = "300px";
+    requestAnimationFrame(() => {
+      const h = Math.max(...[...card.querySelectorAll(".face")].map(f => f.querySelector(".txt").scrollHeight + 90));
+      card.style.minHeight = Math.max(300, h) + "px";
+    });
+  }
+  $("card").onclick = () => $("card").classList.toggle("flipped");
+  function judge(ok) {
+    if (ok) known++; else missed.push(deck[ci]);
+    ci++;
+    if (ci < deck.length) showCard(); else cardsDone();
+  }
+  $("yesBtn").onclick = () => judge(true);
+  $("noBtn").onclick = () => judge(false);
+  function cardsDone() {
+    $("cardPlay").hidden = true; $("cardDone").hidden = false;
+    $("cardDoneScore").textContent = `${known} / ${deck.length}`;
+    $("cardDoneText").textContent = missed.length ? `Nice work. ${missed.length} card${missed.length > 1 ? "s" : ""} to practice again.` : "You knew every card. Try the practice test next!";
+    $("redoMissedBtn").hidden = !missed.length;
+  }
+  $("redoMissedBtn").onclick = () => startCards(missed);
+  $("restartCardsBtn").onclick = () => startCards(cur.cards);
+
+  // practice test
+  let test = [], ti = 0, right = 0, wrongs = [], answered = false;
+  function startTest(list) {
+    test = shuffle(list || cur.quiz).map(x => {
+      const order = shuffle(x.choices.map((_, i) => i));
+      return { q: x.q, why: x.why, choices: order.map(i => x.choices[i]), answer: order.indexOf(x.answer) };
+    });
+    ti = 0; right = 0; wrongs = [];
+    $("testPlay").hidden = !test.length; $("testDone").hidden = true;
+    Maker.status($("moreStatus"), "");
+    if (test.length) showQ(); else testDone();
+  }
+  function showQ() {
+    const x = test[ti]; answered = false;
+    $("testQ").textContent = x.q;
+    $("testCount").textContent = `Question ${ti + 1} of ${test.length}`;
+    $("testRight").textContent = `${right} right`;
+    $("testBar").style.width = (ti / test.length * 100) + "%";
+    $("testWhy").hidden = true; $("nextBtn").hidden = true;
+    const box = $("testChoices"); box.replaceChildren();
+    x.choices.forEach((ch, i) => {
+      const b = document.createElement("button"); b.className = "choice";
+      const l = document.createElement("b"); l.textContent = "ABCDEFG"[i];
+      const t = document.createElement("span"); t.textContent = ch;
+      b.append(l, t); b.onclick = () => choose(i); box.append(b);
+    });
+  }
+  function choose(i) {
+    if (answered) return; answered = true;
+    const x = test[ti], ok = i === x.answer, btns = $("testChoices").children;
+    btns[x.answer].classList.add("right");
+    if (!ok) { btns[i].classList.add("wrong"); wrongs.push({ ...x, picked: x.choices[i] }); } else right++;
+    $("testRight").textContent = `${right} right`;
+    const w = $("testWhy"); w.hidden = false; w.className = "why " + (ok ? "ok" : "no");
+    w.textContent = (ok ? "Correct! " : "Not quite. ") + (x.why || "");
+    $("nextBtn").hidden = false;
+    $("nextBtn").textContent = ti + 1 < test.length ? "Next question" : "See my score";
+    $("nextBtn").focus({ preventScroll: true });
+  }
+  $("nextBtn").onclick = () => { ti++; if (ti < test.length) showQ(); else testDone(); };
+  function testDone() {
+    $("testPlay").hidden = true; $("testDone").hidden = false;
+    const pct = test.length ? Math.round(right / test.length * 100) : 0;
+    $("testDoneScore").textContent = test.length ? pct + "%" : "–";
+    $("testDoneText").textContent = !test.length ? "No questions yet. Tap the button for a fresh set." :
+      `${right} of ${test.length} right. ` + (pct >= 90 ? "You're ready for the test!" : pct >= 70 ? "Almost there. Look over the ones you missed." : "Keep going. Study the flashcards, then try again.");
+    if (test.length && !cur.example && (cur.best == null || pct > cur.best)) { cur.best = pct; saveSets(); }
+    const ml = $("missList"); ml.replaceChildren();
+    if (wrongs.length) { const h = document.createElement("p"); h.className = "label"; h.textContent = "Ones to review"; ml.append(h); }
+    for (const w of wrongs) {
+      const d = document.createElement("div"); d.className = "miss";
+      const q = document.createElement("strong"); q.textContent = w.q;
+      const a = document.createElement("span"); a.textContent = "Answer: " + w.choices[w.answer];
+      const p = document.createElement("span"); p.className = "muted"; p.textContent = "You picked: " + w.picked;
+      d.append(q, a, p); ml.append(d);
+    }
+  }
+  $("retakeBtn").onclick = () => startTest();
+
+  let moreBusy = false;
+  $("moreQBtn").onclick = async () => {
+    if (moreBusy) return; moreBusy = true; $("moreQBtn").disabled = true;
+    Maker.status($("moreStatus"), "Writing new questions…", "busy");
+    const source = cur.notes || cur.cards.map(c => `${c.front}: ${c.back}`).join("\n");
+    try {
+      const fresh = Maker.cleanQuiz(await Maker.post("/api/study", { kind: "more", name: cur.name, notes: source, missed: wrongs.map(w => w.q), existing: cur.quiz.map(q => q.q) }));
+      if (!fresh.length) throw { code: "empty_completion" };
+      if (!cur.example) { cur.quiz = fresh; saveSets(); }
+      startTest(fresh);
+    } catch (e) {
+      Maker.status($("moreStatus"), Maker.errText(e), "err");
+    } finally { moreBusy = false; $("moreQBtn").disabled = false; }
+  };
+
+  renderSets();
+  updateMake();
+})();
+</script>
+
+<script>
+// Snapdeck: the study-deck maker on its own (/snapdeck.html opens /?app=snapdeck).
+(function () {
+  if (new URLSearchParams(location.search).get("app") !== "snapdeck") return;
+  document.title = "Snapdeck";
+  document.getElementById("appName").textContent = "Snapdeck";
+  document.querySelectorAll("#home > .panel.feature").forEach(function (e) { e.hidden = true; });
+})();
+</script>
+</body>
+</html>

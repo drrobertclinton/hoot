@@ -1,0 +1,102 @@
+/* Vilasi paywall, lock cards and membership card. Colors come from --vb-accent (set per app). */
+:root {
+  --vb-accent: #333; --vb-on-accent: #fff; --vb-font: inherit; --vb-display: inherit;
+  --vb-surface: #fffdfb; --vb-raise: #f5f1ee; --vb-ink: #1d1a1b; --vb-muted: #6b6466; --vb-line: rgba(0, 0, 0, .12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --vb-surface: #1c191b; --vb-raise: #272326; --vb-ink: #f4f0f1; --vb-muted: #b3abae; --vb-line: rgba(255, 255, 255, .14); }
+}
+:root[data-theme="dark"] { --vb-surface: #1c191b; --vb-raise: #272326; --vb-ink: #f4f0f1; --vb-muted: #b3abae; --vb-line: rgba(255, 255, 255, .14); }
+
+body.vb-locked { overflow: hidden; }
+.vb-scrim { position: fixed; inset: 0; z-index: 10000; background: rgba(12, 10, 11, .55); display: flex; align-items: flex-end; justify-content: center; animation: vb-fade .18s ease-out; }
+@media (min-width: 700px) { .vb-scrim { align-items: center; } }
+.vb-pw { position: relative; box-sizing: border-box; width: 100%; max-width: 560px; max-height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  background: var(--vb-surface); color: var(--vb-ink); font-family: var(--vb-font); border-radius: 22px 22px 0 0;
+  padding: calc(env(safe-area-inset-top, 0px) + 22px) 20px calc(env(safe-area-inset-bottom, 0px) + 22px); box-shadow: 0 -10px 40px rgba(0, 0, 0, .25); animation: vb-up .24s cubic-bezier(.2, .8, .2, 1); }
+@media (min-width: 700px) { .vb-pw { border-radius: 22px; max-height: calc(100% - 48px); padding: 28px; } }
+@media (max-width: 699px) { .vb-pw { min-height: 70%; } }
+.vb-pw * { box-sizing: border-box; }
+.vb-x { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); right: 12px; width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--vb-raise); color: var(--vb-ink); display: grid; place-items: center; cursor: pointer; }
+@media (min-width: 700px) { .vb-x { top: 14px; } }
+.vb-x svg, .vb-feats svg, .vb-lock-ic svg, .vb-pill svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.vb-kicker { margin: 0 0 4px; font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--vb-accent); font-weight: 700; }
+.vb-pw h2 { margin: 0 48px 6px 0; font-family: var(--vb-display); font-size: 1.6rem; line-height: 1.15; font-weight: 700; }
+.vb-reason { margin: 0 0 10px; color: var(--vb-muted); }
+.vb-loading { color: var(--vb-muted); padding: 40px 0; text-align: center; }
+.vb-note { margin: 10px 0; padding: 10px 12px; border-radius: 12px; background: var(--vb-raise); font-size: .9rem; color: var(--vb-ink); }
+.vb-seg { display: flex; gap: 4px; padding: 4px; background: var(--vb-raise); border-radius: 999px; margin: 14px 0 12px; }
+.vb-seg button { flex: 1; border: 0; background: transparent; color: var(--vb-ink); font: 600 .95rem var(--vb-font); padding: 9px 10px; border-radius: 999px; cursor: pointer; min-height: 40px; }
+.vb-seg button[aria-pressed="true"] { background: var(--vb-surface); box-shadow: 0 1px 4px rgba(0, 0, 0, .15); }
+.vb-seg small { color: var(--vb-accent); font-weight: 700; margin-left: 4px; }
+.vb-tiers { display: grid; gap: 10px; }
+.vb-tier { display: block; width: 100%; text-align: left; font: inherit; color: inherit; background: var(--vb-surface); border: 1.5px solid var(--vb-line); border-radius: 16px; padding: 14px 16px; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.vb-tier.on { border-color: var(--vb-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--vb-accent) 22%, transparent); }
+.vb-tier-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.vb-tier-top b { font-size: 1.08rem; }
+.vb-price { display: block; margin-top: 4px; font-size: 1.35rem; font-weight: 700; }
+.vb-price span { font-size: .9rem; font-weight: 500; color: var(--vb-muted); }
+.vb-per { display: block; font-size: .82rem; color: var(--vb-muted); }
+.vb-na { font-size: .95rem; font-weight: 500; color: var(--vb-muted); }
+.vb-feats { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; font-size: .92rem; }
+.vb-feats li { display: flex; gap: 8px; align-items: flex-start; }
+.vb-feats li svg { color: var(--vb-accent); flex: none; margin-top: 2px; }
+.vb-feats li.soon { color: var(--vb-muted); }
+.vb-badge { flex: none; font-size: .72rem; font-weight: 700; letter-spacing: .03em; padding: 4px 8px; border-radius: 999px; background: var(--vb-raise); color: var(--vb-ink); }
+.vb-badge.trial { background: var(--vb-accent); color: var(--vb-on-accent); }
+.vb-soon { flex: none; font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 3px 7px; border-radius: 999px; border: 1px solid var(--vb-line); color: var(--vb-muted); white-space: nowrap; }
+.vb-soon.big { font-size: .74rem; padding: 6px 10px; }
+.vb-cta { margin: 14px 0 6px; }
+.vb-buy { display: block; width: 100%; border: 0; border-radius: 14px; padding: 15px 18px; min-height: 52px; background: var(--vb-accent); color: var(--vb-on-accent); font: 700 1.05rem var(--vb-font); cursor: pointer; }
+.vb-buy.small { width: auto; display: inline-block; padding: 10px 16px; min-height: 44px; font-size: .95rem; border-radius: 12px; }
+.vb-buy:disabled { opacity: .5; cursor: default; }
+.vb-terms-line { margin: 8px 2px 0; font-size: .86rem; color: var(--vb-muted); text-align: center; }
+.vb-free { margin: 12px 0; font-size: .9rem; }
+.vb-free summary { cursor: pointer; font-weight: 600; padding: 6px 0; }
+.vb-free ul { margin: 6px 0 0; padding-left: 20px; color: var(--vb-muted); }
+.vb-once { margin-top: 18px; }
+.vb-once h3 { margin: 0 0 8px; font-size: 1.02rem; }
+.vb-item { display: flex; align-items: center; gap: 12px; justify-content: space-between; padding: 12px 14px; border: 1px solid var(--vb-line); border-radius: 14px; margin-bottom: 8px; }
+.vb-item.focus { border-color: var(--vb-accent); }
+.vb-item b { display: block; }
+.vb-item-price { display: block; font-weight: 700; margin-top: 2px; }
+.vb-item p { margin: 4px 0 0; font-size: .86rem; color: var(--vb-muted); }
+.vb-pass { margin: 14px 0; padding: 16px; border-radius: 16px; background: var(--vb-raise); border: 1.5px solid var(--vb-accent); }
+.vb-pass p { margin: 6px 0 0; color: var(--vb-muted); }
+.vb-disclose { margin: 16px 0 0; font-size: .76rem; line-height: 1.45; color: var(--vb-muted); }
+.vb-status { min-height: 1.3em; margin: 10px 0 0; font-size: .9rem; font-weight: 600; text-align: center; }
+.vb-foot { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; margin-top: 8px; }
+.vb-link { background: none; border: 0; padding: 10px 2px; font: 600 .88rem var(--vb-font); color: var(--vb-ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+
+.vb-lock { display: flex; align-items: center; gap: 12px; padding: 14px 16px; margin: 12px 0; border-radius: 16px; border: 1px dashed color-mix(in srgb, var(--vb-accent) 55%, transparent); background: color-mix(in srgb, var(--vb-accent) 7%, transparent); color: inherit; }
+.vb-lock-ic { flex: none; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--vb-accent); color: var(--vb-on-accent); }
+.vb-lock-text { flex: 1; min-width: 0; }
+.vb-lock-text b { display: block; }
+.vb-lock-text p { margin: 3px 0 0; font-size: .9rem; opacity: .8; }
+.vb-lock-btn { flex: none; border: 0; border-radius: 12px; padding: 10px 14px; min-height: 44px; background: var(--vb-accent); color: var(--vb-on-accent); font: 700 .9rem var(--vb-font); cursor: pointer; }
+.vb-lock.compact { padding: 10px 12px; }
+@media (max-width: 420px) { .vb-lock { flex-wrap: wrap; } .vb-lock-btn { width: 100%; } }
+.vb-pill { display: inline-flex; align-items: center; gap: 3px; font-size: .7rem; font-weight: 700; letter-spacing: .04em; padding: 2px 7px 2px 5px; border-radius: 999px; background: var(--vb-accent); color: var(--vb-on-accent); vertical-align: middle; }
+.vb-pill svg { width: 12px; height: 12px; }
+
+.vb-member { margin: 14px 0; padding: 16px; border-radius: 16px; border: 1px solid var(--vb-line); }
+.vb-member > h2, .vb-member > h3 { margin-top: 0; }
+.vb-member p { margin: 4px 0 10px; }
+.vb-credits { list-style: none; padding: 0; margin: 0 0 12px; }
+.vb-credits li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-top: 1px solid var(--vb-line); font-size: .92rem; }
+.vb-member-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.vb-ghost { border: 1px solid var(--vb-line); background: transparent; color: inherit; border-radius: 12px; padding: 10px 14px; min-height: 44px; font: 600 .92rem var(--vb-font); cursor: pointer; }
+.vb-toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 92px); transform: translate(-50%, 20px); z-index: 10001; max-width: calc(100% - 32px); padding: 12px 16px; border-radius: 12px; background: #1d1a1b; color: #fff; font-size: .92rem; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+.vb-toast.show { opacity: 1; transform: translate(-50%, 0); }
+.vb-disclosure-inline { font-size: .82rem; opacity: .8; margin: 8px 0 0; }
+@keyframes vb-fade { from { opacity: 0; } }
+@keyframes vb-up { from { transform: translateY(30px); opacity: .6; } }
+@media (prefers-reduced-motion: reduce) { .vb-scrim, .vb-pw { animation: none; } }
+
+.vb-launch { display: block; width: 100%; text-align: left; margin: 14px 0 4px; padding: 14px 16px; border-radius: 16px; cursor: pointer; font: inherit; color: var(--vb-ink);
+  border: 1.5px solid color-mix(in srgb, var(--vb-accent) 60%, transparent); background: linear-gradient(120deg, color-mix(in srgb, var(--vb-accent) 22%, transparent), color-mix(in srgb, var(--vb-accent) 6%, transparent)); }
+.vb-launch-k { display: inline-block; font-size: .7rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--vb-on-accent); background: var(--vb-accent); padding: 3px 8px; border-radius: 999px; margin-bottom: 8px; }
+.vb-launch b { display: block; font-family: var(--vb-display); font-size: 1.3rem; font-weight: 600; line-height: 1.2; }
+.vb-launch-s { display: block; color: var(--vb-muted); font-size: .9rem; margin-top: 2px; }
+.vb-launch small { display: block; color: var(--vb-muted); font-size: .76rem; margin-top: 6px; }
+.vb-then { display: block; font-size: .82rem !important; font-weight: 500; color: var(--vb-muted); }

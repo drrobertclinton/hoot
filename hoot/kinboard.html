@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Kinboard</title>
+<meta name="description" content="The family board: this week's plans, chores with points, and rewards kids can earn.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+.kid-row { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px }
+.kid { flex: none; display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 14px 6px 6px; border-radius: 99px; border: 2px solid var(--rule); background: var(--card, transparent); font-weight: 700 }
+.kid[aria-pressed="true"] { border-color: var(--who); background: color-mix(in srgb, var(--who) 14%, transparent) }
+.dot { width: 30px; height: 30px; border-radius: 50%; background: var(--who); color: #fff; display: grid; place-items: center; font-size: 14px; font-weight: 800; flex: none }
+.pts { font-variant-numeric: tabular-nums; color: var(--accent) }
+.item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--rule) }
+.item:first-child { border-top: 0 }
+.item .grow { flex: 1; min-width: 0 }
+.item .when { font-size: 13px; color: var(--muted, #667) }
+.tick { width: 44px; height: 44px; border-radius: 12px; border: 2px solid var(--rule); background: none; font-size: 22px; flex: none; padding: 0 }
+.tick[aria-pressed="true"] { background: var(--good, #2f8a4e); border-color: var(--good, #2f8a4e); color: #fff }
+.day h3 { margin: 0 0 4px }
+.day.today h3 { color: var(--accent) }
+.form { display: grid; gap: 10px }
+.form label { display: grid; gap: 4px; font-weight: 700; font-size: 14px }
+.form input, .form select { min-height: 44px; border-radius: 10px; border: 1px solid var(--rule); padding: 8px 10px; font: inherit; background: transparent; color: inherit }
+.days { display: flex; gap: 6px; flex-wrap: wrap }
+.days button { min-width: 44px; min-height: 40px; padding: 4px 8px }
+.days button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent) }
+.pending { border-left: 4px solid var(--bolt); padding-left: 10px }
+.empty { color: var(--muted, #667); text-align: center; padding: 18px 6px }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="brand">
+    <svg class="logo" viewBox="0 0 38 38" aria-hidden="true"><rect width="38" height="38" rx="11" fill="var(--accent)"/><path d="M9 9l5 4M29 9l-5 4" stroke="var(--bolt)" stroke-width="3" stroke-linecap="round"/><circle cx="13.5" cy="19" r="6" fill="var(--bolt)"/><circle cx="24.5" cy="19" r="6" fill="var(--bolt)"/><circle cx="13.5" cy="19" r="2.6" fill="#16213a"/><circle cx="24.5" cy="19" r="2.6" fill="#16213a"/><path d="M19 23l-2.6 3.2h5.2z" fill="var(--bolt)"/></svg>
+    <div><h1>Kinboard</h1><p class="small muted" style="margin:0">The family board, by Hoot</p></div>
+  </header>
+
+  <div class="tabs" role="tablist" id="tabs" style="grid-template-columns:repeat(4,1fr)">
+    <button role="tab" data-tab="today">Today</button>
+    <button role="tab" data-tab="week">Week</button>
+    <button role="tab" data-tab="rewards">Rewards</button>
+    <button role="tab" data-tab="family">Family</button>
+  </div>
+
+  <!-- TODAY -->
+  <section id="today" class="wrap" style="padding:0;gap:14px">
+    <div class="kid-row" id="kidPick"></div>
+    <div class="panel"><div><h2 id="todayTitle">Today's chores</h2><p class="small muted" id="todaySub"></p></div><div id="choreList"></div></div>
+    <div class="panel"><h2>Today's plans</h2><div id="todayEvents"></div></div>
+  </section>
+
+  <!-- WEEK -->
+  <section id="week" class="wrap" style="padding:0;gap:14px" hidden>
+    <div class="row"><button class="ghost" id="prevWk">‹ Last week</button><strong id="wkLabel" style="flex:1;text-align:center"></strong><button class="ghost" id="nextWk">Next week ›</button></div>
+    <div id="weekDays" class="wrap" style="padding:0;gap:12px"></div>
+    <div class="panel">
+      <h2>Add a plan</h2>
+      <div class="form">
+        <label>What<input type="text" id="evName" placeholder="Soccer practice, dentist, movie night" maxlength="60"></label>
+        <div class="row"><label style="flex:1">Day<input type="date" id="evDate"></label><label style="flex:1">Time<input type="time" id="evTime"></label></div>
+        <label>Who<select id="evWho"></select></label>
+        <button class="primary" id="evAdd">Add to the board</button>
+        <div class="status err" id="evErr" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REWARDS -->
+  <section id="rewards" class="wrap" style="padding:0;gap:14px" hidden>
+    <div class="kid-row" id="kidPick2"></div>
+    <div class="panel"><div><h2>Rewards</h2><p class="small muted" id="rwSub"></p></div><div id="rewardList"></div></div>
+    <div class="panel" id="pendingPanel" hidden><h2>Waiting for a grown-up</h2><div id="pendingList"></div></div>
+  </section>
+
+  <!-- FAMILY (grown-ups) -->
+  <section id="family" class="wrap" style="padding:0;gap:14px" hidden>
+    <div class="panel" id="lockPanel">
+      <h2>Grown-ups only</h2>
+      <p id="pinMsg">Enter your 4-digit grown-up PIN to change chores, rewards and the family.</p>
+      <input type="password" id="pin" inputmode="numeric" maxlength="4" autocomplete="off" class="code-input" placeholder="PIN">
+      <button class="primary" id="pinOk">Unlock</button>
+      <div class="status err" id="pinErr" hidden></div>
+    </div>
+    <div id="adminView" class="wrap" style="padding:0;gap:14px" hidden>
+      <div class="panel">
+        <h2>Family</h2><div id="memberList"></div>
+        <div class="form">
+          <label>Name<input type="text" id="mName" maxlength="20" placeholder="First name"></label>
+          <label>Kind<select id="mKind"><option value="kid">Kid (earns points)</option><option value="adult">Grown-up</option></select></label>
+          <button id="mAdd">Add to the family</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Chores</h2><div id="choreAdmin"></div>
+        <div class="form">
+          <label>Chore<input type="text" id="cName" maxlength="40" placeholder="Make bed, feed the dog, homework"></label>
+          <div class="row"><label style="flex:1">Who<select id="cWho"></select></label><label style="width:110px">Points<input type="number" id="cPts" min="1" max="100" value="5"></label></div>
+          <div><p class="label" style="margin:0 0 6px">Days</p><div class="days" id="cDays"></div></div>
+          <button id="cAdd">Add chore</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Rewards</h2><div id="rewardAdmin"></div>
+        <div class="form">
+          <div class="row"><label style="flex:1">Reward<input type="text" id="rName" maxlength="40" placeholder="30 min extra screen time"></label><label style="width:110px">Points<input type="number" id="rCost" min="1" max="1000" value="25"></label></div>
+          <button id="rAdd">Add reward</button>
+        </div>
+      </div>
+      <button class="ghost" id="lockBtn">Lock grown-up settings</button>
+    </div>
+  </section>
+
+  <p class="small muted">Kinboard keeps everything on this device. Put it on the family tablet or the kitchen screen so everyone sees the same board.</p>
+  <nav class="foot"><a href="./">Hoot</a><a href="tutor.html">My Own Tutor</a><a href="privacy.html">Privacy</a></nav>
+</div>
+
+<script>
+(function () {
+const $ = id => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const KEY = "kinboard-v1";
+const COLORS = ["#2459d6", "#d6456a", "#1f9d6b", "#c47a10", "#7a4bd6", "#0e8a94", "#b3373b", "#4b6070"];
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const uid = () => Math.random().toString(36).slice(2, 10);
+const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const fromIso = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+
+let db;
+try { db = JSON.parse(localStorage.getItem(KEY)); } catch { db = null; }
+if (!db) db = {
+  pin: null,
+  members: [{ id: uid(), name: "Kid 1", kind: "kid", color: COLORS[0] }],
+  chores: [], rewards: [{ id: uid(), name: "Pick the family movie", cost: 20 }, { id: uid(), name: "30 minutes extra screen time", cost: 30 }],
+  events: [], done: {}, redeemed: [], earnedAdj: {},
+};
+if (!db.chores.length && db.members[0]) {
+  const k = db.members[0].id;
+  db.chores.push({ id: uid(), name: "Make your bed", who: k, pts: 2, days: [0, 1, 2, 3, 4, 5, 6] }, { id: uid(), name: "Homework done", who: k, pts: 5, days: [1, 2, 3, 4] });
+}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch {} };
+save();
+
+const kids = () => db.members.filter(m => m.kind === "kid");
+const member = id => db.members.find(m => m.id === id);
+let curKid = (kids()[0] || {}).id, tab = "today", weekStart = startOfWeek(new Date()), unlocked = false;
+function startOfWeek(d) { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - x.getDay()); return x; }
+
+// Points: earned from done chores, minus approved rewards.
+function points(kidId) {
+  let p = db.earnedAdj[kidId] || 0;
+  for (const [key, ok] of Object.entries(db.done)) if (ok) { const [, cid] = key.split("|"); const c = db.chores.find(x => x.id === cid); if (c && c.who === kidId) p += c.pts; }
+  for (const r of db.redeemed) if (r.kid === kidId && r.status !== "declined") p -= r.cost;
+  return p;
+}
+
+function kidPicker(box) {
+  box.replaceChildren();
+  for (const k of kids()) {
+    const b = el("button", "kid"); b.style.setProperty("--who", k.color); b.setAttribute("aria-pressed", String(k.id === curKid));
+    b.append(el("span", "dot", k.name[0].toUpperCase()), el("span", null, k.name), el("span", "pts", String(points(k.id))));
+    b.onclick = () => { curKid = k.id; render(); };
+    box.append(b);
+  }
+  if (!kids().length) box.append(el("p", "muted small", "Add a kid in Family to start earning points."));
+}
+
+function renderToday() {
+  kidPicker($("kidPick"));
+  const today = new Date(), d = iso(today), k = member(curKid);
+  $("todayTitle").textContent = k ? `${k.name}'s chores` : "Today's chores";
+  const list = $("choreList"); list.replaceChildren();
+  const mine = db.chores.filter(c => c.who === curKid && c.days.includes(today.getDay()));
+  const doneN = mine.filter(c => db.done[`${d}|${c.id}`]).length;
+  $("todaySub").textContent = mine.length ? `${DAYS[today.getDay()]}: ${doneN} of ${mine.length} done` : "";
+  if (!mine.length) list.append(el("p", "empty", "No chores today."));
+  for (const c of mine) {
+    const row = el("div", "item"), key = `${d}|${c.id}`, on = !!db.done[key];
+    const t = el("button", "tick", on ? "✓" : ""); t.setAttribute("aria-pressed", String(on)); t.setAttribute("aria-label", (on ? "Undo " : "Done: ") + c.name);
+    t.onclick = () => { db.done[key] = !on; save(); render(); };
+    const g = el("div", "grow"); g.append(el("div", null, c.name), el("div", "when", `${c.pts} point${c.pts === 1 ? "" : "s"}`));
+    row.append(t, g); list.append(row);
+  }
+  const ev = $("todayEvents"); ev.replaceChildren();
+  const evs = db.events.filter(e => e.date === d).sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+  if (!evs.length) ev.append(el("p", "empty", "Nothing planned today."));
+  for (const e of evs) ev.append(eventRow(e));
+}
+
+function eventRow(e) {
+  const row = el("div", "item"), who = member(e.who);
+  const dot = el("span", "dot", who ? who.name[0].toUpperCase() : "★"); dot.style.setProperty("--who", who ? who.color : "#4b6070");
+  const g = el("div", "grow"); g.append(el("div", null, e.name), el("div", "when", [e.time ? fmtTime(e.time) : "Any time", who ? who.name : "Everyone"].join(" · ")));
+  const x = el("button", "ghost small", "Remove"); x.onclick = () => { db.events = db.events.filter(y => y.id !== e.id); save(); render(); };
+  row.append(dot, g, x); return row;
+}
+const fmtTime = t => { const [h, m] = t.split(":").map(Number); return `${(h % 12) || 12}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`; };
+
+function renderWeek() {
+  const end = new Date(weekStart); end.setDate(end.getDate() + 6);
+  const f = d => d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  $("wkLabel").textContent = `${f(weekStart)} to ${f(end)}`;
+  const box = $("weekDays"); box.replaceChildren(); const todayIso = iso(new Date());
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(weekStart); day.setDate(day.getDate() + i); const d = iso(day);
+    const p = el("div", "panel day" + (d === todayIso ? " today" : ""));
+    p.append(el("h3", null, day.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })));
+    const evs = db.events.filter(e => e.date === d).sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+    const chores = db.chores.filter(c => c.days.includes(day.getDay()));
+    if (!evs.length) p.append(el("p", "small muted", "No plans."));
+    for (const e of evs) p.append(eventRow(e));
+    if (chores.length) p.append(el("p", "small muted", `${chores.length} chore${chores.length === 1 ? "" : "s"}`));
+    box.append(p);
+  }
+  const sel = $("evWho"); sel.replaceChildren(new Option("Everyone", ""));
+  for (const m of db.members) sel.append(new Option(m.name, m.id));
+  if (!$("evDate").value) $("evDate").value = todayIso;
+}
+
+function renderRewards() {
+  kidPicker($("kidPick2"));
+  const k = member(curKid), have = k ? points(k.id) : 0;
+  $("rwSub").textContent = k ? `${k.name} has ${have} points.` : "";
+  const list = $("rewardList"); list.replaceChildren();
+  if (!db.rewards.length) list.append(el("p", "empty", "A grown-up can add rewards in Family."));
+  for (const r of db.rewards) {
+    const row = el("div", "item"), g = el("div", "grow");
+    g.append(el("div", null, r.name), el("div", "when", `${r.cost} points`));
+    const b = el("button", have >= r.cost ? "go small" : "small", have >= r.cost ? "Ask for it" : `${r.cost - have} to go`);
+    b.disabled = !k || have < r.cost;
+    b.onclick = () => { db.redeemed.push({ id: uid(), kid: k.id, reward: r.name, cost: r.cost, status: "pending", at: Date.now() }); save(); render(); };
+    row.append(g, b); list.append(row);
+  }
+  const pend = db.redeemed.filter(r => r.status === "pending");
+  $("pendingPanel").hidden = !pend.length;
+  const pl = $("pendingList"); pl.replaceChildren();
+  for (const r of pend) {
+    const row = el("div", "item pending"), g = el("div", "grow"), who = member(r.kid);
+    g.append(el("div", null, `${who ? who.name : "Someone"}: ${r.reward}`), el("div", "when", `${r.cost} points, waiting for a grown-up`));
+    const ok = el("button", "primary small", "Approve"), no = el("button", "small", "Decline");
+    ok.onclick = () => askPin(() => { r.status = "approved"; save(); render(); });
+    no.onclick = () => askPin(() => { r.status = "declined"; save(); render(); });
+    row.append(g, ok, no); pl.append(row);
+  }
+}
+
+// Grown-up PIN (hashed, kept on the device).
+const hash = async s => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("kinboard-pin:" + s)))].map(b => b.toString(16).padStart(2, "0")).join("");
+let afterUnlock = null;
+function askPin(fn) { if (unlocked) return fn(); afterUnlock = fn; setTab("family"); $("pin").focus(); }
+$("pinOk").onclick = async () => {
+  const v = $("pin").value.trim();
+  if (!/^\d{4}$/.test(v)) { $("pinErr").textContent = "The PIN is 4 numbers."; $("pinErr").hidden = false; return; }
+  const h = await hash(v);
+  if (db.pin && db.pin !== h) { $("pinErr").textContent = "That PIN doesn't match."; $("pinErr").hidden = false; return; }
+  if (!db.pin) { db.pin = h; save(); }
+  unlocked = true; $("pin").value = ""; $("pinErr").hidden = true;
+  if (afterUnlock) { const f = afterUnlock; afterUnlock = null; f(); setTab("rewards"); } else render();
+};
+$("lockBtn").onclick = () => { unlocked = false; render(); };
+
+function renderFamily() {
+  $("lockPanel").hidden = unlocked; $("adminView").hidden = !unlocked;
+  $("pinMsg").textContent = db.pin ? "Enter your 4-digit grown-up PIN to change chores, rewards and the family." : "Make a 4-digit grown-up PIN. You'll need it to change chores and rewards and to approve rewards.";
+  if (!unlocked) return;
+  const ml = $("memberList"); ml.replaceChildren();
+  for (const m of db.members) {
+    const row = el("div", "item"), dot = el("span", "dot", m.name[0].toUpperCase()); dot.style.setProperty("--who", m.color);
+    const g = el("div", "grow"); g.append(el("div", null, m.name), el("div", "when", m.kind === "kid" ? `Kid · ${points(m.id)} points` : "Grown-up"));
+    const x = el("button", "ghost small", "Remove");
+    x.onclick = () => { db.members = db.members.filter(y => y.id !== m.id); db.chores = db.chores.filter(c => c.who !== m.id); if (curKid === m.id) curKid = (kids()[0] || {}).id; save(); render(); };
+    row.append(dot, g, x); ml.append(row);
+  }
+  const cw = $("cWho"); cw.replaceChildren(); for (const k of kids()) cw.append(new Option(k.name, k.id));
+  const ca = $("choreAdmin"); ca.replaceChildren();
+  for (const c of db.chores) {
+    const row = el("div", "item"), g = el("div", "grow"), who = member(c.who);
+    g.append(el("div", null, c.name), el("div", "when", `${who ? who.name : "?"} · ${c.pts} pts · ${c.days.length === 7 ? "Every day" : c.days.map(d => DAYS[d]).join(", ")}`));
+    const x = el("button", "ghost small", "Remove"); x.onclick = () => { db.chores = db.chores.filter(y => y.id !== c.id); save(); render(); };
+    row.append(g, x); ca.append(row);
+  }
+  const ra = $("rewardAdmin"); ra.replaceChildren();
+  for (const r of db.rewards) {
+    const row = el("div", "item"), g = el("div", "grow"); g.append(el("div", null, r.name), el("div", "when", `${r.cost} points`));
+    const x = el("button", "ghost small", "Remove"); x.onclick = () => { db.rewards = db.rewards.filter(y => y.id !== r.id); save(); render(); };
+    row.append(g, x); ra.append(row);
+  }
+}
+const pickDays = new Set([1, 2, 3, 4, 5]);
+DAYS.forEach((d, i) => { const b = el("button", null, d); b.type = "button"; b.setAttribute("aria-pressed", String(pickDays.has(i))); b.onclick = () => { pickDays.has(i) ? pickDays.delete(i) : pickDays.add(i); b.setAttribute("aria-pressed", String(pickDays.has(i))); }; $("cDays").append(b); });
+$("mAdd").onclick = () => { const n = $("mName").value.trim(); if (!n) return; db.members.push({ id: uid(), name: n, kind: $("mKind").value, color: COLORS[db.members.length % COLORS.length] }); $("mName").value = ""; if (!curKid) curKid = (kids()[0] || {}).id; save(); render(); };
+$("cAdd").onclick = () => { const n = $("cName").value.trim(), who = $("cWho").value, pts = Math.max(1, Math.min(100, +$("cPts").value || 1)); if (!n || !who || !pickDays.size) return; db.chores.push({ id: uid(), name: n, who, pts, days: [...pickDays].sort() }); $("cName").value = ""; save(); render(); };
+$("rAdd").onclick = () => { const n = $("rName").value.trim(), cost = Math.max(1, Math.min(1000, +$("rCost").value || 1)); if (!n) return; db.rewards.push({ id: uid(), name: n, cost }); $("rName").value = ""; save(); render(); };
+$("evAdd").onclick = () => {
+  const n = $("evName").value.trim(), d = $("evDate").value;
+  if (!n || !d) { $("evErr").textContent = "Add what it is and the day."; $("evErr").hidden = false; return; }
+  $("evErr").hidden = true;
+  db.events.push({ id: uid(), name: n, date: d, time: $("evTime").value || "", who: $("evWho").value || "" });
+  $("evName").value = ""; $("evTime").value = ""; weekStart = startOfWeek(fromIso(d)); save(); render();
+};
+$("prevWk").onclick = () => { weekStart.setDate(weekStart.getDate() - 7); render(); };
+$("nextWk").onclick = () => { weekStart.setDate(weekStart.getDate() + 7); render(); };
+
+function setTab(t) { tab = t; render(); }
+document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => setTab(b.dataset.tab));
+function render() {
+  for (const t of ["today", "week", "rewards", "family"]) $(t).hidden = t !== tab;
+  document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === tab)));
+  ({ today: renderToday, week: renderWeek, rewards: renderRewards, family: renderFamily })[tab]();
+}
+render();
+})();
+</script>
+</body>
+</html>

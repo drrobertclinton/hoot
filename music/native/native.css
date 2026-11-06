@@ -1,0 +1,3 @@
+/* Native app only (html.native-app is set by native.js) */
+html.native-app { -webkit-tap-highlight-color: transparent; }
+html.native-app #install, html.native-app #install-card { display: none !important; }
