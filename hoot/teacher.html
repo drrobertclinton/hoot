@@ -67,7 +67,7 @@
     </div>
   </section>
 
-  <nav class="foot"><a href="./">Open Hoot</a><a href="privacy.html">Privacy</a></nav>
+  <nav class="foot"><a href="./">Open Hoot</a><a href="privacy">Privacy</a></nav>
 </div>
 
 <script>window.HOOT_API="https://hoot-tutor.robert-1f2.workers.dev"</script><script src="maker.js"></script>
@@ -89,7 +89,7 @@
     if (!cls) return;
     $("codeShow").textContent = cls.code;
     $("classTitle").textContent = cls.name + (cls.teacher ? " · " + cls.teacher : "");
-    $("teacherLink").value = `${location.origin}/teacher.html?class=${cls.code}&key=${encodeURIComponent(saved.key)}`;
+    $("teacherLink").value = `${location.origin + location.pathname.replace(/[^/]*$/, "")}teacher?class=${cls.code}&key=${encodeURIComponent(saved.key)}`;
     renderSets();
   }
   let pendingRemove = null;
@@ -167,7 +167,7 @@
       try {
         cls = await Maker.post("/api/class", { action: "manage", code: saved.code, key: saved.key });
         remember();
-        if (location.search) history.replaceState(null, "", "teacher.html");
+        if (location.search) history.replaceState(null, "", "teacher");
       } catch (e) { cls = null; Maker.status($("createStatus"), Maker.errText(e), "err"); }
     }
     show();

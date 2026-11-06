@@ -1,5 +1,5 @@
 // Offline-first service worker for the web preview. Bump VERSION on every release so installed copies refresh.
-const VERSION = 'vilasi-music-v1.0.2';
+const VERSION = 'vilasi-music-v1.0.3-web';
 const SHELL = [
   './',
   'fonts/fraunces-latin-wght-italic.woff2',
@@ -10,7 +10,7 @@ const SHELL = [
   'icons/icon-192.png',
   'icons/icon-512.png',
   'icons/maskable-512.png',
-  'index.html',
+
   'js/achievements.js',
   'js/app.js',
   'js/audio/engine.js',
@@ -53,10 +53,10 @@ const SHELL = [
   'native/config.js',
   'native/native.css',
   'native/native.js',
-  'privacy.html',
+  'privacy',
   'styles.css',
-  'support.html',
-  'terms.html',
+  'support',
+  'terms',
   'vendor/vexflow/vexflow-bravura.js',
 ];
 self.addEventListener('install', (e) => {
@@ -72,7 +72,7 @@ self.addEventListener('fetch', (e) => {
   if (url.origin !== location.origin) return;
   if (req.mode === 'navigate') {
     e.respondWith(fetch(req).then((res) => { const copy = res.clone(); caches.open(VERSION).then((c) => c.put(req, copy)); return res; })
-      .catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match('index.html'))));
+      .catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match('./'))));
     return;
   }
   e.respondWith(caches.match(req, { ignoreSearch: true }).then((hit) => {

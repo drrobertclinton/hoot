@@ -34,7 +34,7 @@ body.k5 .choice { font-size: 19px }
     <div class="chips" id="bands" role="tablist"></div>
     <div class="sets" id="courses"></div>
     <p class="small muted note">Hoot is extra help for learning and practice. It can't promise a passing grade or test score.</p>
-    <nav class="foot"><a href="./">Flashcards from my pages</a><a id="otherLevel" href="tutor.html?level=612"></a><button class="ghost small" id="grownBtn">Grown-up settings</button><a href="privacy.html">Privacy</a></nav>
+    <nav class="foot"><a href="./">Flashcards from my pages</a><a id="otherLevel" href="tutor?level=612"></a><button class="ghost small" id="grownBtn">Grown-up settings</button><a href="privacy">Privacy</a></nav>
   </section>
 
   <!-- ONE COURSE -->
@@ -202,7 +202,7 @@ if (L) {
   $("prepBtn").onclick = () => { settings.band = "prep"; save(SETTINGS, settings); showPick(); };
 }
 const other = level === "k5" ? "612" : "k5";
-$("otherLevel").href = `/tutor.html?level=${other}`; $("otherLevel").textContent = LEVELS[other].name;
+$("otherLevel").href = `tutor?level=${other}`; $("otherLevel").textContent = LEVELS[other].name;
 
 const SETTINGS = "hoot-tutor-settings-v1", PROGRESS = "hoot-tutor-progress-v1", CHATS = "hoot-tutor-chats-v1";
 let settings = load(SETTINGS, { help: "teach", state: "North Carolina", pin: null, band: "elem" });

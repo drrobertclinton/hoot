@@ -148,7 +148,7 @@
       var b = document.createElement('button');
       b.type = 'button'; b.textContent = '‹ Back'; b.setAttribute('aria-label', 'Back to the app');
       b.style.cssText = 'position:sticky;top:0;z-index:9999;display:block;margin:0;padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 10px;width:100%;text-align:left;font:600 17px -apple-system,system-ui,sans-serif;border:0;background:' + (CFG.statusBar || '#222') + ';color:' + (hexLum(CFG.statusBar) > 0.6 ? '#111' : '#fff') + ';';
-      b.onclick = function () { if (history.length > 1) history.back(); else location.href = 'index.html'; };
+      b.onclick = function () { if (history.length > 1) history.back(); else location.href = './'; };
       document.body.insertBefore(b, document.body.firstChild);
     };
     if (document.body) addBack(); else document.addEventListener('DOMContentLoaded', addBack);
@@ -182,7 +182,7 @@
       if (changed) return;
       var h = location.hash, atHome = !h || h === '#' || h === '#/' || h === '#/home' || h === '#home';
       var onIndex = /\/(index\.html)?$/.test(location.pathname);
-      if (!onIndex) { history.length > 1 ? history.back() : (location.href = 'index.html'); return; }
+      if (!onIndex) { history.length > 1 ? history.back() : (location.href = './'); return; }
       if (!atHome) { if (ev && ev.canGoBack) history.back(); else location.hash = '#/'; return; }
       App.minimizeApp().catch(function () { App.exitApp(); });
     });
