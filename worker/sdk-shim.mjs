@@ -4,7 +4,16 @@ export class APIConnectionError extends APIError {}
 export class RateLimitError extends APIError {}
 export class AuthenticationError extends APIError {}
 export class BadRequestError extends APIError {}
-async function create({ betas, fallbacks, ...body }) {  // fallbacks/betas dropped: plain Messages API call
+async function create(args) { // tries the asked-for model, then smaller ones if the account cannot use it
+  const first = args.model, tries = [first, "claude-sonnet-5-5", "claude-haiku-5-5"].filter((m, i, a) => a.indexOf(m) === i);
+  let last;
+  for (const model of tries) {
+    try { return await one({ ...args, model }); }
+    catch (e) { last = e; if (!(e.status === 404 || (e.status === 400 && /model/i.test(e.message)))) throw e; }
+  }
+  throw last;
+}
+async function one({ betas, fallbacks, ...body }) {  // fallbacks/betas dropped: plain Messages API call
   const key = globalThis.process?.env?.ANTHROPIC_API_KEY;
   if (!key) throw new AuthenticationError(401, "missing key");
   let r;

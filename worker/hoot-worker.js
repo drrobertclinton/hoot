@@ -464,7 +464,20 @@ var AuthenticationError = class extends APIError {
 };
 var BadRequestError = class extends APIError {
 };
-async function create({ betas, fallbacks, ...body }) {
+async function create(args) {
+  const first = args.model, tries = [first, "claude-sonnet-5-5", "claude-haiku-5-5"].filter((m, i, a) => a.indexOf(m) === i);
+  let last;
+  for (const model of tries) {
+    try {
+      return await one({ ...args, model });
+    } catch (e) {
+      last = e;
+      if (!(e.status === 404 || e.status === 400 && /model/i.test(e.message))) throw e;
+    }
+  }
+  throw last;
+}
+async function one({ betas, fallbacks, ...body }) {
   const key = globalThis.process?.env?.ANTHROPIC_API_KEY;
   if (!key) throw new AuthenticationError(401, "missing key");
   let r;
@@ -574,7 +587,7 @@ async function callClaude(content, { system: system2, maxTokens = 16e3, messages
     if (e instanceof Anthropic.RateLimitError) throw new StudyError("rate_limited", 429);
     if (e instanceof Anthropic.AuthenticationError) throw new StudyError("server_misconfigured", 500, "API key missing or invalid");
     if (e instanceof Anthropic.BadRequestError) throw new StudyError("bad_request", 400, e.message);
-    if (e instanceof Anthropic.APIConnectionError || e instanceof Anthropic.APIError) throw new StudyError("upstream_error", 502);
+    if (e instanceof Anthropic.APIConnectionError || e instanceof Anthropic.APIError) throw new StudyError("upstream_error", 502, "Claude said: " + (e.status || "") + " " + String(e.message).slice(0, 150));
     throw e;
   }
   if (res.stop_reason === "refusal") throw new StudyError("refused", 422);
