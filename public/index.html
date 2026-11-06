@@ -15,7 +15,7 @@
 <div class="wrap">
   <header class="brand">
     <svg class="logo" viewBox="0 0 38 38" aria-hidden="true"><rect width="38" height="38" rx="11" fill="var(--accent)"/><path d="M9 9l5 4M29 9l-5 4" stroke="var(--bolt)" stroke-width="3" stroke-linecap="round"/><circle cx="13.5" cy="19" r="6" fill="var(--bolt)"/><circle cx="24.5" cy="19" r="6" fill="var(--bolt)"/><circle cx="13.5" cy="19" r="2.6" fill="#16213a"/><circle cx="24.5" cy="19" r="2.6" fill="#16213a"/><path d="M19 23l-2.6 3.2h5.2z" fill="var(--bolt)"/></svg>
-    <h1>Hoot</h1>
+    <h1 id="appName">Hoot</h1>
   </header>
 
   <!-- HOME -->
@@ -27,6 +27,10 @@
     <a class="panel feature" href="/tutor.html?level=612">
       <h2>My Own Tutor 6-12</h2>
       <p class="small muted">Middle school, high school and AP courses through calculus, plus ACT, SAT, PSAT and state test prep.</p>
+    </a>
+    <a class="panel feature" href="/kinboard.html">
+      <h2>Kinboard</h2>
+      <p class="small muted">The family board: this week's plans, chores with points, and rewards kids can earn.</p>
     </a>
     <div class="panel">
       <div>
@@ -436,5 +440,14 @@
 })();
 </script>
 
+<script>
+// Snapdeck: the study-deck maker on its own (/snapdeck.html opens /?app=snapdeck).
+(function () {
+  if (new URLSearchParams(location.search).get("app") !== "snapdeck") return;
+  document.title = "Snapdeck";
+  document.getElementById("appName").textContent = "Snapdeck";
+  document.querySelectorAll("#home > .panel.feature").forEach(function (e) { e.hidden = true; });
+})();
+</script>
 </body>
 </html>

@@ -20,9 +20,12 @@ window.Maker = (() => {
   const STOP_ALL = ["rate_limited", "server_misconfigured"];
   const errText = e => ERR[e && e.code] || "Something went wrong. Check your connection and try again.";
 
+  // Where the API lives: same site by default, or window.HOOT_API when the
+  // pages are hosted apart from it (for example, a Cloudflare Worker).
+  const BASE = (window.HOOT_API || "").replace(/\/$/, "");
   async function api(path, opts) {
     let r;
-    try { r = await fetch(path, opts); } catch { throw { code: "upstream_error" }; }
+    try { r = await fetch(BASE + path, opts); } catch { throw { code: "upstream_error" }; }
     const j = await r.json().catch(() => null);
     if (!r.ok || !j) throw { code: (j && j.code) || (r.status === 413 ? "too_large" : "upstream_error") };
     return j.data;

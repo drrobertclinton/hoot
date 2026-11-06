@@ -18,6 +18,11 @@ The same tutor page runs as two apps, picked by `?level=`:
 
 The level is remembered on the device. `/tutor.html` with no level shows every course.
 
+## Kinboard and Snapdeck
+
+- **Kinboard** (`/kinboard.html`): the family board. This week's plans, chores with points for each kid, and rewards kids ask for and a grown-up approves with a PIN. Everything stays on the device, so it fits a family tablet or kitchen screen. Sharing one board across several phones will need a server later.
+- **Snapdeck** (`/snapdeck.html`): the photo-to-flashcards study deck maker on its own, without the tutor and Kinboard cards.
+
 ## What's where
 
 - `public/index.html` – the kids' app (sets and scores stay in the browser), with the grown-up agreement screen.
@@ -61,3 +66,9 @@ ANTHROPIC_API_KEY=... npm start   # http://localhost:3000, classes kept in memor
 The privacy notice and grown-up screen are a first version written to collect no
 personal information from children. Have a lawyer review them against COPPA
 (and FERPA if schools sign up) before a wide launch.
+
+## Hosting on vilasi.co with a Cloudflare Worker
+
+- `worker/hoot-worker.js` is the whole API (`/api/study`, `/api/class`) in one file for the Cloudflare dashboard. Rebuild it with `worker/build.sh`.
+- Worker settings: secret `ANTHROPIC_API_KEY`; optional KV namespace bound as `HOOT` (teacher classes and a daily cap), `DAILY_CAP` (default 3000), `ALLOWED_ORIGINS` (default vilasi.co).
+- `worker/static.sh <dir>` copies `public/` with relative links and `window.HOOT_API` set, for hosting at vilasi.co/apps/hoot/.
