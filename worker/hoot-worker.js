@@ -464,14 +464,14 @@ var AuthenticationError = class extends APIError {
 };
 var BadRequestError = class extends APIError {
 };
-async function create({ betas, ...body }) {
+async function create({ betas, fallbacks, ...body }) {
   const key = globalThis.process?.env?.ANTHROPIC_API_KEY;
   if (!key) throw new AuthenticationError(401, "missing key");
   let r;
   try {
     r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
-      headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2026-10-21", ...betas ? { "anthropic-beta": betas.join(",") } : {} },
+      headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2026-10-21" },
       body: JSON.stringify(body)
     });
   } catch (e) {
@@ -480,6 +480,7 @@ async function create({ betas, ...body }) {
   const j = await r.json().catch(() => ({}));
   if (r.ok) return j;
   const msg = j.error && j.error.message || "HTTP " + r.status;
+  console.error("claude api", r.status, msg);
   if (r.status === 429 || r.status === 529) throw new RateLimitError(r.status, msg);
   if (r.status === 401 || r.status === 403) throw new AuthenticationError(r.status, msg);
   if (r.status === 400) throw new BadRequestError(r.status, msg);
@@ -1049,9 +1050,9 @@ async function guard(fn) {
   try {
     return [200, { data: await fn() }];
   } catch (e) {
-    if (e instanceof StudyError) return [e.status, { code: e.code }];
+    if (e instanceof StudyError) return [e.status, { code: e.code, detail: String(e.message || "").slice(0, 200) }];
     console.error(e);
-    return [500, { code: "upstream_error" }];
+    return [500, { code: "upstream_error", detail: String(e && e.message || e).slice(0, 200) }];
   }
 }
 async function study({ method, ip, body }) {
