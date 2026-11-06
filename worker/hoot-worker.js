@@ -478,7 +478,7 @@ async function create(args) {
   throw last;
 }
 async function one({ betas, fallbacks, ...body }) {
-  const key = globalThis.process?.env?.ANTHROPIC_API_KEY;
+  const key = String(globalThis.process?.env?.ANTHROPIC_API_KEY || "").replace(/[^\x21-\x7e]/g, "");
   if (!key) throw new AuthenticationError(401, "missing key");
   let r;
   try {
@@ -1104,7 +1104,7 @@ var entry_default = {
     if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: h });
     const url = new URL(req.url);
     const send = (s2, j2) => new Response(JSON.stringify(j2), { status: s2, headers: { ...h, "content-type": "application/json" } });
-    if (url.pathname === "/") return send(200, { ok: true, app: "hoot-tutor", version: 3, key: Boolean(env.ANTHROPIC_API_KEY), classes: Boolean(env.HOOT) });
+    if (url.pathname === "/") return send(200, { ok: true, app: "hoot-tutor", version: 4, key: Boolean(env.ANTHROPIC_API_KEY), classes: Boolean(env.HOOT) });
     const route = url.pathname === "/api/study" ? study : url.pathname === "/api/class" ? klass : null;
     if (!route) return send(404, { code: "not_found" });
     let body = null;

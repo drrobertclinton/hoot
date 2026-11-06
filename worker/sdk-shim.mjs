@@ -14,7 +14,7 @@ async function create(args) { // tries the asked-for model, then smaller ones if
   throw last;
 }
 async function one({ betas, fallbacks, ...body }) {  // fallbacks/betas dropped: plain Messages API call
-  const key = globalThis.process?.env?.ANTHROPIC_API_KEY;
+  const key = String(globalThis.process?.env?.ANTHROPIC_API_KEY || "").replace(/[^\x21-\x7e]/g, ""); // pasted keys often carry a stray space or line break
   if (!key) throw new AuthenticationError(401, "missing key");
   let r;
   try {
