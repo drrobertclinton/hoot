@@ -3,6 +3,7 @@
 // Settings: ANTHROPIC_API_KEY (secret). Optional: KV binding HOOT (teacher classes
 // + daily cap), DAILY_CAP (default 3000 Claude calls a day), ALLOWED_ORIGINS.
 import { study, klass } from "../lib/routes.mjs";
+import Anthropic from "./sdk-shim.mjs";
 const DEFAULT_ORIGINS = "https://vilasi.co,https://www.vilasi.co";
 function cors(req, env) {
   const allowed = (env.ALLOWED_ORIGINS || DEFAULT_ORIGINS).split(",").map(s => s.trim());
@@ -17,7 +18,13 @@ export default {
     if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: h });
     const url = new URL(req.url);
     const send = (s, j) => new Response(JSON.stringify(j), { status: s, headers: { ...h, "content-type": "application/json" } });
-    if (url.pathname === "/" ) return send(200, { ok: true, app: "hoot-tutor", version: 4, key: Boolean(env.ANTHROPIC_API_KEY), classes: Boolean(env.HOOT) });
+    if (url.pathname === "/" ) return send(200, { ok: true, app: "hoot-tutor", version: 5, key: Boolean(env.ANTHROPIC_API_KEY), classes: Boolean(env.HOOT) });
+    if (url.pathname === "/selftest") { // one tiny Claude call, so setup problems show their real reason
+      try {
+        const r = await new Anthropic().messages.create({ model: "claude-opus-5-5", max_tokens: 16, messages: [{ role: "user", content: "Reply with the word ok." }] });
+        return send(200, { ok: true, model: r.model, reply: (r.content || []).map(b => b.text || "").join("") });
+      } catch (e) { return send(200, { ok: false, status: e.status || 0, error: String(e.message || e).slice(0, 300) }); }
+    }
     const route = url.pathname === "/api/study" ? study : url.pathname === "/api/class" ? klass : null;
     if (!route) return send(404, { code: "not_found" });
     let body = null;

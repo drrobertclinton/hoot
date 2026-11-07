@@ -19,7 +19,13 @@ window.Maker = (() => {
     class_full: "This class has the most study guides it can hold. Remove an old one first."
   };
   const STOP_ALL = ["rate_limited", "server_misconfigured"];
-  const errText = e => (ERR[e && e.code] || "Something went wrong. Check your connection and try again.") + (e && e.detail && /^(upstream_error|server_misconfigured)$/.test(e.code) ? " Grown-up note: " + e.detail : "");
+  // Kids see "ask a grown-up". Once a grown-up has agreed on this device, show the real reason instead.
+  const grownUp = () => { try { return localStorage.getItem("hoot-consent-v1") === "yes"; } catch { return false; } };
+  const errText = e => {
+    const code = e && e.code, setup = code === "upstream_error" || code === "server_misconfigured";
+    if (setup && grownUp()) return "Hoot's setup needs attention: " + (e.detail && e.detail !== code ? e.detail : code) + ". (Grown-up note: ask Claude to check the Worker.)";
+    return (ERR[code] || "Something went wrong. Check your connection and try again.");
+  };
 
   // Where the API lives: same site by default, or window.HOOT_API when the
   // pages are hosted apart from it (for example, a Cloudflare Worker).
