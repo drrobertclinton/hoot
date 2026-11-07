@@ -7,7 +7,8 @@ window.Maker = (() => {
 
   const ERR = {
     rate_limited: "Hoot is busy right now. Wait a few minutes and try again.",
-    server_misconfigured: "Hoot isn't set up yet. Ask a grown-up to check the app settings.",
+    server_misconfigured: "Hoot isn't set up yet. Ask a grown-up to set it up.",
+    upstream_error: "Hoot isn't ready yet. Ask a grown-up to set it up, then try again.",
     too_large: "That's too big to send. Try fewer or smaller pages.",
     image_rejected: "One of the photos couldn't be read. Remove it and take it again.",
     refused: "Hoot couldn't make a study set from these pages. Try clearer photos of the review pages.",
@@ -18,13 +19,22 @@ window.Maker = (() => {
     class_full: "This class has the most study guides it can hold. Remove an old one first."
   };
   const STOP_ALL = ["rate_limited", "server_misconfigured"];
-  const errText = e => ERR[e && e.code] || "Something went wrong. Check your connection and try again.";
+  // Kids see "ask a grown-up". Once a grown-up has agreed on this device, show the real reason instead.
+  const grownUp = () => { try { return localStorage.getItem("hoot-consent-v1") === "yes"; } catch { return false; } };
+  const errText = e => {
+    const code = e && e.code, setup = code === "upstream_error" || code === "server_misconfigured";
+    if (setup && grownUp()) return "Hoot's setup needs attention: " + (e.detail && e.detail !== code ? e.detail : code) + ". (Grown-up note: ask Claude to check the Worker.)";
+    return (ERR[code] || "Something went wrong. Check your connection and try again.");
+  };
 
+  // Where the API lives: same site by default, or window.HOOT_API when the
+  // pages are hosted apart from it (for example, a Cloudflare Worker).
+  const BASE = (window.HOOT_API || "").replace(/\/$/, "");
   async function api(path, opts) {
     let r;
-    try { r = await fetch(path, opts); } catch { throw { code: "upstream_error" }; }
+    try { r = await fetch(BASE + path, opts); } catch { throw { code: "upstream_error" }; }
     const j = await r.json().catch(() => null);
-    if (!r.ok || !j) throw { code: (j && j.code) || (r.status === 413 ? "too_large" : "upstream_error") };
+    if (!r.ok || !j) throw { code: (j && j.code) || (r.status === 413 ? "too_large" : "upstream_error"), detail: j && j.detail };
     return j.data;
   }
   const post = (path, body) => api(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
