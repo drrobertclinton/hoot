@@ -7,7 +7,8 @@ window.Maker = (() => {
 
   const ERR = {
     rate_limited: "Hoot is busy right now. Wait a few minutes and try again.",
-    server_misconfigured: "Hoot isn't set up yet. Ask a grown-up to check the app settings.",
+    server_misconfigured: "Hoot isn't set up yet. Ask a grown-up to set it up.",
+    upstream_error: "Hoot isn't ready yet. Ask a grown-up to set it up, then try again.",
     too_large: "That's too big to send. Try fewer or smaller pages.",
     image_rejected: "One of the photos couldn't be read. Remove it and take it again.",
     refused: "Hoot couldn't make a study set from these pages. Try clearer photos of the review pages.",
@@ -18,7 +19,7 @@ window.Maker = (() => {
     class_full: "This class has the most study guides it can hold. Remove an old one first."
   };
   const STOP_ALL = ["rate_limited", "server_misconfigured"];
-  const errText = e => ERR[e && e.code] || ("Something went wrong. Check your connection and try again." + (e && e.detail ? " (" + e.detail + ")" : ""));
+  const errText = e => (ERR[e && e.code] || "Something went wrong. Check your connection and try again.") + (e && e.detail && /^(upstream_error|server_misconfigured)$/.test(e.code) ? " Grown-up note: " + e.detail : "");
 
   // Where the API lives: same site by default, or window.HOOT_API when the
   // pages are hosted apart from it (for example, a Cloudflare Worker).
