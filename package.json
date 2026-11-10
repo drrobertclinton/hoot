@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.mjs"
+    "start": "node server.mjs",
+    "build:cloudflare": "node cloudflare/build.mjs"
   },
   "keywords": [],
   "author": "",
@@ -17,5 +18,9 @@
   "private": "true",
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.10",
+    "miniflare": "^4.20260730.0"
   }
 }

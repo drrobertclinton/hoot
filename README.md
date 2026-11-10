@@ -51,3 +51,9 @@ ANTHROPIC_API_KEY=... npm start   # http://localhost:3000, classes kept in memor
 The privacy notice and grown-up screen are a first version written to collect no
 personal information from children. Have a lawyer review them against COPPA
 (and FERPA if schools sign up) before a wide launch.
+
+## Cloudflare Workers
+
+`npm run build:cloudflare` bundles the whole app (pages and API) into `dist/worker.js`.
+Upload it as a Worker with the `nodejs_compat` compatibility flag and an `ANTHROPIC_API_KEY` secret.
+Add `KV_REST_API_URL` and `KV_REST_API_TOKEN` (Upstash Redis) to turn on teacher classes.
