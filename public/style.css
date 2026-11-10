@@ -159,3 +159,47 @@ textarea:focus-visible, select:focus-visible { outline: 3px solid var(--accent);
 .feature .muted { color: inherit; opacity: .85 }
 h3 { font-size: 18px; font-weight: 800 }
 .note { text-align: center }
+
+/* ---------- Looks: "hoot" (owl, bright) for young kids; "clean" and "dark" are grown-up looks for grades 6-12 ---------- */
+.brand .logo.mono { display: none }
+#lookBtn { margin-left: auto }
+:root:not([data-look="hoot"]) .brand .logo.owl { display: none }
+:root:not([data-look="hoot"]) .brand .logo.mono { display: block }
+.looks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px }
+.look-opt { flex-direction: column; align-items: flex-start; justify-content: flex-start; text-align: left; gap: 10px; padding: 12px; min-width: 0 }
+.look-opt[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) }
+.look-opt strong { font-size: 15px }
+.swatch { width: 100%; height: 34px; border-radius: 8px; border: 1px solid rgba(0,0,0,.08) }
+.look-hoot .swatch { background: linear-gradient(90deg, #2459d6 0 50%, #ffd23f 50%) }
+.look-clean .swatch { background: linear-gradient(90deg, #ffffff 0 50%, #3b4bc8 50%) }
+.look-dark .swatch { background: linear-gradient(90deg, #0b0d12 0 50%, #8b9cff 50%) }
+@media (max-width: 420px) { .looks { grid-template-columns: 1fr } .look-opt { flex-direction: row; align-items: center } .swatch { width: 44px; flex: none } }
+
+:root[data-look="clean"] {
+  --bg: #f4f5f7; --paper: #ffffff; --ink: #111318; --muted: #5d6370; --line: #e1e4ea;
+  --rule: #e1e4ea; --margin: #d5d9e1; --accent: #3b4bc8; --accent-ink: #ffffff;
+  --bolt: #111318; --bolt-ink: #ffffff; --good: #18794e; --good-bg: #e6f4ec; --bad: #c4314b; --bad-bg: #fbe9ec;
+  --shadow: 0 1px 2px rgba(17,19,24,.06);
+  --display: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root[data-look="clean"]:not([data-theme="light"]) {
+  --bg: #0b0d12; --paper: #151821; --ink: #eceef3; --muted: #9aa1b0; --line: #262b38;
+  --rule: #262b38; --margin: #2f3545; --accent: #8b9cff; --accent-ink: #0b0d12;
+  --bolt: #eceef3; --bolt-ink: #0b0d12; --good: #4cc38a; --good-bg: #13291f; --bad: #ff7a8a; --bad-bg: #331a20;
+  --shadow: none; color-scheme: dark } }
+:root[data-look="dark"] {
+  --bg: #0b0d12; --paper: #151821; --ink: #eceef3; --muted: #9aa1b0; --line: #262b38;
+  --rule: #262b38; --margin: #2f3545; --accent: #8b9cff; --accent-ink: #0b0d12;
+  --bolt: #eceef3; --bolt-ink: #0b0d12; --good: #4cc38a; --good-bg: #13291f; --bad: #ff7a8a; --bad-bg: #331a20;
+  --shadow: none; color-scheme: dark;
+  --display: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+:root:not([data-look="hoot"]) h1 { font-size: 24px; font-weight: 700; letter-spacing: -.02em }
+:root:not([data-look="hoot"]) h2 { font-weight: 700; letter-spacing: -.01em }
+:root:not([data-look="hoot"]) h3 { font-weight: 600 }
+:root:not([data-look="hoot"]) .panel { border-radius: 10px }
+:root:not([data-look="hoot"]) button, :root:not([data-look="hoot"]) .btn { border-radius: 8px; font-weight: 600 }
+:root:not([data-look="hoot"]) .go { font-size: 16px }
+:root:not([data-look="hoot"]) .label { letter-spacing: .04em }

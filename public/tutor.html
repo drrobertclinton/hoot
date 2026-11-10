@@ -7,23 +7,29 @@
 <meta name="description" content="A tutor for every course from kindergarten through calculus, AP, ACT, SAT and state tests.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 <div class="wrap">
   <header class="brand">
-    <svg class="logo" viewBox="0 0 38 38" aria-hidden="true"><rect width="38" height="38" rx="11" fill="var(--accent)"/><path d="M9 9l5 4M29 9l-5 4" stroke="var(--bolt)" stroke-width="3" stroke-linecap="round"/><circle cx="13.5" cy="19" r="6" fill="var(--bolt)"/><circle cx="24.5" cy="19" r="6" fill="var(--bolt)"/><circle cx="13.5" cy="19" r="2.6" fill="#16213a"/><circle cx="24.5" cy="19" r="2.6" fill="#16213a"/><path d="M19 23l-2.6 3.2h5.2z" fill="var(--bolt)"/></svg>
-    <h1>Hoot Tutor</h1>
+    <svg class="logo owl" viewBox="0 0 38 38" aria-hidden="true"><rect width="38" height="38" rx="11" fill="var(--accent)"/><path d="M9 9l5 4M29 9l-5 4" stroke="var(--bolt)" stroke-width="3" stroke-linecap="round"/><circle cx="13.5" cy="19" r="6" fill="var(--bolt)"/><circle cx="24.5" cy="19" r="6" fill="var(--bolt)"/><circle cx="13.5" cy="19" r="2.6" fill="#16213a"/><circle cx="24.5" cy="19" r="2.6" fill="#16213a"/><path d="M19 23l-2.6 3.2h5.2z" fill="var(--bolt)"/></svg>
+    <svg class="logo mono" viewBox="0 0 38 38" aria-hidden="true"><rect width="38" height="38" rx="9" fill="var(--accent)"/><path d="M10 26V13l9 8 9-8v13" fill="none" stroke="var(--accent-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h1 id="appName">Hoot Tutor</h1>
+    <button class="ghost small" id="lookBtn" aria-expanded="false" aria-controls="lookPanel">Look</button>
   </header>
+  <div class="panel" id="lookPanel" hidden>
+    <div><h3>Choose your look</h3><p class="muted small">Only changes how the app looks. Lessons stay the same.</p></div>
+    <div class="looks" id="looks"></div>
+  </div>
 
   <!-- PICK A COURSE -->
   <section id="pick" class="wrap" style="padding:0;gap:16px">
-    <p class="muted">Pick a course. Hoot teaches it one step at a time, from kindergarten through calculus.</p>
+    <p class="muted">Pick a course. <span class="nm">Hoot</span> teaches it one step at a time, from kindergarten through calculus.</p>
     <p class="small muted" id="stateLine"></p>
     <div class="chips" id="bands" role="tablist"></div>
     <div class="sets" id="courses"></div>
-    <p class="small muted note">Hoot is extra help for learning and practice. It can't promise a passing grade or test score.</p>
+    <p class="small muted note"><span class="nm">Hoot</span> is extra help for learning and practice. It can't promise a passing grade or test score.</p>
     <nav class="foot"><a href="/">Flashcards from my pages</a><button class="ghost small" id="grownBtn">Grown-up settings</button><a href="/privacy.html">Privacy</a></nav>
   </section>
 
@@ -38,7 +44,7 @@
     <div class="panel" id="weakPanel">
       <div>
         <h3>Find my weak spots</h3>
-        <p class="muted small">Take a quick check across the whole course, or add a report or graded test from your teacher. Hoot shows which units need work and takes you straight to them.</p>
+        <p class="muted small">Take a quick check across the whole course, or add a report or graded test from your teacher. <span class="nm">Hoot</span> shows which units need work and takes you straight to them.</p>
       </div>
       <div class="row">
         <button class="primary" id="diagBtn">Take a quick check</button>
@@ -52,7 +58,7 @@
       <button class="go" id="repGo" hidden>Find my weak spots in this report</button>
       <div class="status" id="weakStatus" hidden></div>
       <div class="why ok" id="weakResult" hidden></div>
-      <p class="small muted">Hoot is extra help. It can't promise a passing grade or test score.</p>
+      <p class="small muted"><span class="nm">Hoot</span> is extra help. It can't promise a passing grade or test score.</p>
     </div>
     <div class="sets" id="units"></div>
   </section>
@@ -175,6 +181,41 @@ let progress = load(PROGRESS, {});      // {courseId: {unitIndex: {best, mastere
 let chats = load(CHATS, {});            // {"course|unit|mode": [{role, text}]}
 let cur = { c: null, unit: 0, mode: "learn" };
 
+// ---------- look ----------
+// "hoot" = the fun owl look for young kids; "clean" and "dark" = grown-up looks for grades 6-12.
+const LOOKS = [
+  ["hoot", "Hoot", "Bright colors and the owl"],
+  ["clean", "Clean", "Simple and grown-up"],
+  ["dark", "Dark", "Grown-up, easy on the eyes at night"],
+];
+const teenCourse = c => c.band !== "elem" && !(c.band === "state" && /3–8|5, 8/.test(c.grade));
+const teenBand = b => b !== "elem";
+function lookNow() {
+  if (LOOKS.some(l => l[0] === settings.look)) return settings.look;
+  const grownUp = cur.c && $("pick").hidden ? teenCourse(cur.c) : teenBand(settings.band);
+  return grownUp ? "clean" : "hoot";
+}
+const N = () => document.documentElement.dataset.look === "hoot" ? "Hoot" : "My Own Tutor";
+function applyLook() {
+  const look = lookNow();
+  document.documentElement.dataset.look = look;
+  if (look === "dark") document.documentElement.dataset.theme = "dark"; else delete document.documentElement.dataset.theme;
+  $("appName").textContent = look === "hoot" ? "Hoot Tutor" : "My Own Tutor";
+  document.title = $("appName").textContent;
+  for (const n of document.querySelectorAll(".nm")) n.textContent = N();
+  const box = $("looks"); box.replaceChildren();
+  for (const [id, name, desc] of LOOKS) {
+    const b = el("button", "look-opt look-" + id);
+    b.setAttribute("aria-pressed", String(look === id));
+    const sw = el("span", "swatch"); sw.setAttribute("aria-hidden", "true");
+    const t = el("span"); t.append(el("strong", null, name), el("br"), el("span", "small muted", desc));
+    b.append(sw, t);
+    b.onclick = () => { settings.look = id; save(SETTINGS, settings); applyLook(); };
+    box.append(b);
+  }
+}
+$("lookBtn").onclick = () => { const p = $("lookPanel"); p.hidden = !p.hidden; $("lookBtn").setAttribute("aria-expanded", String(!p.hidden)); };
+
 const HELP_OPTS = [
   ["teach", "Teach only", "Hoot never gives the answer to an assigned problem. It works a similar one, then says \"now do yours\". Recommended."],
   ["check", "Check my work", "Hoot says if an answer is right and points to the first wrong step, but doesn't solve it."],
@@ -232,7 +273,7 @@ function openCourse(id) {
   history.replaceState(null, "", `/tutor.html#${c.id}`);
 }
 
-function show(id) { for (const s of ["pick", "courseView", "unitView", "diagView"]) $(s).hidden = s !== id; window.scrollTo(0, 0); }
+function show(id) { for (const s of ["pick", "courseView", "unitView", "diagView"]) $(s).hidden = s !== id; applyLook(); window.scrollTo(0, 0); }
 
 // ---------- a unit ----------
 function openUnit(i, mode) {
@@ -307,11 +348,11 @@ async function send(text, hidden) {
   list.push({ role: "kid", text: text || "Here's my work.", hidden: !!hidden, photos: photos.length || undefined });
   if (!hidden) bubble("kid", (text || "Here's my work.") + (photos.length ? `\n📷 ${photos.length} photo${photos.length > 1 ? "s" : ""}` : ""));
   renderShots(); $("say").value = ""; fit();
-  const wait = bubble("tutor thinking", "Hoot is thinking…");
+  const wait = bubble("tutor thinking", N() === "Hoot" ? "Hoot is thinking…" : "Thinking…");
   try {
     const images = await Promise.all(photos.map(async p => ({ type: "image/jpeg", data: await b64(p.blob) })));
     const d = await Maker.post("/api/study", {
-      kind: "tutor", course: cur.c.id, unit: cur.unit, mode: cur.mode, help: settings.help, state: settings.state,
+      kind: "tutor", course: cur.c.id, unit: cur.unit, mode: cur.mode, help: settings.help, state: settings.state, look: lookNow(),
       messages: list.map(m => ({ role: m.role, text: m.text })), images,
     });
     list.push({ role: "tutor", text: d.say });
@@ -450,7 +491,7 @@ $("repGo").onclick = async () => {
     const images = await Promise.all(imgs.slice(0, 3).map(async s => ({ type: "image/jpeg", data: await b64(s.blob) })));
     const d = await Maker.post("/api/study", { kind: "weakspots", course: cur.c.id, state: settings.state, images, text });
     markWeak(d.weak, d.strong); rep.clear();
-    showWeak(d.weak, d.summary + (imgs.length > 3 ? " (Hoot read the first 3 pages.)" : ""));
+    showWeak(d.weak, d.summary + (imgs.length > 3 ? ` (${N()} read the first 3 pages.)` : ""));
     Maker.status($("weakStatus"), "");
   } catch (e) { Maker.status($("weakStatus"), Maker.errText(e), "err"); }
   finally { $("repGo").disabled = false; }
@@ -476,7 +517,7 @@ function renderSettings() {
   const box = $("helpOpts"); box.replaceChildren();
   for (const [id, name, desc] of HELP_OPTS) {
     const b = el("button", "choice" + (settings.help === id ? " right" : ""));
-    const t = el("span"); t.append(el("strong", null, name), el("br"), el("span", "small muted", desc));
+    const t = el("span"); t.append(el("strong", null, name), el("br"), el("span", "small muted", desc.replace(/Hoot/g, N())));
     b.append(el("b", null, settings.help === id ? "✓" : ""), t);
     b.onclick = () => { settings.help = id; save(SETTINGS, settings); renderSettings(); };
     box.append(b);
