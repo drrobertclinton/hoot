@@ -23,7 +23,7 @@ const FILES = {
 };
 const MAX_BODY = 12 * 1024 * 1024;
 // Pages on these sites (for example the tutor on vilasi.co) may call the API from the browser.
-const ALLOWED = ["https://vilasi.co", "https://www.vilasi.co"];
+const ALLOWED = ["https://vilasi.co", "https://www.vilasi.co", "capacitor://localhost", "ionic://localhost", "https://localhost", "http://localhost"];
 let cors = {};
 const json = (status, body) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", ...cors } });
 
