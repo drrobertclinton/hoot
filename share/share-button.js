@@ -41,7 +41,7 @@
     b.id = 'vilasi-share'; b.type = 'button';
     b.setAttribute('aria-label', 'Share ' + title() + ' with a friend');
     b.innerHTML = '<span aria-hidden="true" style="font-size:17px;line-height:1">\uD83D\uDCAC</span><span>Share</span>';
-    b.style.cssText = 'position:fixed;' + v + ';' + h + ';z-index:2147483000;display:flex;align-items:center;gap:6px;padding:10px 15px;border:0;border-radius:999px;background:' + (d.bg || '#2459d6') + ';color:' + (d.fg || '#fff') + ';font:700 15px/1 system-ui,-apple-system,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.28);cursor:pointer;-webkit-tap-highlight-color:transparent;opacity:.95';
+    b.style.cssText = 'position:fixed;' + v + ';' + h + ';z-index:' + (d.z || 45) + ';display:flex;align-items:center;gap:6px;padding:10px 15px;border:0;border-radius:999px;background:' + (d.bg || '#2459d6') + ';color:' + (d.fg || '#fff') + ';font:700 15px/1 system-ui,-apple-system,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.28);cursor:pointer;-webkit-tap-highlight-color:transparent;opacity:.95';
     b.onclick = share;
     // Sit above any bottom tab bar the app already has.
     function lift() {
@@ -61,7 +61,7 @@
       if (lifted > window.innerHeight / 3) lifted = 0;
       b.style.bottom = 'calc(' + (16 + Math.round(lifted)) + 'px + ' + (lifted ? '0px' : 'env(safe-area-inset-bottom)') + ')';
     }
-    setTimeout(lift, 300); setTimeout(lift, 1500); window.addEventListener('resize', lift);
+    [300, 1500, 3000, 6000, 10000].forEach(function (t) { setTimeout(lift, t); }); window.addEventListener('hashchange', function () { setTimeout(lift, 300); }); window.addEventListener('resize', lift);
     var st = document.createElement('style'); st.textContent = '@media print{#vilasi-share{display:none!important}}';
     document.head.appendChild(st); document.body.appendChild(b);
   }
