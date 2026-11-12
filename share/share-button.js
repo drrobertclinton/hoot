@@ -1,4 +1,4 @@
-/* Vilasi "Share with a friend" button.
+/* Vilasi "Share with a friend" button (ASCII only, so any page charset works).
    Home-screen and store apps have no browser Share button, so every app gets its own.
    Use: <script src="https://vilasi.co/js/share-button.js" defer
           data-title="App name" data-text="One line about it"
@@ -40,9 +40,28 @@
     var b = document.createElement('button');
     b.id = 'vilasi-share'; b.type = 'button';
     b.setAttribute('aria-label', 'Share ' + title() + ' with a friend');
-    b.innerHTML = '<span aria-hidden="true" style="font-size:17px;line-height:1">💬</span><span>Share</span>';
+    b.innerHTML = '<span aria-hidden="true" style="font-size:17px;line-height:1">\uD83D\uDCAC</span><span>Share</span>';
     b.style.cssText = 'position:fixed;' + v + ';' + h + ';z-index:2147483000;display:flex;align-items:center;gap:6px;padding:10px 15px;border:0;border-radius:999px;background:' + (d.bg || '#2459d6') + ';color:' + (d.fg || '#fff') + ';font:700 15px/1 system-ui,-apple-system,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.28);cursor:pointer;-webkit-tap-highlight-color:transparent;opacity:.95';
     b.onclick = share;
+    // Sit above any bottom tab bar the app already has.
+    function lift() {
+      if (v.indexOf('bottom') !== 0) return;
+      var lifted = 0, x = window.innerWidth - 30, y = window.innerHeight - 3;
+      b.style.visibility = 'hidden';
+      var els = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [];
+      b.style.visibility = '';
+      for (var i = 0; i < els.length; i++) {
+        var el = els[i], cs;
+        while (el && el !== document.body && el !== document.documentElement) {
+          cs = getComputedStyle(el);
+          if (cs.position === 'fixed' || cs.position === 'sticky') { lifted = Math.max(lifted, el.getBoundingClientRect().height); break; }
+          el = el.parentElement;
+        }
+      }
+      if (lifted > window.innerHeight / 3) lifted = 0;
+      b.style.bottom = 'calc(' + (16 + Math.round(lifted)) + 'px + ' + (lifted ? '0px' : 'env(safe-area-inset-bottom)') + ')';
+    }
+    setTimeout(lift, 300); setTimeout(lift, 1500); window.addEventListener('resize', lift);
     var st = document.createElement('style'); st.textContent = '@media print{#vilasi-share{display:none!important}}';
     document.head.appendChild(st); document.body.appendChild(b);
   }
