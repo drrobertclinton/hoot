@@ -241,7 +241,7 @@ export function DeviceScreen() {
               <Button label="Disconnect" kind="ghost" compact onPress={disconnect} testID="dev-disconnect" />
             </>
           ) : v.status === 'not_connected' ? (
-            <Button label={`Connect ${info.name.split(' ')[0]}`} icon="link" compact loading={busy} onPress={connect} testID="dev-connect" />
+            <Button label={`Connect ${info.kind === 'platform' ? info.name : info.name.split(' ')[0]}`} icon="link" compact loading={busy} onPress={connect} testID="dev-connect" />
           ) : null}
         </View>
         {msg ? (
@@ -329,7 +329,7 @@ function HookupCard({ h, phone, open, onToggle }: { h: Hookup; phone: Phone; ope
         <View testID={`hookup-steps-${h.id}`}>
           {steps.length ? <Steps items={last ? [...steps, last] : steps} /> : null}
           {h.note ? <Note text={h.note} tone={steps.length ? 'info' : 'warn'} /> : null}
-          <T variant="caption" style={{ marginTop: 8 }}>{`Brings in: ${h.brings}.`}</T>
+          <T variant="caption" style={{ marginTop: 8, alignSelf: 'stretch', flexShrink: 1 }}>{`Brings in: ${h.brings}.`}</T>
           {steps.length ? (
             <Button
               label={strap ? 'Open live heart rate' : h.group === 'glucose' ? 'Connect, then see glucose' : phone === 'ios' ? 'Open Apple Health connection' : 'Open Health Connect connection'}

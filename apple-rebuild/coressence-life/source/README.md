@@ -171,3 +171,8 @@ Source code, design and content belong to Vilasi, Inc. (see LICENSE). Open-sourc
 3. Vilasi Pass: should it unlock Coressence+ All-Access? Not wired in yet.
 4. MD and Labs: name of the clinical partner, states served and booking link (the screens say "coming soon").
 5. Release switch: set `DEMO_TOOLS = false` before the public store build.
+
+## Building the iPhone archive locally (Xcode)
+
+- `plugins/withCoressenceIos.js` pins the ExpoModules pods to Swift 5 so Xcode 26 builds them; it is applied by `expo prebuild`, so do not hand-edit the Podfile.
+- Archive with signing ON (automatic signing, team 5RB2L97RDC). Archiving with `CODE_SIGNING_ALLOWED=NO` drops the HealthKit entitlement from the exported IPA and Apple Health then fails silently on real phones. Before uploading, confirm with `codesign -d --entitlements - <App>.app` that `com.apple.developer.healthkit` is present.

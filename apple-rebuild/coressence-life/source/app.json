@@ -130,6 +130,7 @@
     },
     "plugins": [
       "expo-router",
+      "./plugins/withCoressenceIos",
       [
         "expo-splash-screen",
         {
