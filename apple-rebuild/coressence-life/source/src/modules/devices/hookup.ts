@@ -1,6 +1,6 @@
 // Step-by-step hookup for each brand through Apple Health (iPhone) or Health Connect (Android). Pure data.
 // Menu names are each brand's own and can shift a little between app versions, so every guide says what to look for.
-export type HookupGroup = 'watch' | 'ring' | 'glucose' | 'heart' | 'scale' | 'sleep' | 'apps';
+export type HookupGroup = 'watch' | 'ring' | 'glucose' | 'heart' | 'oxygen' | 'scale' | 'sleep' | 'apps';
 export type Hookup = {
   id: string;
   name: string;
@@ -20,7 +20,8 @@ export const GROUPS: { key: HookupGroup; label: string; icon: string }[] = [
   { key: 'watch', label: 'Watches and bands', icon: 'watch' },
   { key: 'ring', label: 'Rings', icon: 'circle' },
   { key: 'glucose', label: 'Glucose sensors and meters', icon: 'droplet' },
-  { key: 'heart', label: 'Heart: straps and blood pressure cuffs', icon: 'heart' },
+  { key: 'heart', label: 'Heart: straps, ECG and blood pressure cuffs', icon: 'heart' },
+  { key: 'oxygen', label: 'Blood oxygen', icon: 'wind' },
   { key: 'scale', label: 'Scales and body composition', icon: 'bar-chart-2' },
   { key: 'sleep', label: 'Sleep', icon: 'moon' },
   { key: 'apps', label: 'Fitness and food apps', icon: 'smartphone' },
@@ -54,11 +55,23 @@ export const HOOKUPS: Hookup[] = [
   { id: 'withings-bp', name: 'Withings blood pressure', group: 'heart', devices: 'BPM Connect, BPM Vision, BPM Core', ios: ['Open the Withings app and go to Profile.', 'Choose Apple Health and turn on the categories.'], android: HC('the Withings app', 'Profile'), brings: 'Blood pressure and pulse' },
   { id: 'qardio', name: 'Qardio', group: 'heart', devices: 'QardioArm cuff and QardioBase scale', ios: ['Open the Qardio app and open the menu.', 'Go to Settings and turn on Apple Health.'], android: HC('the Qardio app', 'the menu, Settings'), brings: 'Blood pressure, pulse and weight' },
 
+  { id: 'apple-ecg', name: 'Apple Watch ECG and rhythm notices', group: 'heart', devices: 'Apple Watch Series 4 and later', ios: ['Record an ECG with the ECG app on your watch; results save to Apple Health on their own.', 'Irregular rhythm and high or low heart rate notifications are turned on in the Watch app, under Heart.'], android: [], brings: 'ECG results as Apple reports them, rhythm notifications, heart rate and HRV', note: 'Coressence shows these records as reported. It does not read or interpret the tracing.' },
+  { id: 'kardia', name: 'KardiaMobile', group: 'heart', devices: 'KardiaMobile, KardiaMobile 6L and Kardia Card by AliveCor', ios: ['Open the Kardia app and go to Profile (or Settings).', 'Find Health app integration and turn it on.'], android: HC('the Kardia app', 'Profile'), brings: 'Heart rate from each recording, and blood pressure or weight if you log them there', note: 'The ECG tracing and Kardia’s rhythm result stay in the Kardia app; share those with your clinician from there.' },
+  { id: 'withings-ecg', name: 'Withings ScanWatch and BPM Core', group: 'heart', devices: 'ScanWatch, ScanWatch 2, ScanWatch Nova, BPM Core', ios: ['Open the Withings app and go to Profile.', 'Choose Apple Health and turn on the categories.'], android: HC('the Withings app', 'Profile'), brings: 'Heart rate, blood oxygen, sleep, blood pressure and steps', note: 'ECG recordings stay in the Withings app.' },
+  { id: 'ihealth-bp', name: 'iHealth blood pressure', group: 'heart', devices: 'iHealth Track, Neo, Clear and other iHealth cuffs', ios: ['Open iHealth MyVitals and go to Settings.', 'Choose Apple Health and turn on blood pressure.'], android: HC('iHealth MyVitals', 'Settings'), brings: 'Blood pressure and pulse' },
+
+  { id: 'oximeter-wellue', name: 'Wellue and Viatom oximeters', group: 'oxygen', devices: 'O2Ring, SleepU, Checkme and fingertip oximeters that use the ViHealth app', ios: ['Open ViHealth and go to Settings.', 'Turn on Apple Health and allow blood oxygen and heart rate.'], android: HC('ViHealth', 'Settings'), brings: 'Blood oxygen and pulse, including overnight recordings' },
+  { id: 'oximeter-masimo', name: 'Masimo', group: 'oxygen', devices: 'MightySat fingertip oximeter', ios: ['Open the Masimo Personal Health app and go to Settings.', 'Turn on Apple Health sharing.'], android: HC('the Masimo Personal Health app', 'Settings'), brings: 'Blood oxygen, pulse and breathing rate' },
+  { id: 'oximeter-ihealth', name: 'iHealth oximeter', group: 'oxygen', devices: 'iHealth Air fingertip oximeter', ios: ['Open iHealth MyVitals and go to Settings.', 'Choose Apple Health and turn on blood oxygen.'], android: HC('iHealth MyVitals', 'Settings'), brings: 'Blood oxygen and pulse' },
+  { id: 'oximeter-watch', name: 'From a watch or ring', group: 'oxygen', devices: 'Apple Watch, Garmin, Oura, WHOOP, Withings and others that measure blood oxygen', ios: ['Connect the watch or ring using its own steps in this guide; blood oxygen comes with it.'], android: ['Connect the watch or ring using its own steps in this guide; blood oxygen comes with it.'], brings: 'Overnight blood oxygen', note: 'Blood oxygen from a watch or ring is a wellness estimate, not a medical reading.' },
+
   { id: 'withings', name: 'Withings scales', group: 'scale', devices: 'Body Smart, Body Scan, Body Comp, Body+', ios: ['Open the Withings app and go to Profile.', 'Choose Apple Health and turn on the categories.'], android: HC('the Withings app', 'Profile'), brings: 'Weight, body fat and lean mass' },
   { id: 'renpho', name: 'Renpho and Eufy scales', group: 'scale', devices: 'Renpho, Eufy and most Bluetooth smart scales', ios: ['Open the scale’s app and go to its settings or account screen.', 'Find Apple Health (sometimes under Third-party apps) and turn it on.'], android: HC('the scale’s app', 'its settings'), brings: 'Weight and body fat' },
 
   { id: 'eight', name: 'Eight Sleep', group: 'sleep', devices: 'Pod covers and mattresses', ios: ['Open Eight Sleep and go to Profile, then Settings.', 'Choose Apple Health and turn on sharing.'], android: HC('Eight Sleep', 'Profile, Settings'), brings: 'Sleep, heart rate, HRV and breathing rate' },
   { id: 'withings-sleep', name: 'Withings Sleep Analyzer', group: 'sleep', devices: 'Under-mattress sleep sensor', ios: ['Open the Withings app and go to Profile.', 'Choose Apple Health and turn on Sleep.'], android: HC('the Withings app', 'Profile'), brings: 'Sleep and overnight heart rate' },
+
+  { id: 'cpap', name: 'CPAP machines', group: 'sleep', devices: 'ResMed AirSense and AirMini, Philips DreamStation and others', ios: [], android: [], brings: 'Nothing from the machine yet', note: 'ResMed myAir and Philips DreamMapper do not share therapy data with Apple Health or Health Connect today. Wear a watch or ring with your CPAP and Coressence shows your sleep, overnight blood oxygen and breathing rate, which is where good therapy shows up.' },
 
   { id: 'peloton', name: 'Peloton', group: 'apps', devices: 'Bike, Tread, Row and the Peloton app', ios: ['Open Peloton and go to your profile, then Settings.', 'Open Add-ons (or Health app) and connect Apple Health.'], android: HC('Peloton', 'profile, Settings'), brings: 'Workouts with heart rate and energy' },
   { id: 'strava', name: 'Strava', group: 'apps', devices: 'Runs, rides and other recorded activities', ios: ['Open Strava and go to You, then the settings gear.', 'Choose Applications, Services and Devices, then Health, and connect.'], android: HC('Strava', 'You, Settings, Applications'), brings: 'Workouts' },
@@ -72,7 +85,7 @@ export const stepsFor = (h: Hookup, phone: Phone) => (phone === 'ios' ? h.ios : 
 
 /** The last step is always the same: let Coressence read what the brand's app now shares. */
 export function finalStep(h: Hookup, phone: Phone): string | null {
-  if (h.id === 'strap' || !stepsFor(h, phone).length) return null;
+  if (h.id === 'strap' || h.id === 'oximeter-watch' || !stepsFor(h, phone).length) return null;
   return phone === 'ios' ? 'Back in Coressence, open Connected devices, tap Apple Health and choose Connect. Allow the items when iPhone asks.' : 'Back in Coressence, open Connected devices, tap Health Connect and choose Connect. Allow the items when Android asks.';
 }
 

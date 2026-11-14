@@ -2,7 +2,7 @@
 // records from connected devices, each in plain language with the person's own trend. Nothing here diagnoses.
 import { Feather } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { Bars, Hypnogram, LineChart, MultiLine, Tide, Spark, StackedBars } from '@core/charts';
 import { RangePicker, type Range } from '@core/gate';
@@ -14,7 +14,7 @@ import { useSlices } from '../life/state';
 import { snapshot } from '../life/today';
 import { readinessWords } from '../recover/model';
 import { baseline, dayMetrics, eventsOf, kgToLb, metricSeries } from '../measure/model';
-import { useMeasure } from '../measure/state';
+import { syncNow, useMeasure } from '../measure/state';
 import { useMove } from '../move/state';
 import { logMeal, useFuel } from '../fuel/state';
 import { voiceAdvice } from '../rehearse/model';
@@ -477,6 +477,15 @@ function GlucoseDetail() {
   const stats = glucoseStats(ev.glucose, now - 14 * 86400_000, now, t);
   const daily = glucoseDaily(ev.glucose, 14, t);
   const latest = ev.glucose[ev.glucose.length - 1];
+  const demo = useSettings((x) => x.demo);
+  // While this screen is open, fetch new readings as soon as the sensor's app has shared them.
+  useEffect(() => {
+    if (demo) return;
+    void syncNow();
+    const id = setInterval(() => void syncNow(), 5 * 60_000);
+    return () => clearInterval(id);
+  }, [demo]);
+  const age = latest ? Math.max(0, Math.round((now - latest.t) / 60_000)) : null;
   const fuel = useFuel();
   const since = now - 14 * 86400_000;
   const meals = mealResponses(ev.glucose, fuel.meals, ev.workouts, now).filter((r) => r.t >= since);
@@ -500,7 +509,7 @@ function GlucoseDetail() {
           <T variant="caption">mg/dL</T>
         </View>
         <LineChart data={day.map((r) => ({ label: hourShort(r.t), value: r.mgdl }))} color={color} band={[t.glucoseLow, t.glucoseHigh]} testID="glucose-chart" />
-        <T variant="caption">{latest ? `Latest ${latest.mgdl} mg/dL at ${clockOf(latest.t)} · ${brandName(latest.origin)}. The shaded band is your range.` : 'No readings yet.'}</T>
+        <T variant="caption">{latest ? `Latest ${latest.mgdl} mg/dL at ${clockOf(latest.t)} (${age! < 60 ? `${age} min ago` : `${Math.round(age! / 60)} h ago`}) · ${brandName(latest.origin)}. New readings appear here as soon as your sensor’s app shares them; this screen checks every five minutes while it is open.` : 'No readings yet.'}</T>
       </Card>
       {stats ? (
         <>

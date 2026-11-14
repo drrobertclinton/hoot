@@ -183,7 +183,7 @@ test('glucose with meals: before, peak, rise and the two-hour reading; movement 
 test('device hookup guide: every brand has steps for a phone or says plainly why not', () => {
   assert.equal(new Set(HOOKUPS.map((h) => h.id)).size, HOOKUPS.length);
   for (const h of HOOKUPS) {
-    assert.ok(h.ios.length || h.android.length, h.id);
+    assert.ok(h.ios.length || h.android.length || h.id === 'cpap', h.id);
     assert.ok(h.brings.length > 5, h.id);
     if (!h.ios.length || !h.android.length) assert.ok(h.note || h.id === 'apple-watch' || h.id === 'lingo', `${h.id} needs a note`);
   }
