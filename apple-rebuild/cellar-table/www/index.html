@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#150d08">
+<title>Cellar &amp; Table</title>
+<link rel="icon" href="icon.svg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main id="home">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="6" fill="#6e1629" stroke="#f0b95a" stroke-width="1.2"/><g fill="#150d08"><circle cx="10" cy="10" r="4"/><circle cx="22" cy="10" r="4"/><circle cx="10" cy="22" r="4"/><circle cx="22" cy="22" r="4"/></g><circle cx="10" cy="10" r="2.6" fill="#f0b95a"/><circle cx="22" cy="22" r="2.6" fill="#e6d27a"/><circle cx="22" cy="10" r="2.6" fill="#a3243b"/></svg>
+      <h1>Cellar <em>&amp;</em> Table</h1>
+      <button class="iconbtn" data-act="addBottle" aria-label="Add a bottle"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg></button>
+    </div>
+    <div class="searchbar">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M15 15l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      <input id="q" type="search" placeholder="Search name, grape, region, vintage" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" aria-label="Search your cellar">
+      <button class="clearq" data-act="clearSearch" aria-label="Clear search">&times;</button>
+    </div>
+    <div id="results" class="results"></div>
+    <nav id="rackTabs" class="racktabs" aria-label="Racks"></nav>
+  </header>
+  <section id="rackArea" aria-label="Wine rack"></section>
+</main>
+
+<div id="drawerScrim" data-act="drawerClose"></div>
+<aside id="drawer" aria-label="Cellar tools">
+  <div id="drawerHandle" role="button" tabindex="0" aria-label="Open cellar tools">
+    <span class="grab"></span>
+    <div class="dh-row"><span class="sc">Cellar Tools</span><span id="drawerSum" class="dh-sum"></span></div>
+  </div>
+  <div id="drawerBody"></div>
+</aside>
+
+<section id="page" aria-hidden="true">
+  <header class="pg-head">
+    <button class="back" data-act="pageClose"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="sc">Rack</span></button>
+    <h2 id="pgTitle"></h2>
+    <span id="pgExtra"></span>
+  </header>
+  <div id="pgBody"></div>
+</section>
+
+<div id="sheetScrim" data-act="sheetClose"></div>
+<section id="sheet" role="dialog" aria-modal="true"><div id="sheetBody"></div></section>
+
+<div id="dialog"><div class="dlg"><h3 id="dlgT"></h3><p id="dlgM"></p><div class="dlg-btns"><button class="btn ghost" data-act="dlgCancel">Cancel</button><button class="btn burg" id="dlgOk" data-act="dlgOk">OK</button></div></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="gate"></div>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
