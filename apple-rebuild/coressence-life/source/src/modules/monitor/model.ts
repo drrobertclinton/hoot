@@ -1,7 +1,7 @@
 // Monitor: plain-language views of what connected devices report (pure; unit-tested). Nothing here diagnoses.
 // Numbers are compared with the person's own history or with targets their clinician gave them, and when a
 // pattern is worth a professional look the note says so in the app's usual words.
-import { addDays, dayKey, hm, lastDays, parseDay } from '@core/dates';
+import { addDays, dayKey, fmtHm, hm, lastDays, parseDay } from '@core/dates';
 import { clamp, mean, stdev } from '@core/stats';
 import type { BpReading, CycleEntry, DeviceWorkout, EcgClass, EcgRecord, GlucoseReading, RhythmEvent } from '../devices/schema';
 import { sessionLoad } from '../devices/zones';
@@ -20,7 +20,7 @@ export type Targets = {
   glucoseHigh: number;
   glucoseSetBy?: string;
 };
-export type MonitorSlice = { targets: Targets; cycleOn: boolean };
+export type MonitorSlice = { targets: Targets; cycleOn: boolean; /** Glucose rises the person said were not meals (start times). */ notMeals?: number[] };
 export const KEY = 'monitor';
 export const EMPTY: MonitorSlice = { targets: { glucoseLow: 70, glucoseHigh: 180 }, cycleOn: false };
 
@@ -134,6 +134,33 @@ export function glucoseInsights(stats: ReturnType<typeof glucoseStats>, t: Targe
   return out;
 }
 
+/** Standard glucose sensor report levels: under 54 is a very low reading, over 250 a very high one. */
+export const VERY_LOW = 54;
+export const VERY_HIGH = 250;
+
+/**
+ * Warnings for low and very high readings in the last 24 hours, shown when the app is opened. They look back at what
+ * the sensor already recorded (readings can reach the phone hours late), so they are a prompt to review, never a live alarm.
+ */
+export function glucoseWarnings(readings: GlucoseReading[], t: Pick<Targets, 'glucoseLow' | 'glucoseHigh'>, now = Date.now(), clock: (ts: number) => string = (ts) => new Date(ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })): Insight[] {
+  const xs = readings.filter((r) => r.t >= now - 86400_000 && r.t <= now);
+  if (!xs.length) return [];
+  const out: Insight[] = [];
+  const n = (k: number) => `${k} reading${k === 1 ? '' : 's'}`;
+  const lowest = xs.reduce((a, r) => (r.mgdl < a.mgdl ? r : a));
+  const highest = xs.reduce((a, r) => (r.mgdl > a.mgdl ? r : a));
+  const veryLow = xs.filter((r) => r.mgdl < VERY_LOW).length;
+  const low = xs.filter((r) => r.mgdl < t.glucoseLow).length;
+  const veryHigh = xs.filter((r) => r.mgdl > VERY_HIGH).length;
+  if (veryLow)
+    out.push({ tone: 'danger', text: `Very low: ${n(veryLow)} under ${VERY_LOW} mg/dL in the last 24 hours (lowest ${lowest.mgdl} at ${clock(lowest.t)}). If you feel shaky, sweaty, confused or faint now, treat it as your clinician has told you and get help; call 911 if someone cannot be woken or cannot swallow. Tell your clinician about readings this low.` });
+  else if (low) out.push({ tone: 'warn', text: `Low: ${n(low)} under ${t.glucoseLow} mg/dL in the last 24 hours (lowest ${lowest.mgdl} at ${clock(lowest.t)}). Sensors can read low when you lie on them. If you had symptoms, or lows keep happening, talk with your clinician.` });
+  if (veryHigh)
+    out.push({ tone: 'danger', text: `Very high: ${n(veryHigh)} over ${VERY_HIGH} mg/dL in the last 24 hours (highest ${highest.mgdl} at ${clock(highest.t)}). If you have diabetes, follow your clinician’s plan for high readings. With vomiting, deep or fast breathing, severe thirst or confusion, get urgent care. If you have not been told you have diabetes, tell a clinician about readings this high.` });
+  if (out.length) out.push({ tone: 'info', text: 'Coressence shows these after the fact, because sensor readings can reach your phone hours late. For alarms as they happen, keep alerts turned on in your sensor’s own app.' });
+  return out;
+}
+
 // ------------------------------------------------------------------ glucose with meals and workouts (display only)
 const MIN = 60_000;
 const between = (rs: GlucoseReading[], from: number, to: number) => rs.filter((r) => r.t >= from && r.t <= to);
@@ -192,6 +219,62 @@ export function mealResponses(readings: GlucoseReading[], meals: Meal[], workout
     });
   }
   return out.sort((a, b) => b.t - a.t);
+}
+
+/** Breakfast, lunch, dinner or snack, guessed from the clock. */
+export function mealKindAt(t: number): MealKind {
+  const d = new Date(t);
+  const h = d.getHours() + d.getMinutes() / 60;
+  return h >= 5 && h < 10.5 ? 'breakfast' : h >= 11 && h < 15 ? 'lunch' : h >= 17 && h < 21.5 ? 'dinner' : 'snack';
+}
+
+/** A meal entry for a moment in time (the one-tap "I'm eating now" mark, or a rise the person confirmed). */
+export function mealAt(t: number, note?: string): Omit<Meal, 'id'> {
+  const d = new Date(t);
+  return { date: dayKey(t), time: fmtHm(d.getHours() * 60 + d.getMinutes()), kind: mealKindAt(t), tags: [], note };
+}
+
+/**
+ * Rises that look like a meal nobody marked: glucose climbs 30 mg/dL or more within 90 minutes, with no logged
+ * meal from an hour before the climb to half an hour after it began. The start of the climb stands in for the meal time.
+ * These are suggestions for the person to confirm or dismiss; stress, a hard workout or a sensor change can do the same.
+ */
+export function spottedMeals(readings: GlucoseReading[], meals: Meal[], opts: { since: number; now?: number; ignore?: number[]; minRise?: number } = { since: 0 }): MealResponse[] {
+  const now = opts.now ?? Date.now();
+  const minRise = opts.minRise ?? 30;
+  const rs = readings.filter((r) => r.t >= opts.since - 90 * MIN && r.t <= now).sort((a, b) => a.t - b.t);
+  const logged = meals.map(mealTime);
+  const guesses: Meal[] = [];
+  let skipUntil = 0;
+  for (const peak of rs) {
+    if (peak.t < skipUntil || peak.t < opts.since) continue;
+    const lead = between(rs, peak.t - 90 * MIN, peak.t);
+    const around = between(rs, peak.t - 90 * MIN, peak.t + 45 * MIN);
+    if (lead.length < 3 || around.some((r) => r.mgdl > peak.mgdl || (r.mgdl === peak.mgdl && r.t < peak.t))) continue;
+    const floor = Math.min(...lead.map((r) => r.mgdl));
+    if (peak.mgdl - floor < minRise) continue;
+    const start = [...lead].reverse().find((r) => r.mgdl <= floor + 5)!.t;
+    skipUntil = peak.t + 45 * MIN;
+    if (logged.some((t) => t >= start - 60 * MIN && t <= start + 30 * MIN)) continue;
+    if ((opts.ignore || []).some((t) => Math.abs(t - start) <= 20 * MIN)) continue;
+    guesses.push({ id: `spot-${start}`, ...mealAt(start) });
+  }
+  return mealResponses(rs, guesses, [], now).filter((r) => r.rise >= minRise);
+}
+
+/** Averages across meals: before eating, the peak, and two hours after. */
+export function mealAverages(rs: MealResponse[]) {
+  if (!rs.length) return null;
+  const two = rs.filter((r) => r.at2h !== null);
+  return {
+    n: rs.length,
+    before: Math.round(mean(rs.map((r) => r.before))!),
+    peak: Math.round(mean(rs.map((r) => r.peak))!),
+    at2h: two.length ? Math.round(mean(two.map((r) => r.at2h!))!) : null,
+    n2h: two.length,
+    /** Meals where the two-hour reading was back within 20 mg/dL of the pre-meal number. */
+    settled: two.filter((r) => r.at2h! - r.before <= 20).length,
+  };
 }
 
 export type WorkoutResponse = { id: string; t: number; label: string; minutes: number; before: number; lowest: number; after: number | null; change: number | null; /** A meal logged from 30 minutes before to an hour after: its rise would mask the workout's effect. */ mealNearby: boolean };

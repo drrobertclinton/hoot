@@ -10,3 +10,6 @@ export function saveTargets(patch: Partial<Targets>) {
 export function setCycleOn(on: boolean) {
   up((s) => ({ ...s, cycleOn: on }));
 }
+export function dismissSpike(t: number) {
+  up((s) => ({ ...s, notMeals: [...(s.notMeals || []).slice(-199), t] }));
+}

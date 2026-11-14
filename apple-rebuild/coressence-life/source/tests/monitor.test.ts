@@ -196,3 +196,57 @@ test('device hookup guide: every brand has steps for a phone or says plainly why
   assert.ok(searchHookups('glucose').length >= 3);
   for (const id of ['dexcom', 'stelo', 'libre', 'lingo', 'meter']) assert.equal(HOOKUPS.find((h) => h.id === id)!.group, 'glucose');
 });
+
+import { mealAt, mealAverages, mealKindAt, spottedMeals } from '../src/modules/monitor/model';
+
+test('glucose: unmarked rises are offered as possible meals; marked or dismissed ones are not; averages before and at two hours', () => {
+  const day = lastDays(1, '2026-06-20')[0];
+  const at = (hhmm: string) => mealTime({ date: day, time: hhmm });
+  const g: GlucoseReading[] = [];
+  const bumps = [at('07:30'), at('12:30'), at('19:00')];
+  for (let t = at('05:00'); t <= at('23:00'); t += 15 * 60_000) {
+    let v = 90;
+    for (const b of bumps) {
+      const min = (t - b) / 60_000;
+      if (min > 0 && min <= 135) v += min <= 45 ? (50 * min) / 45 : Math.max(0, 50 * (1 - (min - 45) / 90));
+    }
+    g.push({ t, mgdl: Math.round(v), origin: 'dexcom', path: 'healthkit' });
+  }
+  const now = at('23:30');
+  const lunch: Meal = { id: 'l', date: day, time: '12:25', kind: 'lunch', tags: [] };
+  const spots = spottedMeals(g, [lunch], { since: at('05:00'), now });
+  assert.deepEqual(spots.map((s) => s.kind).sort(), ['breakfast', 'dinner']);
+  const dinner = spots.find((s) => s.kind === 'dinner')!;
+  assert.ok(Math.abs(dinner.t - at('19:00')) <= 15 * 60_000);
+  assert.equal(dinner.before, 90);
+  assert.equal(dinner.peak, 140);
+  assert.ok(dinner.at2h !== null && dinner.at2h <= 100);
+  assert.equal(spottedMeals(g, [lunch], { since: at('05:00'), now, ignore: [dinner.t] }).length, 1);
+  assert.equal(spottedMeals(g, [lunch, { id: 'd', ...mealAt(dinner.t) }, { id: 'b', date: day, time: '07:20', kind: 'breakfast', tags: [] }], { since: at('05:00'), now }).length, 0);
+  assert.equal(spottedMeals(g.map((r) => ({ ...r, mgdl: 90 + (r.mgdl - 90) / 3 })), [], { since: at('05:00'), now }).length, 0);
+  assert.equal(mealKindAt(at('12:40')), 'lunch');
+  assert.equal(mealAt(at('19:05')).time, '19:05');
+  const avg = mealAverages(mealResponses(g, [lunch], [], now))!;
+  assert.equal(avg.before, 90);
+  assert.ok(avg.at2h !== null && avg.settled === 1);
+});
+
+import { glucoseWarnings } from '../src/modules/monitor/model';
+
+test('glucose warnings: low, very low and very high in the last 24 hours; quiet when in range; never a live alarm', () => {
+  const t = { glucoseLow: 70, glucoseHigh: 180 };
+  const mk = (vals: number[]): GlucoseReading[] => vals.map((mgdl, i) => ({ t: NOW - (i + 1) * 15 * 60_000, mgdl, origin: 'dexcom', path: 'healthkit' }));
+  const clock = () => '3:10 AM';
+  assert.deepEqual(glucoseWarnings(mk([95, 110, 140, 175]), t, NOW, clock), []);
+  const low = glucoseWarnings(mk([95, 66, 64, 120]), t, NOW, clock);
+  assert.equal(low[0].tone, 'warn');
+  assert.match(low[0].text, /^Low: 2 readings under 70 mg\/dL.*lowest 64 at 3:10 AM/);
+  const very = glucoseWarnings(mk([95, 50, 64, 262, 301]), t, NOW, clock);
+  assert.deepEqual(very.map((w) => w.tone), ['danger', 'danger', 'info']);
+  assert.match(very[0].text, /^Very low: 1 reading under 54/);
+  assert.match(very[1].text, /^Very high: 2 readings over 250.*highest 301/);
+  assert.match(very[2].text, /sensor’s own app/);
+  assert.doesNotMatch(very.map((w) => w.text).join(' '), /units of insulin|take \d+ grams/i);
+  // older than a day: nothing
+  assert.deepEqual(glucoseWarnings(mk([40]).map((r) => ({ ...r, t: NOW - 2 * 86400_000 })), t, NOW, clock), []);
+});

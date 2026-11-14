@@ -16,7 +16,7 @@ import { readinessWords } from '../recover/model';
 import { baseline, dayMetrics, eventsOf, kgToLb, metricSeries } from '../measure/model';
 import { useMeasure } from '../measure/state';
 import { useMove } from '../move/state';
-import { useFuel } from '../fuel/state';
+import { logMeal, useFuel } from '../fuel/state';
 import { voiceAdvice } from '../rehearse/model';
 import { useRehearse } from '../rehearse/state';
 import { ZONE_NAMES } from '../devices/zones';
@@ -36,9 +36,13 @@ import {
   glucoseInsights,
   glucoseLifeInsights,
   glucoseStats,
+  glucoseWarnings,
   loadBalance,
+  mealAt,
+  mealAverages,
   mealPatterns,
   mealResponses,
+  spottedMeals,
   workoutResponses,
   periods,
   rhythmHistory,
@@ -49,7 +53,7 @@ import {
   type Insight,
   type MonitorCard,
 } from './model';
-import { saveTargets, setCycleOn, useMonitor } from './state';
+import { dismissSpike, saveTargets, setCycleOn, useMonitor } from './state';
 
 export const MONITOR_COLOR = '#C2477A';
 const DISCLAIMER = 'Monitor shows what your devices report, compared with your own history or with targets your clinician gave you. It does not diagnose any condition. Readings from wearables are estimates; blood pressure comes from a cuff and glucose from a glucose sensor, never from the phone alone.';
@@ -107,7 +111,7 @@ export function MonitorScreen() {
   const cyc = cycleState(ev.cycle, today);
   const rh = rhythmHistory(ev.ecg, ev.rhythm);
   const w = bodyTrend(m, 'weightKg', 30, today);
-  const attention = [...bpInsights(bpR, mon.targets, now), ...rhythmInsights(ev.ecg, ev.rhythm, now), ...glucoseInsights(g, mon.targets), ...cycleInsights(cyc, m, today)].filter((i) => i.tone === 'warn' || i.tone === 'danger');
+  const attention = [...bpInsights(bpR, mon.targets, now), ...rhythmInsights(ev.ecg, ev.rhythm, now), ...glucoseWarnings(ev.glucose, mon.targets, now, clockOf), ...glucoseInsights(g, mon.targets), ...cycleInsights(cyc, m, today)].filter((i) => i.tone === 'warn' || i.tone === 'danger');
 
   const summary: Record<MonitorCard, { value: string; sub: string; spark?: (number | null)[] }> = {
     readiness: { value: snap.recover.score === null ? '–' : String(Math.round(snap.recover.score * 100)), sub: snap.recover.score === null ? 'Needs heart data or soreness' : readinessWords(snap.recover.score).split('.')[0], spark: lastDays(14, today).map((d) => snapshot(all, goals, d).recover.score) },
@@ -480,10 +484,16 @@ function GlucoseDetail() {
   const patterns = mealPatterns(meals);
   const pairs = [patterns.moved, patterns.protein, patterns.plants, patterns.packaged].filter((x): x is NonNullable<typeof x> => !!x);
   const [open, setOpen] = useState<string | null>(null);
+  const averages = mealAverages(meals);
+  const spotted = spottedMeals(ev.glucose, fuel.meals, { since, now, ignore: mon.notMeals }).slice(0, 5);
+  const [marked, setMarked] = useState<number | null>(null);
   const shown = meals.find((r) => r.id === open) ?? meals.find((r) => r.at2h !== null) ?? meals[0];
-  const mealAt = shown ? shown.curve.reduce((best, p, i) => (Math.abs(p.min) < Math.abs(shown.curve[best].min) ? i : best), 0) : 0;
+  const mealIdx = shown ? shown.curve.reduce((best, p, i) => (Math.abs(p.min) < Math.abs(shown.curve[best].min) ? i : best), 0) : 0;
   return (
     <Screen title="Glucose" subtitle="Readings from your glucose sensor, shown as reported" color={color} accentBar testID="mon-detail-glucose">
+      <View testID="glucose-warnings">
+        <Insights items={glucoseWarnings(ev.glucose, t, now, clockOf)} />
+      </View>
       <Card>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <T variant="heading">Last 24 hours</T>
@@ -511,6 +521,54 @@ function GlucoseDetail() {
         </>
       ) : null}
       <SectionTitle>With your meals</SectionTitle>
+      <Card testID="glucose-mark">
+        {averages ? (
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: 12, marginBottom: 12 }}>
+            <Stat label="Before meals" value={String(averages.before)} unit="mg/dL" sub={`average, ${averages.n} meals`} />
+            <Stat label="2 hours after" value={averages.at2h === null ? '–' : String(averages.at2h)} unit={averages.at2h === null ? undefined : 'mg/dL'} sub={averages.n2h ? `${averages.settled} of ${averages.n2h} back near the start` : 'not in yet'} color={color} />
+          </View>
+        ) : null}
+        <T variant="small" color={c.muted}>
+          Mark the moment you start eating. Coressence keeps your reading from just before and the one two hours after, side by side.
+        </T>
+        <Button
+          label={marked ? `Marked at ${clockOf(marked)}` : 'I’m eating now'}
+          icon={marked ? 'check' : 'clock'}
+          compact
+          disabled={!!marked}
+          style={{ marginTop: 12, alignSelf: 'flex-start' }}
+          onPress={() => {
+            const at = Date.now();
+            logMeal(mealAt(at));
+            setMarked(at);
+          }}
+          testID="glucose-eating-now"
+        />
+        {marked ? (
+          <T variant="caption" style={{ marginTop: 8 }}>
+            Your two-hour reading appears here once your sensor has shared it. Add what you ate in Fuel if you like.
+          </T>
+        ) : null}
+      </Card>
+      {spotted.length ? (
+        <Card style={{ marginTop: 10 }} testID="glucose-spotted">
+          <T variant="heading">Did you eat around these times?</T>
+          <T variant="small" color={c.muted}>
+            Your glucose rose here and no meal was marked. Confirm the ones that were meals and they join your list.
+          </T>
+          {spotted.map((r, i) => (
+            <View key={r.id} style={{ marginTop: 10 }}>
+              {i ? <Divider /> : null}
+              <T variant="body" style={{ marginTop: i ? 10 : 0 }}>{`${weekdayShort(dayKey(r.t))} ${clockOf(r.t)} · ${r.before} to ${r.peak} (+${r.rise})${r.at2h === null ? '' : ` · 2 h ${r.at2h}`}`}</T>
+              <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+                <Button label="Yes, a meal" icon="check" compact kind="secondary" onPress={() => logMeal(mealAt(r.t, 'Marked from a glucose rise'))} testID={`spot-yes-${i}`} />
+                <Button label="Not a meal" compact kind="ghost" onPress={() => dismissSpike(r.t)} testID={`spot-no-${i}`} />
+              </View>
+            </View>
+          ))}
+        </Card>
+      ) : null}
+      <View style={{ height: 10 }} />
       {shown ? (
         <>
           <Card testID="glucose-meal">
@@ -519,7 +577,7 @@ function GlucoseDetail() {
               <T variant="caption">mg/dL</T>
             </View>
             {shown.name ? <T variant="small" color={c.muted}>{shown.name}</T> : null}
-            <LineChart data={shown.curve.map((p, i) => ({ label: i === mealAt ? 'Meal' : i === 0 || i === shown.curve.length - 1 ? `${p.min > 0 ? '+' : ''}${p.min} min` : '', value: p.mgdl }))} color={color} band={[t.glucoseLow, t.glucoseHigh]} height={130} testID="glucose-meal-chart" />
+            <LineChart data={shown.curve.map((p, i) => ({ label: i === mealIdx ? 'Meal' : i === 0 || i === shown.curve.length - 1 ? `${p.min > 0 ? '+' : ''}${p.min} min` : '', value: p.mgdl }))} color={color} band={[t.glucoseLow, t.glucoseHigh]} height={130} testID="glucose-meal-chart" />
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: 12, marginTop: 6 }}>
               <Stat label="Before" value={String(shown.before)} unit="mg/dL" />
               <Stat label="Peak" value={String(shown.peak)} sub={`after ${shown.minutesToPeak} min`} />
@@ -534,7 +592,7 @@ function GlucoseDetail() {
               <React.Fragment key={r.id}>
                 {i ? <Divider /> : null}
                 <T variant="small" onPress={() => setOpen(r.id)} testID={`glucose-meal-${i}`} style={{ paddingVertical: 8 }} color={r.id === shown.id ? color : c.ink}>
-                  {`${weekdayShort(dayKey(r.t))} ${clockOf(r.t)} · ${r.kind} · ${r.before} to ${r.peak} (+${r.rise})${r.movedAfter ? ' · moved after' : ''}`}
+                  {`${weekdayShort(dayKey(r.t))} ${clockOf(r.t)} · ${r.kind} · before ${r.before} · peak ${r.peak} · 2 h ${r.at2h ?? '–'}${r.movedAfter ? ' · moved after' : ''}`}
                 </T>
               </React.Fragment>
             ))}
