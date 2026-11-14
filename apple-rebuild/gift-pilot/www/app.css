@@ -89,7 +89,7 @@ main::-webkit-scrollbar{display:none}
 .row .cd em{font:600 8.5px var(--mono);letter-spacing:.22em;color:#5f6c96;font-style:normal}
 .row .dest{min-width:0;display:flex;flex-direction:column;gap:5px}
 .row .dest .fl{font-size:12.5px}
-.row .dest .sub{font:600 10.5px var(--mono);letter-spacing:.06em;color:#aab6da;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .dest .sub{font:600 10px var(--mono);letter-spacing:.02em;color:#aab6da;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stc{justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
 .stc u{text-decoration:none;color:#0b0b0b;background:var(--amber);padding:2px 5px;border-radius:3px;font:800 8.5px var(--mono);letter-spacing:.1em;animation:blink 1.4s steps(2) infinite}
 @keyframes blink{50%{opacity:.35}}

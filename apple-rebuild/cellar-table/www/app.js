@@ -134,7 +134,14 @@
     }
     h += '</div></div></div><div class="rackinfo"><div class="count"><b>' + inRack + '</b> of ' + (k.rows * k.cols) + ' slots filled · <b>' + ready + '</b> ready to open</div><div class="legend">';
     Object.keys(TYPES).forEach(function (t) { if (typesSeen[t]) h += '<span>' + dot(t) + TYPES[t].label + '</span>'; });
-    h += '<span><span class="dot glow"></span>In its window</span></div><div class="hint">' + (inRack ? 'Tap a bottle to open its label. Press, hold and drag to move it.' : 'Tap any empty slot to lay down your first bottle.') + '</div></div>';
+    h += '<span><span class="dot glow"></span>In its window</span></div>';
+    /* Open first: the ready bottle in this rack whose window closes soonest. */
+    var firsts = S.bottles.filter(function (b) { return b.rackId === k.id && status(b) === 'open'; }).sort(function (a, b) { return win(a).to - win(b).to || (a.vintage || 9999) - (b.vintage || 9999); });
+    if (firsts.length && !ui.moving) {
+      var fb = firsts[0], left = win(fb).to - YEAR;
+      h += '<button class="openfirst" data-act="find" data-id="' + fb.id + '">' + capHtml(fb, 'open') + '<span class="of-t"><small>Open first</small><b>' + esc(fb.name) + ' ' + vint(fb) + '</b><em>' + (left <= 0 ? 'Last year of its window' : left === 1 ? 'One year left in its window' : left + ' years left in its window') + ' \u00b7 slot ' + slotName(fb.r, fb.c) + '</em></span><span class="of-go" aria-hidden="true">\u203a</span></button>';
+    }
+    h += '<div class="hint">' + (inRack ? 'Tap a bottle to open its label. Press, hold and drag to move it.' : 'Tap any empty slot to lay down your first bottle.') + '</div></div>';
     area.innerHTML = h;
   }
   function renderResults() {
@@ -595,7 +602,7 @@
         row('import', 'Restore from backup', 'Replace this cellar with an exported file') +
         (seeds ? row('clearSeed', 'Clear the starter cellar', 'Remove the ' + seeds + ' sample items we poured for you') : '') +
         row('wipe', 'Delete all data', 'Erase every rack, bottle, photo and note', 'danger') +
-        '<p class="about">Cellar &amp; Table · version 1.0<br>Made for adults of legal drinking age. Please enjoy wine responsibly.</p></div>';
+        '<p class="about">Cellar &amp; Table · version 1.2<br>Made for adults of legal drinking age. Please enjoy wine responsibly.</p></div>';
     }
   };
   function exportData() {
