@@ -26,6 +26,7 @@ function editor(id) {
   var h = '<div class="col-wrap"><div class="fit"><div class="paper">' + A.pageSVG(id, S.color[id], S.strokes[id]) +
     '</div></div><div class="tools">';
   api.mid(id === 'pickles' ? '<div class="pk-preview" aria-hidden="true"></div>' : '');
+  h += '<div class="goal" role="status" aria-live="polite" aria-label="Sticker progress"><span class="g-dots"><i></i><i></i></span><span class="g-bar"><b></b><u></u></span><span class="g-stk">' + J.IC.star + '</span></div>';
   h += '<div class="tool-row"><button class="rb tl on" data-m="fill" aria-label="Fill with color">' + J.IC.bucket + '</button><button class="rb tl" data-m="brush" aria-label="Crayon">' + J.IC.crayon + '</button>';
   if (J.S.band === 2) h += '<button class="rb tl" data-m="erase" aria-label="Eraser">' + J.IC.eraser + '</button>';
   if (sizes.length > 1) sizes.forEach(function (z, i) { h += '<button class="rb sz' + (z === size ? ' on' : '') + '" data-z="' + z + '" aria-label="Crayon size ' + (i + 1) + '"><i style="width:' + (6 + i * 7) + 'px;height:' + (6 + i * 7) + 'px"></i></button>'; });
@@ -38,13 +39,55 @@ function editor(id) {
   J.fit(J.$('.fit', wrap), paper, 1);
   J.say(id === 'pickles' ? 'Color Pickles! He will wear your colors on the map.' : 'Tap a color, then tap the picture!');
 
-  function touched() { S.edits[id] = (S.edits[id] || 0) + 1; J.save(); if (prev) prev.innerHTML = A.picklesSVG(S.color.pickles, S.strokes.pickles, 'pk walking'); }
+  function touched() { S.edits[id] = (S.edits[id] || 0) + 1; J.save(); showGoal(); if (prev) prev.innerHTML = A.picklesSVG(S.color.pickles, S.strokes.pickles, 'pk walking'); }
   if (prev) prev.innerHTML = A.picklesSVG(S.color.pickles, S.strokes.pickles, 'pk walking');
   function setFill(r, c) {
     J.$$('[data-r="' + r + '"]', svg).forEach(function (el) { el.setAttribute('fill', c || '#ffffff'); });
     if (c) S.color[id][r] = c; else delete S.color[id][r];
   }
   function redrawStrokes() { layer.innerHTML = S.strokes[id].map(A.strokeHTML).join(''); }
+
+  /* Sticker rule (Knox): 2 or more colors AND three quarters of the picture colored. */
+  var GN = 40, GSTEP = 400 / GN, cellKey = null, cellCount = 0, goalEl = J.$('.goal', wrap), lastMet = false;
+  function isInk(c) { return c && String(c).toLowerCase() !== '#ffffff' && String(c).toLowerCase() !== '#fff'; }
+  function mapCells() {
+    var m = svg.getScreenCTM(); if (!m || !document.elementsFromPoint) return;
+    layer.style.pointerEvents = 'none'; cellKey = new Array(GN * GN); cellCount = 0;
+    for (var gy = 0; gy < GN; gy++) for (var gx = 0; gx < GN; gx++) {
+      var x = (gx + 0.5) * GSTEP, y = (gy + 0.5) * GSTEP, els = document.elementsFromPoint(m.a * x + m.c * y + m.e, m.b * x + m.d * y + m.f), k = null;
+      for (var i = 0; i < els.length; i++) { if (els[i] === svg) break; if (els[i].classList && els[i].classList.contains('rg')) { k = els[i].getAttribute('data-r'); break; } }
+      cellKey[gy * GN + gx] = k; if (k) cellCount++;
+    }
+    if (cellCount < 40) { cellKey = null; }
+  }
+  function progress() {
+    var cols = {}, hit = new Uint8Array(GN * GN), fills = S.color[id], n = 0, i;
+    Object.keys(fills).forEach(function (r) { if (isInk(fills[r])) cols[fills[r].toLowerCase()] = 1; });
+    S.strokes[id].forEach(function (st) {
+      if (!isInk(st.c)) return; cols[st.c.toLowerCase()] = 1;
+      var rad = st.w / 2 + 3, q = st.p;
+      for (var k = 0; k < q.length; k += 2) {
+        var x0 = Math.max(0, Math.floor((q[k] - rad) / GSTEP)), x1 = Math.min(GN - 1, Math.floor((q[k] + rad) / GSTEP)), y0 = Math.max(0, Math.floor((q[k + 1] - rad) / GSTEP)), y1 = Math.min(GN - 1, Math.floor((q[k + 1] + rad) / GSTEP));
+        for (var gy = y0; gy <= y1; gy++) for (var gx = x0; gx <= x1; gx++) hit[gy * GN + gx] = 1;
+      }
+    });
+    if (!cellKey) mapCells();
+    var frac;
+    if (cellKey) { for (i = 0; i < cellKey.length; i++) if (cellKey[i] && (isInk(fills[cellKey[i]]) || hit[i])) n++; frac = n / cellCount; }
+    else { var tot = J.$$('.rg', svg).length || 1; frac = Object.keys(fills).filter(function (r) { return isInk(fills[r]); }).length / tot; }
+    return { list: Object.keys(cols), colors: Object.keys(cols).length, frac: frac, met: Object.keys(cols).length >= 2 && frac >= 0.75 };
+  }
+  function showGoal(quiet) {
+    var g = progress(), dots = J.$$('.g-dots i', goalEl);
+    dots.forEach(function (d, i) { d.classList.toggle('on', g.colors > i); d.style.background = g.list[i] || ''; });
+    J.$('.g-bar b', goalEl).style.width = Math.min(100, Math.round(g.frac * 100)) + '%';
+    goalEl.classList.toggle('met', g.met);
+    goalEl.setAttribute('aria-label', 'Sticker progress: ' + Math.min(g.colors, 2) + ' of 2 colors, ' + Math.round(g.frac * 100) + ' percent colored, goal 75 percent');
+    if (g.met && !lastMet && !quiet) { J.sfx('win'); J.say('Sticker ready! Tap the check mark.', true); }
+    lastMet = g.met; return g;
+  }
+  setTimeout(function () { showGoal(true); }, 60);
+  goalEl.onclick = function () { var g = progress(); J.say(g.colors < 2 ? 'Use two colors or more to earn a sticker.' : g.met ? 'Sticker ready! Tap the check mark.' : 'Keep coloring! Fill most of the picture to earn a sticker.', true); };
 
   var cur = null, curEl = null;
   function pt(e) { var p = J.svgPt(svg, e); return [Math.round(Math.max(-5, Math.min(405, p.x))), Math.round(Math.max(-5, Math.min(405, p.y)))]; }
@@ -98,12 +141,16 @@ function editor(id) {
       touched();
     } else if (a === 'clear') {
       if (!b.classList.contains('sure')) { b.classList.add('sure'); J.say('Tap again to start over.', true); setTimeout(function () { b.classList.remove('sure'); }, 2500); return; }
-      b.classList.remove('sure'); S.color[id] = {}; S.strokes[id] = []; undo = [];
+      b.classList.remove('sure'); S.color[id] = {}; S.strokes[id] = []; undo = []; if (S.colorWon) delete S.colorWon[id];
       J.$$('.rg', svg).forEach(function (el) { el.setAttribute('fill', '#ffffff'); }); redrawStrokes(); touched();
     } else if (a === 'done') {
-      var work = Object.keys(S.color[id]).length + S.strokes[id].length, fresh = (S.edits[id] || 0) - (S.colorDone[id] || 0);
-      if (work < 3) { J.sfx('no'); J.say('Add some more color first!', true); return; }
-      var rw = fresh >= 3 ? J.award(3, 'color') : { stars: 3, sticker: null }; S.colorDone[id] = S.edits[id] || 0; J.save();
+      var g = showGoal(true);
+      if (!g.met) {
+        J.sfx('no'); goalEl.classList.remove('nudge'); void goalEl.getBoundingClientRect(); goalEl.classList.add('nudge');
+        J.say(g.colors < 2 ? 'Use two colors or more to earn a sticker!' : 'Almost! Color more of the picture to earn a sticker.', true); return;
+      }
+      if (!S.colorWon) S.colorWon = {};
+      var rw = S.colorWon[id] ? { stars: 3, sticker: null } : J.award(3, 'color'); S.colorWon[id] = 1; S.colorDone[id] = S.edits[id] || 0; J.save();
       J.celebrate({ stars: 3, sticker: rw.sticker, pic: id === 'pickles' ? '<div class="stk-burst wide">' + A.picklesSVG(S.color.pickles, S.strokes.pickles, 'pk walking') + '</div>' : '<div class="stk-burst">' + A.pageSVG(id, S.color[id], S.strokes[id], 'thumb') + '</div>',
         text: id === 'pickles' ? 'Beautiful! Now Pickles wears your colors on the map!' : 'Beautiful coloring!', again: function () { J.clean(); picker(); } });
     }

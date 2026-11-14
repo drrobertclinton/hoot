@@ -359,3 +359,21 @@ svg{display:block}
   #printSheet h1{font-size:26pt;margin:0 0 8pt}#printSheet svg{width:100%;max-width:7in;height:auto;margin:0 auto}#printSheet p{font-size:11pt;margin-top:8pt}
   #printSheet .strokes{mix-blend-mode:multiply}
 }
+
+/* Sticker goal meter (coloring): two color dots + fill bar with a three-quarters mark */
+.goal{display:flex;align-items:center;gap:10px;padding:6px 12px;min-height:44px;background:var(--sand);border:3.5px solid var(--ink);border-radius:22px 26px 20px 24px;box-shadow:0 4px 0 var(--ink);cursor:pointer}
+.goal .g-dots{display:flex;gap:6px;flex:none}
+.goal .g-dots i{width:18px;height:18px;border-radius:50%;border:3px dashed var(--ink);opacity:.45;background:transparent}
+.goal .g-dots i.on{border-style:solid;opacity:1}
+.goal .g-dots i.on:nth-child(1){background:#e8574b}.goal .g-dots i.on:nth-child(2){background:#6b9fd6}
+.goal .g-bar{position:relative;flex:1;height:16px;border:3px solid var(--ink);border-radius:10px;background:#fff;overflow:hidden}
+.goal .g-bar b{display:block;height:100%;width:0;background:#f7c85a;transition:width .35s ease}
+.goal .g-bar u{position:absolute;left:75%;top:-3px;bottom:-3px;width:3px;background:var(--ink);text-decoration:none}
+.goal .g-stk{flex:none;width:30px;height:30px;display:grid;place-items:center;opacity:.35;filter:grayscale(1)}
+.goal .g-stk svg{width:100%;height:100%}
+.goal.met .g-bar b{background:#7fbf7a}
+.goal.met .g-stk{opacity:1;filter:none;animation:goalpop .6s ease}
+.goal.nudge{animation:goalshake .4s ease}
+@keyframes goalpop{0%{transform:scale(.6)}60%{transform:scale(1.35)}100%{transform:scale(1)}}
+@keyframes goalshake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media (prefers-reduced-motion:reduce){.goal.met .g-stk,.goal.nudge{animation:none}.goal .g-bar b{transition:none}}
