@@ -175,8 +175,9 @@ body{background:radial-gradient(1px 1px at 12% 18%,#fff8,transparent),radial-gra
   desc='A hand-drawn island to explore with Jonah and his dog Pickles. Coloring, tracing, counting, mazes, word hunts and stickers. No ads, no accounts, no internet needed.',
   fonts='family=Baloo+2:wght@500;700;800&family=Nunito:wght@500;700',
   css=""":root{--bg:#fbf4e4;--ink:#2e3a4e;--soft:#46546b;--mute:#7b8698;--accent:#7dbb70;--onaccent:#1f2d3d;--accent2:#ef5d50;--link:#1f7f8a;
---body:'Nunito',system-ui,sans-serif;--h1:800 clamp(44px,6.6vw,78px)/1 'Baloo 2',system-ui,sans-serif;--h2:800 clamp(30px,3.8vw,44px)/1.08 'Baloo 2',system-ui,sans-serif;--h3:700 22px/1.2 'Baloo 2',system-ui,sans-serif;
---namefont:800 24px 'Baloo 2',system-ui,sans-serif;--eyebrow:800 15px 'Baloo 2',system-ui,sans-serif;--eyels:.12em;--pillfont:800 19px 'Baloo 2',system-ui,sans-serif;
+--rnd:ui-rounded,'SF Pro Rounded','Arial Rounded MT Bold','Varela Round','Nunito',system-ui,sans-serif;
+--body:var(--rnd);--h1:800 clamp(44px,6.6vw,78px)/1 var(--rnd);--h2:800 clamp(30px,3.8vw,44px)/1.08 var(--rnd);--h3:700 22px/1.2 var(--rnd);
+--namefont:800 24px var(--rnd);--eyebrow:800 15px var(--rnd);--eyels:.12em;--pillfont:800 19px var(--rnd);
 --bezel:#2e3a4e;--phoneshadow:0 10px 0 #2e3a4e,0 30px 50px rgba(46,58,78,.25);
 --rule:3px dashed #e6d7b4;--bandbg:#bfe6ea;--bandink:#2e3a4e;--bandhead:#2e3a4e}
 .pill{border:3px solid #2e3a4e;box-shadow:0 5px 0 #2e3a4e}
@@ -193,37 +194,69 @@ body{background:radial-gradient(1px 1px at 12% 18%,#fff8,transparent),radial-gra
     ['Coloring pages with tap-to-fill and crayons','Letter and number tracing that checks each stroke','Counting, memory match, mazes, word hunts and a sticker treehouse'],'coloring'),
    ('For grown-ups','Three age bands and a parent gate','Choose ages 3 to 5, 6 to 8 or 9 to 11 and the activities change difficulty. Settings, progress, printing and delete sit behind a press-and-hold gate with a sum.',[],'title')],
   band=('Safe by design',[('No ads','No ads, no purchases and no links out of the app.'),('No accounts','Nothing to sign up for. No names, emails or photos are collected.'),('No internet','The app works fully offline. Progress stays on the device.')]),
+  base='/vilasi-kids-apps/jonah-activity-club/', plink='/vilasi-kids-apps/jonah-activity-club/privacy/', slink='/vilasi-kids-apps/jonah-activity-club/support/', pfile='privacy/index.html', sfile='support/index.html', nofonts=True,
   privacy_extra='Jonah Activity Club is made for children. It collects no personal information from anyone, has no advertising, no analytics, no purchases and no links to the web. It does not connect to the internet.',
   kids=True,
   faq=[('What ages is it for?','Ages 3 to 11, in three bands. Pick the band in the grown-ups area.'),
        ('Does my child need to read?','Not in the youngest band. Every activity is introduced out loud, and the speaker button repeats it.'),
        ('How do I open the grown-ups area?','Press and hold the lock on the map for three seconds, then answer the sum.'),
        ('Can I print the coloring pages?','Yes, from the grown-ups area.')]),
+'coressence-life': dict(
+  name='Coressence Life', title='Coressence Life app: your Peak Cycle, one week at a time',
+  desc='The companion app to Live at Your Peak and Perform at Your Peak by Robert Clinton, MD. One weekly loop, one experiment a week from your own data, and a show-day mode for performers.',
+  fonts='family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;700',
+  base='/life/', iconext='png', only_index=True,
+  plink='https://vilasi.co/apps/coressence-life/privacy/', slink='https://vilasi.co/apps/coressence-life/support/',
+  footextra='<a href="/">Coressence Life Series</a><a href="/programs/">Programs</a>',
+  disclaimer='Coressence Life is general education and coaching, not medical care, and does not diagnose or treat any condition.',
+  css=""":root{--bg:#f4f6f5;--ink:#12303a;--soft:#33505a;--mute:#6b8088;--accent:#12a39a;--onaccent:#fff;--accent2:#c8792b;--link:#0b7f86;
+--body:'Manrope',system-ui,sans-serif;--h1:600 clamp(42px,6.2vw,74px)/1.03 'Fraunces',Georgia,serif;--h2:600 clamp(29px,3.6vw,42px)/1.1 'Fraunces',Georgia,serif;--h3:600 21px/1.2 'Fraunces',Georgia,serif;
+--namefont:700 15px 'Manrope',sans-serif;--namels:.3em;--eyebrow:700 13px 'Manrope',sans-serif;--eyels:.2em;--pillfont:700 16px 'Manrope',sans-serif;--pillr:14px;
+--bezel:#0e2f3d;--phoneshadow:0 34px 70px rgba(14,47,61,.28);
+--rule:1px solid #d9e2e0;--bandbg:linear-gradient(160deg,#0f4f63,#0b3442);--bandink:#eaf4f2;--bandhead:#7fe0d2}
+header.top .nm{text-transform:uppercase}.hero h1 em{font-style:italic;color:#0b7f86}
+.feat:nth-of-type(odd){--accent2:#0b7f86}""",
+  h1='Your week on <em>one loop.</em>',
+  lede='Coressence Life is the companion app to Live at Your Peak and Perform at Your Peak by Robert Clinton, MD. It runs the method the courses teach, one week at a time, with your own data.',
+  hero=['cycle','performer'],
+  feats=[
+   ('Your Peak Cycle','Assess, plan, do, measure, review, adjust','The home screen is your week laid out as six stations on one track. It shows where you are now, this week’s lesson, today’s one to three actions and the biggest signal in your data.',[],'cycle'),
+   ('Weekly Experiment','One change a week, judged by your own numbers','Pick one change the course teaches, such as bedtime 30 minutes earlier. Mark the days you do it. The app compares the week before with this week and gives a plain verdict: keep, adjust or drop.',[],'experiment'),
+   ('Performer Day','A show-day mode for singers, actors and speakers','A countdown to your next show, a voice-load budget worked out from your own voice log, warmups with a timer, and the performance-day sequence from Perform at Your Peak.',[],'performer'),
+   ('Why this number','Your readiness score, taken apart','See which inputs moved the score today and by how many points: heart rate variability, resting heart rate, sleep and soreness, each against your own average.',
+    ['Twelve modules in each course, with worksheets and homework','Reads Apple Health; never writes to it','Share a summary with your coach as a file you control'],'why')],
+  band=('Private by design',[('On your phone','No Coressence account, no ads, no tracking. What you enter and measure stays on your device.'),('Your health data','Apple Health is read-only and is never used for advertising or shared.'),('Education, not care','General education and coaching. Talk with your clinician about your health.')]),
+  privacy_extra='', faq=[])
 }
 
 def e(s): return html.escape(s, quote=True)
 
 def head(s, title, desc, depth=''):
+    depth = s.get('base', '')
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)}</title><meta name="description" content="{e(desc)}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:type" content="website">
-<link rel="icon" href="{depth}img/icon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?{s['fonts']}&display=swap" rel="stylesheet">
+<link rel="icon" href="{depth}img/icon.{s.get('iconext','svg')}">
+{'' if s.get('nofonts') else '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?' + s['fonts'] + '&display=swap" rel="stylesheet">'}
 <style>{BASE}{s['css']}</style></head><body>"""
 
+def L(s, k):
+    b = s.get('base', '')
+    return {'home': b or './', 'img': b + 'img/', 'p': s.get('plink', 'privacy.html'), 's': s.get('slink', 'support.html')}[k]
+
 def top(s, home='./'):
-    return f"""<div class="wrap"><header class="top"><a href="{home}"><img src="img/icon.svg" alt=""></a><span class="nm">{e(s['name'])}</span>
-<nav><a class="hide" href="{home}#features">Features</a><a href="support.html">Support</a><a href="privacy.html">Privacy</a></nav></header></div>"""
+    home = L(s, 'home')
+    return f"""<div class="wrap"><header class="top"><a href="{home}"><img src="{L(s,'img')}icon.{s.get('iconext','svg')}" alt=""></a><span class="nm">{e(s['name'])}</span>
+<nav><a class="hide" href="{home}#features">Features</a><a href="{L(s,'s')}">Support</a><a href="{L(s,'p')}">Privacy</a></nav></header></div>"""
 
 def foot(s):
-    return f"""<div class="wrap"><footer><p><a href="./">{e(s['name'])}</a><a href="support.html">Support</a><a href="privacy.html">Privacy</a></p>
-<p>© 2026 Vilasi, Inc.</p></footer></div></body></html>"""
+    return f"""<div class="wrap"><footer><p><a href="{L(s,'home')}">{e(s['name'])}</a><a href="{L(s,'s')}">Support</a><a href="{L(s,'p')}">Privacy</a>{s.get('footextra','')}</p>
+<p>© 2026 Vilasi, Inc.{' ' + s['disclaimer'] if s.get('disclaimer') else ''}</p></footer></div></body></html>"""
 
 def phone(slug, img, alt, wide=False):
     cls = 'wide' if wide else 'phone'
     w, h = (1704, 786) if wide else (786, 1704)
-    return f'<div class="{cls}"><img src="img/{img}.webp" width="{w}" height="{h}" alt="{e(alt)}" loading="lazy"></div>'
+    return f'<div class="{cls}"><img src="{L(SITES[slug],'img')}{img}.webp" width="{w}" height="{h}" alt="{e(alt)}" loading="lazy"></div>'
 
 def index(slug, s):
     wide = s.get('wide')
@@ -232,7 +265,7 @@ def index(slug, s):
     else: heroimg = phone(slug, s['hero'][0], s['name'] + ' screen')
     h = head(s, s['title'], s['desc']) + top(s)
     h += f"""<main><div class="wrap"><section class="hero"><div>{s.get('pre','')}<h1>{s['h1']}</h1><p class="lede">{e(s['lede'])}</p>
-<span class="pill">Coming to the App Store</span><span class="sub">For iPhone{' and iPad' if s.get('kids') else ''}.</span></div>{heroimg}</section>
+<span class="pill">{s.get('pill','Coming to the App Store')}</span><span class="sub">For iPhone{' and iPad' if s.get('kids') else ''}.</span></div>{heroimg}</section>
 <div id="features">"""
     for eye, h2, p, lis, img in s['feats']:
         ul = '<ul>' + ''.join(f'<li>{e(x)}</li>' for x in lis) + '</ul>' if lis else ''
@@ -243,7 +276,7 @@ def index(slug, s):
 
 def privacy(slug, s):
     n = e(s['name'])
-    site = ('<p>This website is a plain information page. It uses no cookies, analytics or advertising.</p>' if s.get('kids') else
+    site = ('<p>This page is plain information. It uses no cookies, analytics, advertising or third-party scripts. Our web host (GitHub Pages) keeps standard server logs.</p>' if s.get('kids') else
             '<p>This website, unlike the app, may record basic visit statistics such as pages viewed and approximate region, through our website host. It does not know who you are in the app, and the app does not talk to this website.</p>')
     kids = ('<h2>Children’s privacy</h2><p>The app is designed for children and follows the requirements of COPPA and the App Store Kids category. Because it collects nothing, there is nothing to share, sell or delete on our side. A parent can erase all progress on the device from the grown-ups area.</p>' if s.get('kids') else
             '<h2>Children</h2><p>The app is made for adults and is not directed at children.</p>')
@@ -262,11 +295,14 @@ def support(slug, s):
     faq = ''.join(f'<h2>{e(q)}</h2><p>{e(a)}</p>' for q, a in s['faq'])
     return head(s, 'Support | ' + s['name'], 'Help with ' + s['name']) + top(s) + f"""<main class="wrap doc"><h1>Support</h1>
 <p>Need help with {n}, or found something that looks wrong? Email <a href="mailto:{EMAIL}?subject={e(s['name']).replace(' ','%20')}%20support">{EMAIL}</a> and tell us which iPhone or iPad you use. We reply within two business days.</p>
-{faq}<p>Read the <a href="privacy.html">privacy policy</a>.</p></main>""" + foot(s)
+{faq}<p>Read the <a href="{L(s,'p')}">privacy policy</a>.</p></main>""" + foot(s)
 
 for slug, s in SITES.items():
     d = os.path.join(OUT, slug)
     open(os.path.join(d, 'index.html'), 'w').write(index(slug, s))
-    open(os.path.join(d, 'privacy.html'), 'w').write(privacy(slug, s))
-    open(os.path.join(d, 'support.html'), 'w').write(support(slug, s))
+    if s.get('only_index'): print('built', slug); continue
+    pp, sp = s.get('pfile', 'privacy.html'), s.get('sfile', 'support.html')
+    for f in (pp, sp): os.makedirs(os.path.dirname(os.path.join(d, f)) or d, exist_ok=True)
+    open(os.path.join(d, pp), 'w').write(privacy(slug, s))
+    open(os.path.join(d, sp), 'w').write(support(slug, s))
     print('built', slug)
