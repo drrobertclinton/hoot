@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" fill="#F3EEE3"/>
+  <g stroke="#1A1814" stroke-opacity=".13" stroke-width="4">
+    <path d="M0 176H1024M0 288H1024M0 400H1024M0 512H1024M0 624H1024M0 736H1024M0 848H1024"/>
+  </g>
+  <path d="M150 0V1024" stroke="#A8802F" stroke-opacity=".55" stroke-width="5"/>
+  <g transform="translate(512 512) rotate(-8)">
+    <g fill="#A8802F">
+      <circle r="330"/>
+      <g id="s"><circle cx="0" cy="-330" r="34"/><circle cx="0" cy="330" r="34"/><circle cx="330" cy="0" r="34"/><circle cx="-330" cy="0" r="34"/></g>
+      <use href="#s" transform="rotate(15)"/><use href="#s" transform="rotate(30)"/><use href="#s" transform="rotate(45)"/><use href="#s" transform="rotate(60)"/><use href="#s" transform="rotate(75)"/>
+    </g>
+    <circle r="288" fill="none" stroke="#F3EEE3" stroke-width="8"/>
+    <circle r="262" fill="none" stroke="#F3EEE3" stroke-width="3" stroke-dasharray="4 14"/>
+    <g fill="none" stroke="#1A1814" stroke-width="46" stroke-linejoin="miter" stroke-miterlimit="6">
+      <path d="M-178 -120 L-92 132 L0 -70 L92 132 L178 -120"/>
+    </g>
+    <g stroke="#1A1814" stroke-width="22" stroke-linecap="butt">
+      <path d="M-232 -120H-124M-54 -70H54M124 -120H232"/>
+    </g>
+  </g>
+</svg>
