@@ -309,7 +309,7 @@ function vBoard() {
     (rows || '<div class="board-empty">No departures scheduled. Add a birthday, anniversary or holiday for one of your passengers.</div>') + '</div>' +
     '<div class="cta-row"><button class="btn dash" data-act="add-occ">' + IC.plus + 'Add a departure</button></div>' + foot();
 }
-function foot() { return '<p class="foot">Gift Pilot keeps everything on this device. No account, no tracking.<br>Some links may earn Vilasi a commission.</p>'; }
+function foot() { return '<p class="foot">Gift Pilot keeps everything on this device. No account, no tracking.</p>'; }
 
 function vPeople() {
   var rows = S.people.map(function (p, i) {
@@ -479,7 +479,7 @@ function findSheet(q) {
     link('G', 'Google Shopping', 'Compare prices across stores', 'https://www.google.com/search?tbm=shop&q=' + e) +
     link('A', 'Amazon', 'Fast shipping options', 'https://www.amazon.com/s?k=' + e) +
     link('E', 'Etsy', 'Handmade and personalized', 'https://www.etsy.com/search?q=' + e) +
-    '<p class="aff">Some links may earn Vilasi a commission.</p><button class="btn ghost" data-act="close-sheet">Done</button>');
+    '<p class="aff">Find it opens a plain web search in your browser.</p><button class="btn ghost" data-act="close-sheet">Done</button>');
 }
 function settingsSheet() {
   var hasSample = S.people.some(function (p) { return p.sample; });
@@ -490,7 +490,7 @@ function settingsSheet() {
     '<button class="btn ghost" data-act="export">Export my data (JSON)</button>' +
     (hasSample ? '<button class="btn ghost" data-act="clear-sample">Remove sample passengers</button>' : '') +
     '<button class="btn danger" data-act="delete-all">Delete all data</button>' +
-    '<p class="aff">Catalog: ' + CAT.length + ' bundled gift ideas, available offline.<br>Some links may earn Vilasi a commission.</p><button class="btn ghost" data-act="close-sheet">Close</button>');
+    '<p class="aff">Catalog: ' + CAT.length + ' bundled gift ideas, available offline.</p><button class="btn ghost" data-act="close-sheet">Close</button>');
 }
 
 /* ---------- interview overlay ---------- */
