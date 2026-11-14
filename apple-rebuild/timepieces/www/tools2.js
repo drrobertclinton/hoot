@@ -160,7 +160,7 @@ var FQ = [
   { k: 'style', q: 'Which style draws you in?', s: 'Pick the one you would reach for most.', o: [['dress', 'Dress'], ['diver', 'Diver'], ['field', 'Field / pilot'], ['chrono', 'Chronograph'], ['gmt', 'GMT / travel'], ['everyday', 'Everyday sports']] },
   { k: 'movement', q: 'What should power it?', s: 'Mechanical watches need wearing or winding; quartz and solar are grab-and-go.', o: [['automatic', 'Automatic'], ['manual', 'Hand-wound'], ['quartz', 'Quartz or solar'], ['any', 'No preference']] },
   { k: 'occ', q: 'Where will you wear it?', s: 'Choose all that apply.', m: true, o: [['office', 'Office'], ['weekend', 'Weekends'], ['water', 'In the water'], ['travel', 'Travel'], ['formal', 'Formal events']] },
-  { k: 'avoid', q: 'Any brands to leave out?', s: 'Optional. Tap any you would rather not see.', m: true }
+  { k: 'avoid', q: 'Any brands to leave out?', s: 'Optional. Tap any you would rather not see. Names are listed for reference only; this app is not affiliated with any brand.', m: true }
 ];
 function priceStr(r) { var f = function (n) { return '$' + n.toLocaleString('en-US'); }; return f(r.p[0]) + ' – ' + f(r.p[1]); }
 function finderResults() {
@@ -206,11 +206,11 @@ TOOLS.finder = {
       return h;
     }
     var res = finderResults();
-    h += '<p class="lede">Your shortlist, drawn from ' + VTP_REF.length + ' current models. Sizes and prices are approximate; confirm with a retailer.</p>';
+    h += '<p class="lede">Your shortlist, drawn from ' + VTP_REF.length + ' current models. Sizes and prices are approximate; not affiliated with any brand. Confirm with a retailer.</p>';
     if (!res.length) h += '<div class="flag note"><b>Nothing matched</b>Try a wider budget or remove some brand exclusions.</div>';
     res.forEach(function (x, i) {
       var r = x.r;
-      h += '<article class="pick"><div class="pick-h">' + miniWatch(refAsWatch(r), 96) + '<div><div class="v-k">' + (i === 0 ? 'Best match' : 'No. ' + (i + 1)) + '</div><h3>' + esc(r.b) + '<br><em>' + esc(r.m) + '</em></h3><div class="pick-p">' + priceStr(r) + '</div></div></div>' +
+      h += '<article class="pick"><div class="pick-h">' + '<svg class="pick-ring" viewBox="-50 -50 100 100" width="84" height="84" aria-hidden="true"><circle r="' + n2(clamp(r.d, 30, 48)) + '" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".55"/><circle r="' + n2(clamp(r.d, 30, 48) - 5) + '" fill="none" stroke="currentColor" stroke-width=".8" stroke-dasharray="1 5" opacity=".5"/><text y="2" text-anchor="middle" font-size="22" fill="currentColor">' + n2(r.d) + '</text><text y="17" text-anchor="middle" font-size="9" letter-spacing="1.5" fill="currentColor" opacity=".6">MM</text></svg><div><div class="v-k">' + (i === 0 ? 'Best match' : 'No. ' + (i + 1)) + '</div><h3>' + esc(r.b) + '<br><em>' + esc(r.m) + '</em></h3><div class="pick-p">' + priceStr(r) + '</div></div></div>' +
         '<div class="spec"><span><b>' + n2(r.d) + '</b>mm case</span><span><b>' + n2(r.l) + '</b>lug-to-lug</span><span><b>' + n2(r.t) + '</b>thick</span><span><b>' + r.wr + '</b>m WR</span></div>' +
         '<p class="pick-n">' + esc(r.n) + '</p><ul>' + x.why.map(function (y) { return '<li>' + esc(y) + '</li>'; }).join('') + '</ul>' +
         '<div class="two"><a class="btn steel" href="https://www.google.com/search?q=' + encodeURIComponent(r.b + ' ' + r.m + ' price') + '" target="_blank" rel="noopener noreferrer">Search prices ↗</a><button class="btn ghost" data-act="fq-try" data-i="' + VTP_REF.indexOf(r) + '">Try on wrist</button></div></article>';
@@ -249,7 +249,7 @@ TOOLS.settings = {
       '<div class="rule"><span>Your data</span></div><div class="privacy"><h3>Private by design</h3><p>Everything you enter stays on this device. There are no accounts, no analytics and no trackers, and the app works fully offline. The Timegrapher analyses microphone audio live and never records or stores it. The only time the app reaches the internet is when you tap “Search prices” in the Finder, which opens a web search in your browser.</p></div>' +
       '<button class="btn steel wide" data-act="exp-json">Export backup (JSON)</button><label class="btn steel wide filelab">Restore from backup<input type="file" accept=".json,application/json" data-in="imp"></label>' +
       '<button class="btn ghost wide" data-act="reseed">Restore the three example watches</button><button class="btn danger wide" data-act="wipe">Delete all data</button>' +
-      '<div class="about"><svg viewBox="-60 -60 120 120" width="64" height="64"><circle r="54" fill="#0b0d0f" stroke="#8b9299" stroke-width="3"/><path d="M0 0L-22 -30M0 0L22 -30" stroke="#9dffb5" stroke-width="6" stroke-linecap="round"/><circle r="5" fill="#e9ebed"/></svg><b>Vilasi Timepieces</b><span>Version 2.0 · Vilasi, Inc.</span><span>Reference data: ' + VTP_REF.length + ' models. Brand and model names belong to their owners and are used for identification only.</span></div>';
+      '<div class="about"><svg viewBox="-60 -60 120 120" width="64" height="64"><circle r="54" fill="#0b0d0f" stroke="#8b9299" stroke-width="3"/><path d="M0 0L-22 -30M0 0L22 -30" stroke="#9dffb5" stroke-width="6" stroke-linecap="round"/><circle r="5" fill="#e9ebed"/></svg><b>Vilasi Timepieces</b><span>Version 2.0 · Vilasi, Inc.</span><span>Reference data: ' + VTP_REF.length + ' models; figures are approximate; not affiliated with any brand. Brand and model names belong to their owners and are used as text for identification only. No brand names or logos are drawn on dials.</span></div>';
   }
 };
 IN.cur = function (el, type) { if (type !== 'change') return; S.settings.currency = el.value.trim() || '$'; save(); };
@@ -277,7 +277,7 @@ ACT.wipe = function () {
 var SWATCH = ['#101113', '#f3f1ea', '#c9ccd1', '#17355e', '#1d4a35', '#6b1f24', '#0f4a52', '#e8731c', '#5b3a22', '#e7c9a6', '#f0c63a', '#8fb7d6'];
 var ED = {
   caseFinish: [['steel', 'Steel'], ['titanium', 'Titanium'], ['gold', 'Gold'], ['bronze', 'Bronze'], ['black', 'Black']],
-  hands: [['baton', 'Baton'], ['dauphine', 'Dauphine'], ['sword', 'Sword'], ['mercedes', 'Mercedes'], ['snowflake', 'Snowflake'], ['arrow', 'Broad arrow']],
+  hands: [['baton', 'Baton'], ['dauphine', 'Dauphine'], ['sword', 'Sword'], ['mercedes', 'Circle'], ['snowflake', 'Snowflake'], ['arrow', 'Broad arrow']],
   markers: [['batons', 'Batons'], ['dots', 'Dots'], ['arabic', 'Arabic'], ['roman', 'Roman'], ['explorer', '3-6-9']],
   bezel: [['plain', 'Plain'], ['dive', 'Dive'], ['gmt', '24-hour'], ['tachy', 'Tachymeter']],
   strap: [['bracelet', 'Bracelet'], ['leather', 'Leather'], ['rubber', 'Rubber'], ['nato', 'Fabric']],
@@ -296,7 +296,7 @@ TOOLS.watch = {
     var w = ui.edit, sec = function (label, key) { return '<div class="rule"><span>' + label + '</span></div>' + chips(ED[key], w[key], 'ed-set', ' data-f="' + key + '"'); };
     var inp = function (label, f, t, ph) { return '<label class="fld"><span>' + label + '</span><input data-in="ef" data-f="' + f + '" data-t="' + (t || 'text') + '" ' + (t === 'num' ? 'inputmode="decimal"' : 'type="text"') + ' value="' + esc(w[f] == null ? '' : w[f]) + '" placeholder="' + (ph || '') + '"></label>'; };
     var refs = '';
-    if (ui.editNew) refs = '<label class="fld"><span>Start from a reference model (optional)</span><select data-in="ef-ref"><option value="">Choose a model to prefill…</option>' + VTP_REF.map(function (r, i) { return '<option value="' + i + '">' + esc(r.b + ' ' + r.m) + '</option>'; }).join('') + '</select></label>';
+    if (ui.editNew) refs = '<label class="fld"><span>Start from a reference model (optional)</span><select data-in="ef-ref"><option value="">Choose a model to prefill…</option>' + VTP_REF.map(function (r, i) { return '<option value="' + i + '">' + esc(r.b + ' ' + r.m) + '</option>'; }).join('') + '</select></label><p class="fine">Reference figures are approximate; not affiliated with any brand. Names are never drawn on the dial.</p>';
     return '<div id="edPrev" class="edprev"></div>' + refs +
       '<div class="grid2">' + inp('Brand', 'brand', 'text', 'Maker') + inp('Model', 'model', 'text', 'Model name') + '</div>' + inp('Reference', 'ref', 'text', 'Optional') +
       '<div class="rule"><span>Dial colour</span></div><div class="swatches">' + SWATCH.map(function (c) { return '<button class="swb' + (w.dial.toLowerCase() === c ? ' on' : '') + '" style="background:' + c + '" data-act="ed-set" data-f="dial" data-v="' + c + '" aria-label="Dial colour ' + c + '"></button>'; }).join('') + '<label class="swb custom" aria-label="Custom dial colour"><input type="color" data-in="ef" data-f="dial" data-t="text" value="' + esc(w.dial) + '"></label></div>' +

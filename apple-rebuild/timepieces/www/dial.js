@@ -183,11 +183,8 @@ function drawWatch(w, o) {
   if (w.date) {
     s += '<rect x="' + n2(dR * .6) + '" y="' + n2(-9 * k) + '" width="' + n2(dR * .24) + '" height="' + n2(18 * k) + '" rx="' + n2(1.5 * k) + '" fill="#f6f4ec" stroke="' + metal + '" stroke-width="' + n2(1.2 * k) + '"/><text class="dt" x="' + n2(dR * .72) + '" y="0" dy=".36em" text-anchor="middle" font-family="' + CONDFONT + '" font-weight="600" font-size="' + n2(15 * k) + '" fill="#15171a">' + new Date().getDate() + '</text>';
   }
-  var brand = String(w.brand || '').toUpperCase();
-  var bfs = Math.min(dR * .105, dR * 1.25 / Math.max(6, brand.length));
-  var escT = function (t) { return String(t).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); };
-  s += '<text y="' + n2(-dR * .36) + '" text-anchor="middle" font-family="' + NUMFONT + '" font-size="' + n2(bfs) + '" letter-spacing="' + n2(bfs * .16) + '" fill="' + ink + '">' + escT(brand) + '</text>';
-  var mvL = { automatic: 'AUTOMATIC', manual: 'HAND-WOUND', quartz: 'QUARTZ', solar: 'SOLAR', springdrive: 'SPRING DRIVE' }[w.movement] || '';
+  /* No maker names or logos are ever drawn on a dial (wordmark-free by design). */
+  var mvL = { automatic: 'AUTOMATIC', manual: 'HAND-WOUND', quartz: 'QUARTZ', solar: 'SOLAR' }[w.movement] || '';
   s += '<text y="' + n2(dR * .4) + '" text-anchor="middle" font-family="' + CONDFONT + '" font-size="' + n2(dR * .062) + '" letter-spacing="' + n2(dR * .02) + '" fill="' + ink + '" opacity=".8">' + mvL + '</text>';
   if (w.wr) s += '<text y="' + n2(dR * .5) + '" text-anchor="middle" font-family="' + CONDFONT + '" font-size="' + n2(dR * .056) + '" letter-spacing="' + n2(dR * .015) + '" fill="' + ink + '" opacity=".6">' + (+w.wr) + ' m</text>';
   /* hands */

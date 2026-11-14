@@ -81,7 +81,9 @@ em{font-style:italic}
 .btn[disabled]{opacity:.35;pointer-events:none}
 
 /* filters */
-.filters{display:flex;gap:2px;overflow-x:auto;margin:22px -8px 0;scrollbar-width:none}
+/* The row stops short of the fixed + button's column, so no filter can ever sit under it; it scrolls sideways with a fade at the cut edge. */
+.filters{display:flex;gap:2px;overflow-x:auto;margin:22px 80px 0 -8px;padding-right:22px;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent)}
 .filters::-webkit-scrollbar{display:none}
 .filters button{min-height:44px;padding:0 9px;white-space:nowrap;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);position:relative}
 .filters button[aria-pressed=true]{color:var(--ink)}

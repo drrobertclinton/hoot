@@ -104,6 +104,14 @@
       return '<button class="racktab' + (k.id === ui.rack ? ' on' : '') + '" data-act="tab" data-id="' + k.id + '">' + esc(k.name) + (n ? '<span class="n">' + n + '</span>' : '') + '</button>';
     }).join('') + '<button class="racktab plus" data-act="tool" data-tool="racks" aria-label="Add or edit racks">+</button>';
   }
+  /* Nameplate: the rack's name once; the kind is added only when the name does not already say it. */
+  function plaqueText(k) {
+    var name = String(k.name || '').trim(), kind = String(k.kind || '').trim();
+    if (!name) return kind || 'Rack';
+    var nl = name.toLowerCase(), words = kind.toLowerCase().split(/\s+/);
+    var said = !kind || nl.indexOf(words[words.length - 1]) >= 0;
+    return said ? name : name + ' \u00b7 ' + kind.charAt(0).toUpperCase() + kind.slice(1);
+  }
   function renderRack() {
     var k = curRack(), area = $('#rackArea');
     if (!k) { area.innerHTML = ''; return; }
@@ -112,7 +120,7 @@
     var m = matchSet(), h = '';
     if (ui.moving) { var mb = bottle(ui.moving); h += '<div class="banner"><span>Tap a slot for <b>' + esc(mb ? mb.name : '') + '</b></span><button data-act="moveCancel">Cancel</button></div>'; }
     else if (ui.lit && !ui.q) h += '<div class="banner"><span>Lit for <b>' + esc(ui.lit.label) + '</b></span><button data-act="clearLit">Clear</button></div>';
-    h += '<div class="rackwrap"><div class="rack" style="--s:' + s + 'px;--cols:' + k.cols + '"><span class="plaque">' + esc(k.name) + ' · ' + esc(k.kind) + '</span><div class="grid"><span></span>';
+    h += '<div class="rackwrap"><div class="rack" style="--s:' + s + 'px;--cols:' + k.cols + '"><span class="plaque">' + esc(plaqueText(k)) + '</span><div class="grid"><span></span>';
     for (var c = 0; c < k.cols; c++) h += '<span class="gl">' + (c + 1) + '</span>';
     var inRack = 0, ready = 0, typesSeen = {};
     for (var r = 0; r < k.rows; r++) {

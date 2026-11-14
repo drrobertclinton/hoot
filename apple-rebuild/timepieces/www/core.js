@@ -42,8 +42,8 @@ function seedState() {
   var ago = function (n) { return ymd(now - n * DAY); };
   var at = function (days, hour) { var d = new Date(now - days * DAY); d.setHours(hour, 12, 0, 0); return d.getTime(); };
   var a = Object.assign(blankWatch(), {
-    id: 'w_seed_bb', brand: 'Tudor', model: 'Black Bay 58', ref: 'M79030N', dial: '#101113', hands: 'snowflake', markers: 'dots', bezel: 'dive', bezelColor: '#15161a', strap: 'bracelet', accent: '#eae4d0',
-    diameter: 39, l2l: 47.8, thickness: 11.9, movement: 'automatic', spec: 'cosc', styles: ['sport', 'everyday', 'travel'], wr: 200, warrantyYears: 5, example: true,
+    id: 'w_seed_bb', brand: '', model: 'Diver 40', ref: '', dial: '#101113', hands: 'snowflake', markers: 'dots', bezel: 'dive', bezelColor: '#15161a', strap: 'bracelet', accent: '#eae4d0',
+    diameter: 40, l2l: 48, thickness: 12, movement: 'automatic', spec: 'cosc', styles: ['sport', 'everyday', 'travel'], wr: 200, warrantyYears: 5, example: true,
     purchase: { date: ago(880), price: 3950, from: 'Authorised dealer', serial: 'EXAMPLE-0417', insured: 4300 },
     service: { last: '', interval: 10, history: [] },
     papers: { innerBox: true, outerBox: true, warrantyCard: true, manual: true, hangTags: true, spareLinks: true, receipt: true },
@@ -57,8 +57,8 @@ function seedState() {
     notes: 'Example watch. Edit or delete it from the dial.'
   });
   var b = Object.assign(blankWatch(), {
-    id: 'w_seed_al', brand: 'Seiko', model: 'Prospex Alpinist', ref: 'SPB121', dial: '#1d4a35', hands: 'dauphine', markers: 'explorer', bezel: 'plain', strap: 'leather', strapColor: '#4a2e1b', caseFinish: 'steel', date: true, accent: '#e9c66a',
-    diameter: 39.5, l2l: 46.4, thickness: 13.2, movement: 'automatic', spec: 'custom', specMin: -15, specMax: 25, styles: ['sport', 'travel', 'everyday'], wr: 200, warrantyYears: 3, example: true,
+    id: 'w_seed_al', brand: '', model: 'Field 38', ref: '', dial: '#1d4a35', hands: 'dauphine', markers: 'explorer', bezel: 'plain', strap: 'leather', strapColor: '#4a2e1b', caseFinish: 'steel', date: true, accent: '#e9c66a',
+    diameter: 38, l2l: 46, thickness: 12.5, movement: 'automatic', spec: 'custom', specMin: -15, specMax: 25, styles: ['sport', 'travel', 'everyday'], wr: 200, warrantyYears: 3, example: true,
     purchase: { date: ago(390), price: 725, from: 'Online retailer', serial: 'EXAMPLE-1D2204', insured: 750 },
     service: { last: '', interval: 5, history: [] },
     papers: { innerBox: true, warrantyCard: true, manual: true, receipt: true },
@@ -71,8 +71,8 @@ function seedState() {
     notes: 'Example watch.'
   });
   var c = Object.assign(blankWatch(), {
-    id: 'w_seed_no', brand: 'Nomos', model: 'Tangente 35', ref: '139', dial: '#f3f1ea', hands: 'baton', markers: 'arabic', bezel: 'plain', strap: 'leather', strapColor: '#15171a', accent: '#2f4f9e',
-    diameter: 35, l2l: 45, thickness: 6.6, movement: 'manual', spec: 'std', styles: ['dress'], wr: 30, warrantyYears: 2, example: true,
+    id: 'w_seed_no', brand: '', model: 'Dress 36', ref: '', dial: '#f3f1ea', hands: 'baton', markers: 'arabic', bezel: 'plain', strap: 'leather', strapColor: '#15171a', accent: '#2f4f9e',
+    diameter: 36, l2l: 44, thickness: 7, movement: 'manual', spec: 'std', styles: ['dress'], wr: 30, warrantyYears: 2, example: true,
     purchase: { date: ago(2050), price: 1680, from: 'Boutique', serial: 'EXAMPLE-88213', insured: 2100 },
     service: { last: '', interval: 5, history: [] },
     papers: { innerBox: true, outerBox: true, warrantyCard: true, manual: true },
@@ -216,7 +216,7 @@ function renderInfo() {
     return;
   }
   var av = avgRate(w), ds = daysSince(w.id), sv = svcStatus(w), today = ymd(Date.now()), on = wearsOn(today).indexOf(w.id) >= 0;
-  el.innerHTML = '<div class="brand">' + esc((w.brand || 'Watch').toUpperCase()) + '</div><h1 class="model">' + esc(w.model || 'Untitled') + '</h1>' +
+  el.innerHTML = '<div class="brand">' + esc((w.brand || (w.example ? 'Example watch' : 'Watch')).toUpperCase()) + '</div><h1 class="model">' + esc(w.model || 'Untitled') + '</h1>' +
     '<div class="meta">' + n2(+w.diameter) + ' mm · ' + (MOVES[w.movement] || '') + (w.ref ? ' · Ref. ' + esc(w.ref) : '') + '</div>' +
     '<div class="pager">' + dots + '</div>' +
     '<div class="facts">' +

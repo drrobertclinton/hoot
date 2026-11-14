@@ -255,6 +255,37 @@ function upcoming() {
 }
 function isHot(u) { var st = occStatus(u.o); return u.n <= (u.o.lead || 14) && (st === 'planning' || st === 'chosen'); }
 
+/* Radar layout: blips are nudged apart, and only the nearest three carry a name,
+   each placed on whichever side is free of other labels, blips and the rim. */
+function radarBlips(near) {
+  var K = 100 / 132, pts = [];
+  near.forEach(function (u) {
+    var base = hash(u.o.id) % 360, r = 7 + (u.n / 90) * 38, x, y, t = 0, clash;
+    do {
+      var ang = (base + t * 37) * Math.PI / 180;
+      x = 50 + Math.cos(ang) * r; y = 50 + Math.sin(ang) * r;
+      clash = pts.some(function (q) { return Math.abs(q.x - x) < 11 && Math.abs(q.y - y) < 11; });
+      t++;
+    } while (clash && t < 10);
+    pts.push({ u: u, x: x, y: y, lab: null });
+  });
+  var boxes = [], opts = [[17, 0], [-17, 0], [0, -12], [0, 12], [15, -10], [-15, -10], [15, 10], [-15, 10], [0, -17], [0, 17], [23, 0], [-23, 0], [19, -13], [-19, -13], [19, 13], [-19, 13]];
+  var hit = function (a, b) { return a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1; };
+  pts.slice(0, 3).forEach(function (q) {
+    var best = null, bestScore = 1e9;
+    opts.forEach(function (o, oi) {
+      var cx = q.x + o[0] * K, cy = q.y + o[1] * K;
+      var bx = { x0: cx - 8.5, x1: cx + 8.5, y0: cy - 4.5, y1: cy + 4.5 }, score = oi * .1;
+      boxes.forEach(function (b) { if (hit(bx, b)) score += 100; });
+      pts.forEach(function (p2) { if (p2 !== q && hit(bx, { x0: p2.x - 5.5, x1: p2.x + 5.5, y0: p2.y - 5.5, y1: p2.y + 5.5 })) score += 60; });
+      [[bx.x0, bx.y0], [bx.x1, bx.y0], [bx.x0, bx.y1], [bx.x1, bx.y1]].forEach(function (c) { if (Math.hypot(c[0] - 50, c[1] - 50) > 47) score += 40; });
+      if (score < bestScore) { bestScore = score; best = { o: o, bx: bx }; }
+    });
+    q.lab = best.o; boxes.push(best.bx);
+  });
+  return pts;
+}
+
 function vBoard() {
   var up = upcoming();
   if (!S.people.length) return '<div class="board"><div class="board-head"><h2>' + IC.jet + 'DEPARTURES</h2><time id="clock">' + clock() + '</time></div><div class="board-empty">The board is clear. Add your first passenger — someone you buy gifts for — and their occasions will line up here with a live countdown.</div></div><div class="cta-row"><button class="btn amber grow" data-act="add-person">' + IC.plus + 'Add a passenger</button></div>' + foot();
@@ -262,9 +293,9 @@ function vBoard() {
   var hot = up.filter(isHot);
   var radar = '<section class="radar-wrap"><div class="radar" aria-label="Occasions radar, next 90 days">' +
     '<svg viewBox="0 0 100 100"><g fill="none" stroke="#2f6a62" stroke-width=".6"><circle cx="50" cy="50" r="16"/><circle cx="50" cy="50" r="32"/><circle cx="50" cy="50" r="47"/><path d="M50 2v96M2 50h96"/></g><g font-family="monospace" font-size="5" fill="#4f9a8c"><text x="52" y="37">30</text><text x="52" y="21">60</text><text x="52" y="7">90</text></g></svg><div class="sweep"></div>' +
-    near.map(function (u) {
-      var ang = (hash(u.o.id) % 360) * Math.PI / 180, r = 7 + (u.n / 90) * 38;
-      return '<button class="blip' + (isHot(u) ? ' hot' : '') + '" style="left:' + (50 + Math.cos(ang) * r).toFixed(1) + '%;top:' + (50 + Math.sin(ang) * r).toFixed(1) + '%" data-act="open-occ" data-id="' + u.o.id + '" aria-label="' + esc(u.p.name + ' ' + occLabel(u.o) + ' in ' + u.n + ' days') + '"><i></i><span>' + esc(first(u.p).slice(0, 3).toUpperCase()) + '</span></button>';
+    radarBlips(near).map(function (q, qi, all) {
+      var u = q.u;
+      return '<button class="blip' + (isHot(u) ? ' hot' : '') + '" style="left:' + q.x.toFixed(1) + '%;top:' + q.y.toFixed(1) + '%;z-index:' + (all.length - qi) + (q.lab ? ';--lx:' + q.lab[0] + 'px;--ly:' + q.lab[1] + 'px' : '') + '" data-act="open-occ" data-id="' + u.o.id + '" aria-label="' + esc(u.p.name + ' ' + occLabel(u.o) + ' in ' + u.n + ' days') + '"><i></i>' + (q.lab ? '<span>' + esc(first(u.p).slice(0, 3).toUpperCase()) + '</span>' : '') + '</button>';
     }).join('') + '</div><div class="radar-info"><small>OCCASIONS RADAR · 90 DAYS</small>' +
     (up.length ? flaps(first(up[0].p).slice(0, 9)) + '<p>Next out: <b>' + esc(occLabel(up[0].o)) + '</b> in <b>' + (up[0].n === 0 ? 'today' : up[0].n + (up[0].n === 1 ? ' day' : ' days')) + '</b>. ' + near.length + ' on radar' + (hot.length ? ', <b>' + hot.length + ' inside reminder window</b>.' : ', none urgent.') + '</p>' : '<p>No occasions yet. Add a departure to light up the radar.</p>') + '</div></section>';
   var rows = up.map(function (u, i) {

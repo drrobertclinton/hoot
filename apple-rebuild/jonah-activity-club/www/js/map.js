@@ -50,7 +50,14 @@ function scene() {
   s += '<path d="' + rd + '" fill="none" stroke="#d6b77c" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 26"/>';
   // little details: shells, grass tufts, flowers
   [[1000, 860, 'shell', 0.5], [1290, 780, 'star', 0.5], [1560, 860, 'shell', 0.45], [2080, 840, 'star', 0.5], [1180, 880, 'pail', 0.55], [480, 880, 'ball', 0.5]].forEach(function (p) { s += A.itemAt(c, p[2], p[0], p[1], p[3]); });
-  s += ln(c, 'M90 700l6 -22l6 22l8 -24l4 24M520 640l6 -22l6 22l8 -24l4 24M2330 590l6 -22l6 22l8 -24l4 24M700 690l6 -20l6 20');
+  // grass tufts: three filled green blades each, so they read as plants (not as letters)
+  var tuft = function (x, y, k) {
+    var P = function (a, b) { return (x + a * k).toFixed(1) + ' ' + (y + b * k).toFixed(1); };
+    return sh(c, null, '#7cc47a', 'M' + P(-10, 0) + 'Q' + P(-17, -15) + ' ' + P(-25, -22) + 'Q' + P(-9, -19) + ' ' + P(-2, 0) + 'Z') +
+      sh(c, null, '#7cc47a', 'M' + P(2, 0) + 'Q' + P(9, -19) + ' ' + P(25, -22) + 'Q' + P(17, -15) + ' ' + P(10, 0) + 'Z') +
+      sh(c, null, '#8fd08a', 'M' + P(-7, 0) + 'Q' + P(-6, -24) + ' ' + P(1, -38) + 'Q' + P(8, -22) + ' ' + P(7, 0) + 'Z');
+  };
+  [[100, 700, 1], [532, 640, 1], [2342, 590, 1], [706, 690, 0.8]].forEach(function (p) { s += tuft(p[0], p[1], p[2]); });
   [[150, 600], [470, 560], [880, 560], [2110, 540], [2330, 520]].forEach(function (p, k) { s += A.dot(p[0], p[1], 9, ['#f08ab0', '#f7c85a', '#fff7e0'][k % 3]) + A.dot(p[0], p[1], 3, '#f08a6b'); });
 
   // --- Heron Run Lane: Jonah's house ---

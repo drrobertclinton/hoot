@@ -532,7 +532,7 @@
     back: function () { back(); },
     menu: function () { cur().menu = !cur().menu; render('keep'); },
     nav: function (el) { cur().menu = false; go({ name: el.dataset.to }); },
-    filter: function (el) { var r = cur(); r.filter = el.dataset.f; r.menu = false; render('keep'); var f = document.querySelector('.filters'); if (f && f.getBoundingClientRect().top < 0) f.scrollIntoView(); },
+    filter: function (el) { var r = cur(); r.filter = el.dataset.f; r.menu = false; render('keep'); var f = document.querySelector('.filters'); if (f && f.getBoundingClientRect().top < 0) f.scrollIntoView(); var on = f && f.querySelector('[aria-pressed=true]'); if (on) f.scrollLeft = Math.max(0, on.getBoundingClientRect().left - f.getBoundingClientRect().left + f.scrollLeft - 36); },
     open: function (el) { cur().menu = false; go({ name: 'entry', id: el.dataset.id, focus: el.dataset.focus || null }); },
     'new': function () { cur().menu = false; go({ name: 'form' }); },
     edit: function (el) { go({ name: 'form', id: el.dataset.id }); },
