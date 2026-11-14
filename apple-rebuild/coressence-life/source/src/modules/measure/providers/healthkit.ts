@@ -44,7 +44,6 @@ const READ = [
   'HKQuantityTypeIdentifierStepCount',
   'HKQuantityTypeIdentifierBloodPressureSystolic',
   'HKQuantityTypeIdentifierBloodPressureDiastolic',
-  'HKQuantityTypeIdentifierHeartRateVariabilityRMSSD',
   ...QUANTITIES.map((q) => q[0]),
   ...CATEGORIES,
   'HKWorkoutTypeIdentifier',
@@ -95,8 +94,8 @@ async function raw(days: number): Promise<RawPlatform> {
     const xs = await safe(() => HK.queryQuantitySamples(id, { limit: 0, filter, unit: unit as never }), [] as readonly any[]);
     points[kind] = xs.map((x: any): RawPoint => ({ start: ms(x.startDate), end: ms(x.endDate), value: Number(x.quantity), origin: origin(x) }));
   }
-  const rmssd = await safe(() => HK.queryQuantitySamples('HKQuantityTypeIdentifierHeartRateVariabilityRMSSD' as QId, { limit: 0, filter, unit: 'ms' as never }), [] as readonly any[]);
-  points.hrvRmssd = rmssd.map((x: any) => ({ start: ms(x.startDate), value: Number(x.quantity), origin: origin(x) }));
+  // Apple Health stores HRV as SDNN only; RMSSD arrives through the direct brand connections.
+  points.hrvRmssd = [];
 
   // Steps: Apple Health's own daily totals, which already remove the overlap between iPhone and Watch.
   const stepStats = await safe(() => HK.queryStatisticsCollectionForQuantity('HKQuantityTypeIdentifierStepCount', ['cumulativeSum'], startDate, { day: 1 }, { filter, unit: 'count' as never }), [] as readonly any[]);
