@@ -46,6 +46,11 @@ export const SHOP = {
   storeUrl: '',
 };
 
+/** Where to get the printed or e-book editions. Empty: the Resources page offers only "Read in the app". */
+export const BOOK_LINKS: Record<'live' | 'perform', string> = { live: '', perform: '' };
+/** Coressence Health Library store links by key (lifestyle, nutrition, kitchen, recovery, mind, zinc). Empty until published. */
+export const LIBRARY_LINKS: Record<string, string> = {};
+
 /**
  * Coressence Connect, the companion service in services/connect that holds vendor sign-in tokens and webhooks for
  * Oura, WHOOP, Garmin, Google Health (Fitbit and Pixel Watch), Withings, Polar and Dexcom. Leave serviceUrl empty

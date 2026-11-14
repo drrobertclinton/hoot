@@ -12,8 +12,8 @@ import { moduleInfo, type ModuleId } from '../modules/registry';
 const SHELVES: { title: string; line: string; ids: ModuleId[] }[] = [
   { title: 'Body', line: 'Train it, feed it, rest it', ids: ['move', 'fuel', 'sleep', 'recover'] },
   { title: 'Mind and voice', line: 'Quiet the noise, protect the instrument', ids: ['restore', 'rehearse', 'track'] },
-  { title: 'Your numbers', line: 'What the data says this week', ids: ['measure', 'monitor', 'devices', 'labs'] },
-  { title: 'Learn and plan', line: 'The courses and the week ahead', ids: ['education', 'plan', 'coach'] },
+  { title: 'Know yourself', line: 'Your numbers and your list', ids: ['measure', 'monitor', 'devices', 'labs', 'stack'] },
+  { title: 'Learn and plan', line: 'The courses and the week ahead', ids: ['education', 'resources', 'plan', 'coach'] },
   { title: 'Care and shop', line: 'Outside the app, when you want it', ids: ['md', 'shop'] },
 ];
 
@@ -29,6 +29,8 @@ const SHORT: Partial<Record<ModuleId, string>> = {
   monitor: 'Readiness, load, glucose, BP',
   devices: 'Watches, rings and straps',
   labs: 'Results, trends and notes',
+  stack: 'Medicines, supplements, peptides',
+  resources: 'Books, worksheets and guides',
   education: 'Live and Perform at Your Peak',
   plan: 'Personal plan and calendar',
   coach: 'The method and weekly review',

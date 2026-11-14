@@ -8,7 +8,9 @@ Coressence Life is the companion to two courses by Robert Clinton, MD (Live at Y
 - Weekly Experiment: one change from the course, measured before and after from the user's own data, with a keep, adjust or drop verdict.
 - Performer Day for singers, actors and speakers: show countdown, voice-load budget, warmups and performance-day sequence.
 - Why this number: the readiness score taken apart, point by point.
-- All of Coressence (grid icon on Home, and at the top of Toolkit): one page that opens every section of the program: Move, Fuel, Sleep, Recover, Restore, Rehearse, Track, Measure, Monitor, Devices, Labs, Courses, Plan, Coach, MD and Shop.
+- All of Coressence (grid icon on Home, and at the top of Toolkit): one page that opens every section of the program: Move, Fuel, Sleep, Recover, Restore, Rehearse, Track, Measure, Monitor, Devices, Labs, Stack Check, Courses, Resources, Plan, Coach, MD and Shop.
+- Stack Check is a personal list of the medicines and supplements a user takes, arranged by time of day, with a text summary they can share with their pharmacist or clinician. It does not check interactions, calculate or suggest doses, or give medical advice, and says so on screen.
+- Resources and books lists the two course books (their full text is in the app), the worksheets, the in-app guides and a reading list of the author's six forthcoming books, each linked to the matching section of the app. It has no outbound links and nothing for sale.
 - Coressence MD is an information page for a separate telehealth service from the author's medical practice, available today only to people located in North Carolina. The app takes no payment for it and collects no medical information; "Request a visit" opens the user's email app.
 - Coressence Shop is a gear guide (what to look for). There is nothing to buy in the app and it has no outbound links.
 

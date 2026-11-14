@@ -2,7 +2,7 @@
 // ship as its own app. The toolkit files each one under the step of the method it serves.
 import type { IconName } from '@core/ui';
 
-export type ModuleId = 'life' | 'devices' | 'monitor' | 'measure' | 'track' | 'move' | 'fuel' | 'sleep' | 'recover' | 'restore' | 'rehearse' | 'coach' | 'plan' | 'labs' | 'md' | 'shop' | 'education' | 'plus';
+export type ModuleId = 'life' | 'devices' | 'monitor' | 'measure' | 'track' | 'move' | 'fuel' | 'sleep' | 'recover' | 'restore' | 'rehearse' | 'coach' | 'plan' | 'labs' | 'md' | 'shop' | 'education' | 'plus' | 'stack' | 'resources';
 export type ModuleInfo = { id: ModuleId; name: string; tagline: string; icon: IconName; route: string; tier: 'free' | 'premium' | 'storefront'; step: 'assess' | 'plan' | 'do' | 'measure' | 'review' | 'more' };
 
 const ALL_MODULES: ModuleInfo[] = [
@@ -20,6 +20,8 @@ const ALL_MODULES: ModuleInfo[] = [
   { id: 'plan', name: 'Plan', tagline: 'Personal plan and calendar', icon: 'calendar', route: '/plan', tier: 'free', step: 'plan' },
   { id: 'education', name: 'Course', tagline: 'Live and Perform at Your Peak', icon: 'book-open', route: '/learn', tier: 'premium', step: 'plan' },
   { id: 'labs', name: 'Labs', tagline: 'Your results, trends and notes', icon: 'droplet', route: '/labs', tier: 'free', step: 'assess' },
+  { id: 'stack', name: 'Stack Check', tagline: 'Everything you take, ready for a pharmacist', icon: 'layers', route: '/stack', tier: 'free', step: 'assess' },
+  { id: 'resources', name: 'Resources', tagline: 'Books, worksheets and guides', icon: 'bookmark', route: '/resources', tier: 'free', step: 'plan' },
   { id: 'md', name: 'MD', tagline: 'Telehealth visits, a separate medical service', icon: 'video', route: '/md', tier: 'storefront', step: 'more' },
   { id: 'shop', name: 'Shop', tagline: 'Coressence Shop: gear guide and books', icon: 'shopping-bag', route: '/shop', tier: 'storefront', step: 'more' },
 ];

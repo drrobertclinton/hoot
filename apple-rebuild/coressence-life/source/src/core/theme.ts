@@ -143,6 +143,8 @@ export function moduleColor(c: Palette, id: string): string {
     experiment: c.sand,
     performer: c.dark ? '#F08A66' : '#B9532F',
     cycle: c.teal,
+    stack: c.dark ? '#C9A2F2' : '#7A4BB0',
+    resources: c.dark ? '#E0C27A' : '#9A7420',
   };
   return fixed[id] ?? c.accent;
 }

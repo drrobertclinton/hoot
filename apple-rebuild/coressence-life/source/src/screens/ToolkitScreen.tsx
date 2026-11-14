@@ -58,7 +58,7 @@ export default function ToolkitScreen() {
           <View style={{ flex: 1 }}>
             <T variant="bodyStrong">All of Coressence</T>
             <T variant="small" color={c.muted}>
-              Every section on one page: Move, Fuel, Sleep, Recover, Restore, MD, Shop and more.
+              Every section on one page: Move, Fuel, Sleep, Recover, Restore, Stack Check, Resources, MD, Shop and more.
             </T>
           </View>
           <Feather name="chevron-right" size={17} color={c.muted} />
