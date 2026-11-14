@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#050607">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<title>Vilasi Timepieces</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<main id="home">
+  <header class="top">
+    <div class="wm"><b>VILASI</b><i>Timepieces</i></div>
+    <span id="today"></span>
+    <button class="gear" data-act="tool" data-tool="settings" aria-label="Settings and about">
+      <svg viewBox="-12 -12 24 24" width="24" height="24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6"><circle r="3.2"/><path d="M0-10v3M0 7v3M-10 0h3M7 0h3M-7.1-7.1l2.1 2.1M5 5l2.1 2.1M-7.1 7.1L-5 5M5-5l2.1-2.1" stroke-linecap="round"/><circle r="7"/></g></svg>
+    </button>
+  </header>
+  <div class="stage">
+    <div class="track-wrap"><div id="track"></div></div>
+    <svg id="ring" viewBox="-210 -210 420 420" aria-label="Tools"></svg>
+  </div>
+  <p id="hint">Tap the bezel for tools · swipe to change watch</p>
+  <section id="info" aria-live="polite"></section>
+</main>
+
+<section id="sheet" class="sheet" hidden aria-modal="true" role="dialog">
+  <header class="sheet-head">
+    <button class="back" data-act="close-sheet" aria-label="Back to dial">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 4l-8 8 8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div><small id="sheetKicker"></small><h2 id="sheetTitle"></h2></div>
+  </header>
+  <div id="sheetBody" class="sheet-body"></div>
+</section>
+
+<div id="modal" class="modal" hidden><div id="modalCard" class="modal-card" role="dialog" aria-modal="true"></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="data.js"></script>
+<script src="dial.js"></script>
+<script src="core.js"></script>
+<script src="tg.js"></script>
+<script src="tools.js"></script>
+<script src="tools2.js"></script>
+</body>
+</html>
