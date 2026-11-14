@@ -130,3 +130,69 @@ test('demo: every Monitor card has data, and the words never diagnose', () => {
   assert.ok(all.length >= 3);
   assert.doesNotMatch(words(all), /you have (a|an)? ?(condition|disease|hypertension|diabetes|afib|atrial)|diagnosis is|\bAI\b|working draft/i);
 });
+
+// ---- glucose lined up with meals and workouts
+import { glucoseLifeInsights, mealPatterns, mealResponses, mealTime, workoutResponses } from '../src/modules/monitor/model';
+import { HOOKUPS, finalStep, searchHookups, stepsFor } from '../src/modules/devices/hookup';
+import type { Meal } from '../src/modules/fuel/model';
+import type { DeviceWorkout } from '../src/modules/devices/schema';
+
+test('glucose with meals: before, peak, rise and the two-hour reading; movement after a meal is noticed', () => {
+  const meals: Meal[] = [];
+  const g: GlucoseReading[] = [];
+  const workouts: DeviceWorkout[] = [];
+  const days = lastDays(8, '2026-06-20');
+  days.forEach((d, i) => {
+    const m: Meal = { id: `m${i}`, date: d, time: '19:00', kind: 'dinner', tags: i % 2 ? ['protein', 'plants'] : [] };
+    meals.push(m);
+    const t0 = mealTime(m);
+    const walked = i % 2 === 1;
+    if (walked) workouts.push({ id: `w${i}`, origin: 'apple', path: 'healthkit', start: t0 + 20 * 60_000, end: t0 + 35 * 60_000, type: 'walk', label: 'Walk' });
+    const top = walked ? 25 : 60;
+    for (let min = -30; min <= 150; min += 15) {
+      const bump = min <= 0 ? 0 : min <= 45 ? (top * min) / 45 : Math.max(0, top * (1 - (min - 45) / 90));
+      g.push({ t: t0 + min * 60_000, mgdl: Math.round(90 + bump), origin: 'dexcom', path: 'healthkit' });
+    }
+  });
+  const now = mealTime(meals[7]) + 4 * 3600_000;
+  const rs = mealResponses(g, meals, workouts, now);
+  assert.equal(rs.length, 8);
+  const still = rs.find((r) => r.id === 'm0')!;
+  assert.equal(still.before, 90);
+  assert.equal(still.peak, 150);
+  assert.equal(still.rise, 60);
+  assert.equal(still.minutesToPeak, 45);
+  assert.equal(still.at2h, 100);
+  assert.equal(still.movedAfter, false);
+  assert.equal(rs.find((r) => r.id === 'm1')!.movedAfter, true);
+  const p = mealPatterns(rs);
+  assert.deepEqual(p.moved!.map((x) => x.rise), [25, 60]);
+  assert.equal(p.byKind[0].label, 'Dinner');
+  const ws = workoutResponses(g, workouts, now);
+  assert.equal(ws.length, 4);
+  assert.ok(ws[0].after !== null && ws[0].lowest >= 90);
+  const said = glucoseLifeInsights(rs, ws).map((i) => i.text).join(' ');
+  assert.match(said, /walk or workout/);
+  assert.match(said, /Meals with protein/);
+  assert.doesNotMatch(said, /diagnos|insulin dose|you should take/i);
+  // a meal too recent to have two hours of readings, or with no sensor data, is left out
+  assert.equal(mealResponses(g, meals, workouts, mealTime(meals[7]) + 30 * 60_000).length, 7);
+  assert.equal(mealResponses([], meals).length, 0);
+});
+
+test('device hookup guide: every brand has steps for a phone or says plainly why not', () => {
+  assert.equal(new Set(HOOKUPS.map((h) => h.id)).size, HOOKUPS.length);
+  for (const h of HOOKUPS) {
+    assert.ok(h.ios.length || h.android.length, h.id);
+    assert.ok(h.brings.length > 5, h.id);
+    if (!h.ios.length || !h.android.length) assert.ok(h.note || h.id === 'apple-watch' || h.id === 'lingo', `${h.id} needs a note`);
+  }
+  const fitbit = HOOKUPS.find((h) => h.id === 'fitbit')!;
+  assert.equal(stepsFor(fitbit, 'ios').length, 0);
+  assert.equal(finalStep(fitbit, 'ios'), null);
+  assert.match(fitbit.note!, /does not share with Apple Health/);
+  assert.match(finalStep(HOOKUPS.find((h) => h.id === 'oura')!, 'ios')!, /Apple Health/);
+  assert.deepEqual(searchHookups('stelo').map((h) => h.id), ['stelo']);
+  assert.ok(searchHookups('glucose').length >= 3);
+  for (const id of ['dexcom', 'stelo', 'libre', 'lingo', 'meter']) assert.equal(HOOKUPS.find((h) => h.id === id)!.group, 'glucose');
+});

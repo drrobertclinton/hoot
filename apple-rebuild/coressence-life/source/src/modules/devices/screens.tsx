@@ -6,7 +6,8 @@ import React, { useEffect, useState } from 'react';
 import { Platform, View } from 'react-native';
 import { useSettings } from '@core/settings';
 import { useTheme } from '@core/theme';
-import { Badge, Button, Card, Chip, Divider, Note, Screen, SectionTitle, T } from '@core/ui';
+import { Badge, Button, Card, Chip, Divider, Field, Note, Screen, SectionTitle, T, type IconName } from '@core/ui';
+import { GROUPS, NOT_LISTED, finalStep, phoneOf, searchHookups, stepsFor, type Hookup, type Phone } from './hookup';
 import { CONNECT } from '@core/appConfig';
 import { ALSO_THROUGH_PLATFORM, CONNECTIONS, connectionInfo, type ConnectionId, type ConnectionInfo } from './catalog';
 import { statusOf, suppliedBy, type StatusView } from './model';
@@ -141,6 +142,19 @@ export function DevicesScreen() {
         ) : null}
       </Card>
 
+      <Card onPress={() => router.push('/devices/hookup' as never)} style={{ marginTop: 10 }} testID="devices-hookup">
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <Feather name="list" size={20} color={DEVICES_COLOR} />
+          <View style={{ flex: 1 }}>
+            <T variant="heading">Connect my device, step by step</T>
+            <T variant="small" color={c.muted}>
+              Watches, rings, glucose sensors, straps, cuffs and scales: find yours and follow the steps.
+            </T>
+          </View>
+          <Feather name="chevron-right" size={18} color={c.muted} />
+        </View>
+      </Card>
+
       <SectionTitle>On your phone</SectionTitle>
       {section(['healthkit', 'healthconnect', 'samsung'])}
       {serviceReady() || demo ? (
@@ -270,6 +284,109 @@ export function DeviceScreen() {
       </View>
       {info.kind === 'cloud' ? <Note text="When this brand also shares to Apple Health or Health Connect, Coressence uses the direct connection for the numbers it provides and ignores the copy, so nothing is counted twice." /> : null}
       {info.id === 'healthkit' ? <Note text="ECG results and irregular rhythm notifications are shown exactly as Apple Watch reported them. Coressence does not read the ECG recording or make a diagnosis." /> : null}
+      <Note text={PRIVACY_NOTE} icon="shield" />
+    </Screen>
+  );
+}
+
+function Steps({ items }: { items: string[] }) {
+  const c = useTheme();
+  return (
+    <View style={{ marginTop: 8, gap: 8 }}>
+      {items.map((text, i) => (
+        <View key={i} style={{ flexDirection: 'row', gap: 10 }}>
+          <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: DEVICES_COLOR + '22', alignItems: 'center', justifyContent: 'center' }}>
+            <T variant="caption" color={DEVICES_COLOR}>
+              {i + 1}
+            </T>
+          </View>
+          <T variant="small" color={c.ink} style={{ flex: 1 }}>
+            {text}
+          </T>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function HookupCard({ h, phone, open, onToggle }: { h: Hookup; phone: Phone; open: boolean; onToggle: () => void }) {
+  const c = useTheme();
+  const steps = stepsFor(h, phone);
+  const last = finalStep(h, phone);
+  const strap = h.id === 'strap';
+  return (
+    <Card onPress={onToggle} style={{ marginTop: 10, padding: 14 }} testID={`hookup-${h.id}`}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <View style={{ flex: 1 }}>
+          <T variant="heading">{h.name}</T>
+          <T variant="small" color={c.muted}>
+            {h.devices}
+          </T>
+        </View>
+        <Feather name={open ? 'chevron-up' : 'chevron-down'} size={18} color={c.muted} />
+      </View>
+      {open ? (
+        <View testID={`hookup-steps-${h.id}`}>
+          {steps.length ? <Steps items={last ? [...steps, last] : steps} /> : null}
+          {h.note ? <Note text={h.note} tone={steps.length ? 'info' : 'warn'} /> : null}
+          <T variant="caption" style={{ marginTop: 8 }}>{`Brings in: ${h.brings}.`}</T>
+          {steps.length ? (
+            <Button
+              label={strap ? 'Open live heart rate' : h.group === 'glucose' ? 'Connect, then see glucose' : phone === 'ios' ? 'Open Apple Health connection' : 'Open Health Connect connection'}
+              icon={strap ? 'activity' : 'link'}
+              compact
+              kind="secondary"
+              style={{ marginTop: 10, alignSelf: 'flex-start' }}
+              onPress={() => router.push((strap ? '/move-live' : `/devices/${phone === 'ios' ? 'healthkit' : 'healthconnect'}`) as never)}
+              testID={`hookup-go-${h.id}`}
+            />
+          ) : null}
+        </View>
+      ) : null}
+    </Card>
+  );
+}
+
+/** Find your device and follow the steps: every brand that can reach Coressence through the phone's health store. */
+export function HookupScreen() {
+  const c = useTheme();
+  const [phone, setPhone] = useState<Phone>(phoneOf(Platform.OS));
+  const [q, setQ] = useState('');
+  const [open, setOpen] = useState<string | null>(null);
+  const found = searchHookups(q);
+  return (
+    <Screen title="Connect my device" subtitle="Find yours and follow the steps" color={DEVICES_COLOR} accentBar testID="hookup">
+      <Card>
+        <T variant="small" color={c.muted}>
+          Your device’s own app shares its readings with {phone === 'ios' ? 'Apple Health' : 'Health Connect'} on this phone, and Coressence reads them there. Nothing leaves the phone. Menu names are each brand’s own and can differ a little between app versions.
+        </T>
+        <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+          <Chip label="iPhone" selected={phone === 'ios'} onPress={() => setPhone('ios')} testID="hookup-ios" />
+          <Chip label="Android" selected={phone === 'android'} onPress={() => setPhone('android')} testID="hookup-android" />
+        </View>
+        <Field label="Search by brand or model" value={q} onChangeText={setQ} autoCorrect={false} testID="hookup-search" style={{ marginTop: 12 }} />
+      </Card>
+      {GROUPS.map((g) => {
+        const items = found.filter((h) => h.group === g.key);
+        if (!items.length) return null;
+        return (
+          <React.Fragment key={g.key}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 }}>
+              <Feather name={g.icon as IconName} size={15} color={DEVICES_COLOR} />
+              <View style={{ flex: 1 }}>
+                <SectionTitle>{g.label}</SectionTitle>
+              </View>
+            </View>
+            {items.map((h) => (
+              <HookupCard key={h.id} h={h} phone={phone} open={open === h.id} onToggle={() => setOpen(open === h.id ? null : h.id)} />
+            ))}
+          </React.Fragment>
+        );
+      })}
+      <SectionTitle>{found.length ? 'Not on the list?' : 'No match: try this'}</SectionTitle>
+      <Card testID="hookup-other">
+        <Steps items={NOT_LISTED[phone]} />
+      </Card>
       <Note text={PRIVACY_NOTE} icon="shield" />
     </Screen>
   );

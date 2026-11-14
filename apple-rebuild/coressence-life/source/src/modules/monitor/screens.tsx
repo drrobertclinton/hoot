@@ -16,6 +16,7 @@ import { readinessWords } from '../recover/model';
 import { baseline, dayMetrics, eventsOf, kgToLb, metricSeries } from '../measure/model';
 import { useMeasure } from '../measure/state';
 import { useMove } from '../move/state';
+import { useFuel } from '../fuel/state';
 import { voiceAdvice } from '../rehearse/model';
 import { useRehearse } from '../rehearse/state';
 import { ZONE_NAMES } from '../devices/zones';
@@ -33,8 +34,12 @@ import {
   cycleState,
   glucoseDaily,
   glucoseInsights,
+  glucoseLifeInsights,
   glucoseStats,
   loadBalance,
+  mealPatterns,
+  mealResponses,
+  workoutResponses,
   periods,
   rhythmHistory,
   rhythmInsights,
@@ -468,6 +473,15 @@ function GlucoseDetail() {
   const stats = glucoseStats(ev.glucose, now - 14 * 86400_000, now, t);
   const daily = glucoseDaily(ev.glucose, 14, t);
   const latest = ev.glucose[ev.glucose.length - 1];
+  const fuel = useFuel();
+  const since = now - 14 * 86400_000;
+  const meals = mealResponses(ev.glucose, fuel.meals, ev.workouts, now).filter((r) => r.t >= since);
+  const sessions = workoutResponses(ev.glucose, ev.workouts, now, fuel.meals).filter((w) => w.t >= since);
+  const patterns = mealPatterns(meals);
+  const pairs = [patterns.moved, patterns.protein, patterns.plants, patterns.packaged].filter((x): x is NonNullable<typeof x> => !!x);
+  const [open, setOpen] = useState<string | null>(null);
+  const shown = meals.find((r) => r.id === open) ?? meals.find((r) => r.at2h !== null) ?? meals[0];
+  const mealAt = shown ? shown.curve.reduce((best, p, i) => (Math.abs(p.min) < Math.abs(shown.curve[best].min) ? i : best), 0) : 0;
   return (
     <Screen title="Glucose" subtitle="Readings from your glucose sensor, shown as reported" color={color} accentBar testID="mon-detail-glucose">
       <Card>
@@ -496,6 +510,85 @@ function GlucoseDetail() {
           <Insights items={glucoseInsights(stats, t)} />
         </>
       ) : null}
+      <SectionTitle>With your meals</SectionTitle>
+      {shown ? (
+        <>
+          <Card testID="glucose-meal">
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <T variant="heading">{`${shown.kind[0].toUpperCase()}${shown.kind.slice(1)}, ${shortDate(dayKey(shown.t))} at ${clockOf(shown.t)}`}</T>
+              <T variant="caption">mg/dL</T>
+            </View>
+            {shown.name ? <T variant="small" color={c.muted}>{shown.name}</T> : null}
+            <LineChart data={shown.curve.map((p, i) => ({ label: i === mealAt ? 'Meal' : i === 0 || i === shown.curve.length - 1 ? `${p.min > 0 ? '+' : ''}${p.min} min` : '', value: p.mgdl }))} color={color} band={[t.glucoseLow, t.glucoseHigh]} height={130} testID="glucose-meal-chart" />
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: 12, marginTop: 6 }}>
+              <Stat label="Before" value={String(shown.before)} unit="mg/dL" />
+              <Stat label="Peak" value={String(shown.peak)} sub={`after ${shown.minutesToPeak} min`} />
+              <Stat label="Rise" value={`+${shown.rise}`} color={color} />
+              <Stat label="At 2 hours" value={shown.at2h === null ? '–' : String(shown.at2h)} />
+            </View>
+            {shown.movedAfter ? <Badge text="You moved within 90 minutes" color={c.ok} /> : null}
+          </Card>
+          <Card style={{ marginTop: 10 }} testID="glucose-meal-list">
+            <T variant="heading">Recent meals</T>
+            {meals.slice(0, 8).map((r, i) => (
+              <React.Fragment key={r.id}>
+                {i ? <Divider /> : null}
+                <T variant="small" onPress={() => setOpen(r.id)} testID={`glucose-meal-${i}`} style={{ paddingVertical: 8 }} color={r.id === shown.id ? color : c.ink}>
+                  {`${weekdayShort(dayKey(r.t))} ${clockOf(r.t)} · ${r.kind} · ${r.before} to ${r.peak} (+${r.rise})${r.movedAfter ? ' · moved after' : ''}`}
+                </T>
+              </React.Fragment>
+            ))}
+          </Card>
+          {patterns.byKind.length ? (
+            <Card style={{ marginTop: 10 }} testID="glucose-meal-kinds">
+              <T variant="heading">Average rise by meal</T>
+              <Bars data={patterns.byKind.map((g) => ({ label: g.label, value: g.rise }))} color={color} unit=" mg/dL" valueLabels height={120} />
+            </Card>
+          ) : null}
+          {pairs.length ? (
+            <Card style={{ marginTop: 10 }} testID="glucose-meal-pairs">
+              <T variant="heading">Your meals, side by side</T>
+              {pairs.map((pr, i) => (
+                <View key={i} style={{ flexDirection: 'row', marginTop: 10 }}>
+                  {pr.map((g) => (
+                    <Stat key={g.label} label={g.label} value={`+${g.rise}`} unit="mg/dL" sub={`${g.n} meals`} />
+                  ))}
+                </View>
+              ))}
+            </Card>
+          ) : null}
+        </>
+      ) : (
+        <Card testID="glucose-meal-empty">
+          <T variant="small" color={c.muted}>
+            Log a meal in Fuel and Coressence will show your glucose for the two hours after it: where you started, how high it went and how fast it settled.
+          </T>
+          <Button label="Log a meal" icon="coffee" compact kind="secondary" style={{ marginTop: 12, alignSelf: 'flex-start' }} onPress={() => router.push('/fuel' as never)} testID="glucose-log-meal" />
+        </Card>
+      )}
+      <SectionTitle>With your workouts</SectionTitle>
+      {sessions.length ? (
+        <Card testID="glucose-workouts">
+          {sessions.slice(0, 8).map((w, i) => (
+            <React.Fragment key={w.id}>
+              {i ? <Divider /> : null}
+              <View style={{ paddingVertical: 8 }}>
+                <T variant="body">{`${w.label}, ${w.minutes} min · ${weekdayShort(dayKey(w.t))} ${clockOf(w.t)}`}</T>
+                <T variant="small" color={c.muted}>
+                  {`Before ${w.before} · lowest ${w.lowest}${w.after === null ? '' : ` · hour after ${w.after} (${w.change! > 0 ? '+' : ''}${w.change})`} mg/dL${w.mealNearby ? ' · meal nearby' : ''}`}
+                </T>
+              </View>
+            </React.Fragment>
+          ))}
+        </Card>
+      ) : (
+        <Card testID="glucose-workouts-empty">
+          <T variant="small" color={c.muted}>
+            Record a workout or walk on your watch and Coressence will show your glucose before, during and for the hour after it.
+          </T>
+        </Card>
+      )}
+      <Insights items={glucoseLifeInsights(meals, sessions)} />
       <SectionTitle>Your range</SectionTitle>
       <Card>
         <T variant="small" color={c.muted}>

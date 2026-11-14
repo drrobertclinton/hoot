@@ -1,13 +1,14 @@
 // Monitor: plain-language views of what connected devices report (pure; unit-tested). Nothing here diagnoses.
 // Numbers are compared with the person's own history or with targets their clinician gave them, and when a
 // pattern is worth a professional look the note says so in the app's usual words.
-import { addDays, dayKey, lastDays, parseDay } from '@core/dates';
+import { addDays, dayKey, hm, lastDays, parseDay } from '@core/dates';
 import { clamp, mean, stdev } from '@core/stats';
 import type { BpReading, CycleEntry, DeviceWorkout, EcgClass, EcgRecord, GlucoseReading, RhythmEvent } from '../devices/schema';
 import { sessionLoad } from '../devices/zones';
 import type { MeasureSlice } from '../measure/model';
 import { dayMetrics } from '../measure/model';
 import type { MoveSlice } from '../move/model';
+import type { Meal, MealKind, MealTag } from '../fuel/model';
 
 export type Targets = {
   /** Home blood pressure targets from the person's clinician. Empty until entered. */
@@ -130,6 +131,127 @@ export function glucoseInsights(stats: ReturnType<typeof glucoseStats>, t: Targe
   if (stats.veryLow > 0) out.push({ tone: 'warn', text: `Some readings were under 54 mg/dL. Sensors can read low when pressed on during sleep, but if you felt shaky, sweaty or confused, or this keeps happening, talk with your clinician.` });
   if (stats.cv > 36) out.push({ tone: 'info', text: `Your readings moved around a lot (variability ${stats.cv}%). Meals, activity and sleep all play a part; the Fuel log can help you see which.` });
   if (stats.inRange >= 90 && !stats.veryLow) out.push({ tone: 'good', text: `${stats.inRange}% of readings were inside ${t.glucoseLow}–${t.glucoseHigh} mg/dL.` });
+  return out;
+}
+
+// ------------------------------------------------------------------ glucose with meals and workouts (display only)
+const MIN = 60_000;
+const between = (rs: GlucoseReading[], from: number, to: number) => rs.filter((r) => r.t >= from && r.t <= to);
+
+/** When a logged meal happened, in the phone's local time. */
+export function mealTime(m: Pick<Meal, 'date' | 'time'>): number {
+  const d = parseDay(m.date);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime() + hm(m.time) * MIN;
+}
+
+export type MealResponse = {
+  id: string;
+  t: number;
+  kind: MealKind;
+  tags: MealTag[];
+  name?: string;
+  /** Average in the 30 minutes before the meal. */
+  before: number;
+  /** Highest reading in the two hours after. */
+  peak: number;
+  rise: number;
+  minutesToPeak: number;
+  /** Reading closest to two hours after, when there is one. */
+  at2h: number | null;
+  /** A recorded workout or walk that began within 90 minutes after the meal. */
+  movedAfter: boolean;
+  curve: { min: number; mgdl: number }[];
+};
+
+/** The two hours after each logged meal. Meals without enough sensor readings around them are left out. */
+export function mealResponses(readings: GlucoseReading[], meals: Meal[], workouts: DeviceWorkout[] = [], now = Date.now()): MealResponse[] {
+  const out: MealResponse[] = [];
+  for (const m of meals) {
+    const t = mealTime(m);
+    if (t + 120 * MIN > now) continue;
+    const pre = between(readings, t - 30 * MIN, t);
+    const post = between(readings, t, t + 120 * MIN);
+    if (!pre.length || post.length < 4) continue;
+    const before = Math.round(mean(pre.map((r) => r.mgdl))!);
+    const top = post.reduce((a, r) => (r.mgdl > a.mgdl ? r : a));
+    const late = between(readings, t + 105 * MIN, t + 135 * MIN).sort((a, b) => Math.abs(a.t - t - 120 * MIN) - Math.abs(b.t - t - 120 * MIN))[0];
+    out.push({
+      id: m.id,
+      t,
+      kind: m.kind,
+      tags: m.tags,
+      name: m.food?.name || m.note,
+      before,
+      peak: top.mgdl,
+      rise: Math.max(0, top.mgdl - before),
+      minutesToPeak: Math.round((top.t - t) / MIN),
+      at2h: late ? late.mgdl : null,
+      movedAfter: workouts.some((w) => w.start >= t - 5 * MIN && w.start <= t + 90 * MIN),
+      curve: [...pre, ...post.filter((r) => r.t > t)].map((r) => ({ min: Math.round((r.t - t) / MIN), mgdl: r.mgdl })),
+    });
+  }
+  return out.sort((a, b) => b.t - a.t);
+}
+
+export type WorkoutResponse = { id: string; t: number; label: string; minutes: number; before: number; lowest: number; after: number | null; change: number | null; /** A meal logged from 30 minutes before to an hour after: its rise would mask the workout's effect. */ mealNearby: boolean };
+
+/** Glucose around each recorded workout: the 30 minutes before, the lowest point during, and the hour after. */
+export function workoutResponses(readings: GlucoseReading[], workouts: DeviceWorkout[], now = Date.now(), meals: Meal[] = []): WorkoutResponse[] {
+  const mealTimes = meals.map(mealTime);
+  const seen = new Set<string>();
+  const out: WorkoutResponse[] = [];
+  for (const w of [...workouts].sort((a, b) => a.start - b.start)) {
+    const slot = `${Math.round(w.start / (10 * MIN))}`; // the same session can arrive from two apps
+    if (seen.has(slot) || w.end > now) continue;
+    const pre = between(readings, w.start - 30 * MIN, w.start);
+    const during = between(readings, w.start, w.end + 15 * MIN);
+    if (!pre.length || !during.length) continue;
+    seen.add(slot);
+    const post = between(readings, w.end, w.end + 60 * MIN);
+    const before = Math.round(mean(pre.map((r) => r.mgdl))!);
+    const after = post.length ? Math.round(mean(post.map((r) => r.mgdl))!) : null;
+    out.push({ id: w.id, t: w.start, label: w.label, minutes: Math.round((w.end - w.start) / MIN), before, lowest: Math.min(...during.map((r) => r.mgdl)), after, change: after === null ? null : after - before, mealNearby: mealTimes.some((t) => t >= w.start - 30 * MIN && t <= w.end + 60 * MIN) });
+  }
+  return out.sort((a, b) => b.t - a.t);
+}
+
+const avgRise = (xs: MealResponse[]) => (xs.length ? Math.round(mean(xs.map((x) => x.rise))!) : null);
+
+/** Average rise by meal, by what was on the plate, and with or without movement afterwards. Groups need 3 meals. */
+export function mealPatterns(rs: MealResponse[]) {
+  const group = (label: string, xs: MealResponse[]) => ({ label, n: xs.length, rise: avgRise(xs) });
+  const byKind = (['breakfast', 'lunch', 'dinner', 'snack'] as MealKind[]).map((k) => group(k[0].toUpperCase() + k.slice(1), rs.filter((r) => r.kind === k))).filter((g) => g.n >= 3);
+  const pair = (a: string, xa: MealResponse[], b: string, xb: MealResponse[]) => (xa.length >= 3 && xb.length >= 3 ? [group(a, xa), group(b, xb)] : null);
+  return {
+    byKind,
+    protein: pair('With protein', rs.filter((r) => r.tags.includes('protein')), 'Without', rs.filter((r) => !r.tags.includes('protein'))),
+    plants: pair('With vegetables or fruit', rs.filter((r) => r.tags.includes('plants')), 'Without', rs.filter((r) => !r.tags.includes('plants'))),
+    packaged: pair('Mostly packaged', rs.filter((r) => r.tags.includes('processed')), 'Not packaged', rs.filter((r) => !r.tags.includes('processed'))),
+    moved: pair('Moved within 90 minutes', rs.filter((r) => r.movedAfter), 'Did not', rs.filter((r) => !r.movedAfter)),
+  };
+}
+
+/** Plain observations from the person's own meals and workouts. They describe; they never tell anyone how to treat anything. */
+export function glucoseLifeInsights(rs: MealResponse[], ws: WorkoutResponse[]): Insight[] {
+  const out: Insight[] = [];
+  const p = mealPatterns(rs);
+  const said = (pr: ReturnType<typeof mealPatterns>['moved'], text: (a: number, b: number) => string, min = 8) => {
+    if (pr && pr[0].rise !== null && pr[1].rise !== null && pr[1].rise - pr[0].rise >= min) out.push({ tone: 'good', text: text(pr[0].rise, pr[1].rise) });
+  };
+  said(p.moved, (a, b) => `After meals followed by a walk or workout, your glucose rose about ${a} mg/dL on average, against about ${b} when you stayed still. Ten minutes of walking after eating is an easy thing to repeat.`);
+  said(p.protein, (a, b) => `Meals with protein rose about ${a} mg/dL on average; meals without rose about ${b}.`);
+  said(p.plants, (a, b) => `Meals with vegetables or fruit rose about ${a} mg/dL on average; meals without rose about ${b}.`);
+  if (p.packaged && p.packaged[0].rise !== null && p.packaged[1].rise !== null && p.packaged[0].rise - p.packaged[1].rise >= 8)
+    out.push({ tone: 'info', text: `Mostly packaged meals rose about ${p.packaged[0].rise} mg/dL on average, against about ${p.packaged[1].rise} for the rest.` });
+  const top = [...p.byKind].sort((a, b) => (b.rise ?? 0) - (a.rise ?? 0))[0];
+  if (p.byKind.length >= 2 && top?.rise) out.push({ tone: 'info', text: `${top.label} is your biggest rise on average (about ${top.rise} mg/dL over ${top.n} meals). That is the meal where a change would show up most clearly.` });
+  const drops = ws.filter((w) => w.change !== null && !w.mealNearby);
+  if (drops.length >= 3) {
+    const avg = Math.round(mean(drops.map((w) => w.change!))!);
+    out.push({ tone: 'info', text: avg <= -5 ? `In the hour after a workout your glucose averaged about ${Math.abs(avg)} mg/dL lower than before it.` : avg >= 5 ? `In the hour after a workout your glucose averaged about ${avg} mg/dL higher than before it. Hard sessions can do that for a short while.` : 'Your glucose stayed about level across your recent workouts.' });
+  }
+  if (ws.some((w) => w.lowest < 70)) out.push({ tone: 'warn', text: 'Glucose dipped under 70 mg/dL around at least one workout. If you felt shaky or light-headed, or you take glucose-lowering medicine, raise it with your clinician.' });
   return out;
 }
 
