@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#bfe6ea">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' blob: data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'none'">
+<title>Jonah Activity Club</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<main id="map" aria-label="Island map">
+  <div id="mapScroll"></div>
+  <div class="hud hud-l"><button id="hudStars" class="chip"></button></div>
+  <div class="hud hud-r"><button id="hudVoice" class="rb"></button><button id="hudGrown" class="rb grown" aria-label="Grown-ups: press and hold for three seconds"></button></div>
+  <div id="grownTip" role="status">Grown-ups: press and hold</div>
+  <button id="nudgeL" class="rb nudge" aria-label="Look left"></button>
+  <button id="nudgeR" class="rb nudge" aria-label="Look right"></button>
+</main>
+
+<section id="stage" class="stage" hidden>
+  <div class="bar"><button id="btnBack" class="rb" aria-label="Back"></button><div id="barMid"></div><button id="btnSay" class="rb" aria-label="Say it again"></button></div>
+  <div id="body"></div>
+</section>
+
+<div id="cele" hidden></div>
+
+<section id="title">
+  <div class="title-in">
+    <h1><span>Jonah</span><span>Activity</span><span>Club</span></h1>
+    <div id="titleArt"></div>
+    <button id="titlePlay" class="rb huge go" aria-label="Play"></button>
+  </div>
+</section>
+
+<div id="gate" hidden></div>
+<section id="parent" hidden aria-label="Grown-ups area"></section>
+<div id="printSheet" aria-hidden="true"></div>
+
+<script src="js/art.js"></script>
+<script src="js/core.js"></script>
+<script src="js/map.js"></script>
+<script src="js/color.js"></script>
+<script src="js/trace.js"></script>
+<script src="js/tide.js"></script>
+<script src="js/maze.js"></script>
+<script src="js/words.js"></script>
+<script src="js/stickers.js"></script>
+<script src="js/parent.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
